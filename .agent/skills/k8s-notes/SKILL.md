@@ -1,48 +1,36 @@
 ---
 name: k8s-notes
-description: Generates and curates a compact set of structured Kubernetes (CKAD) study notes in Markdown format.
+description: Manages and curates a structured Kubernetes (CKAD) study notes project with standardized file layouts across numbered domains.
 ---
 
-# K8s Notes Generator & Curator (CKAD)
+# K8s Notes Manager & Curator (CKAD)
 
-This skill guides the creation, curation, and maintenance of concise, highly actionable Kubernetes study notes specifically tailored for the Certified Kubernetes Application Developer (CKAD) exam (aligned with official CNCF/Linux Foundation curriculum: K8s v1.35).
+This skill manages a structured set of Kubernetes study notes for the Certified Kubernetes Application Developer (CKAD) exam (aligned with official CNCF/Linux Foundation curriculum v1.35).
 
-## Directory & File Structure
+> **Current date**: 2026-07-26
 
-Notes are organized by key CKAD concepts/domains into dedicated directories. Main concepts or specific submechanics (e.g., taints/tolerations, node affinity, sidecars) use the exact same standardized 5-file layout:
+## Environment
+
+| Field | Value |
+|---|---|
+| Working directory | `/home/matti/k8s-notes` |
+| Workspace root | `/` |
+| Curriculum version | CNCF/Linux Foundation CKAD v1.35 |
+
+## Organizational Principles
+
+Notes are organized by numbered CKAD domains and submechanics. Each domain and submechanics folder follows the same standardized 5-file layout:
 
 ```text
-<concept>/
+<domain>/
 ├── 1-yaml-structure.md      # Minimal/essential YAML templates with key fields
-├── 2-in-depth-mechanics.md  # Core behavior, state transitions, runtime mechanics, edge cases
+├── 2-mechanics/             # Subdirectory with granular in-depth articles
 ├── 3-imperative-commands.md # Fast `kubectl` commands, dry-run flags, editable vs non-editable fields
 ├── 4-debugging.md           # Troubleshooting steps, common failure modes, quick remedies
 └── 5-ckad-tips.md           # Exam-specific time-savers, shortcuts, and key pitfalls
 ```
 
-### Subfolders for Submechanics
-For complex concepts with distinct subcomponents or specialized mechanics, create subfolders inside the main concept folder. Each subfolder **must follow the exact same 5-file structure**:
-
-```text
-pods/
-├── 1-yaml-structure.md
-├── 2-in-depth-mechanics.md
-├── 3-imperative-commands.md
-├── 4-debugging.md
-├── 5-ckad-tips.md
-├── multi-container/
-│   ├── 1-yaml-structure.md
-│   ├── 2-in-depth-mechanics.md
-│   ├── 3-imperative-commands.md
-│   ├── 4-debugging.md
-│   └── 5-ckad-tips.md
-└── scheduling-taints-tolerations/
-    ├── 1-yaml-structure.md
-    ├── 2-in-depth-mechanics.md
-    ├── 3-imperative-commands.md
-    ├── 4-debugging.md
-    └── 5-ckad-tips.md
-```
+Domains that contain distinct submechanics use a three-level hierarchy: the domain directory contains a top-level set of 5 files plus subdirectories for each submechanics group, each following the same 5-file layout. The `2-mechanics/` subdirectory holds granular articles for each submechanics topic.
 
 ---
 
@@ -90,8 +78,9 @@ Ensure notes comprehensively cover all 5 official CKAD domains:
 - Provide clean, minimal, syntax-accurate YAML snippets.
 - Use line annotations/comments pointing out essential fields.
 - Highlight required vs optional fields relevant to speed on the exam.
+- Must contain a **"## Field Reference"** table with columns: Field | Required/Optional/Important | Editable with `kubectl edit` | Notes & Best Usage.
 
-### 2. `2-in-depth-mechanics.md`
+### 2. `2-mechanics/` articles (`01-*.md`, `02-*.md`, etc.)
 - Explain inner workings, lifecycle states, and behavioral logic (e.g. how rolling updates compute surge/unavailable, how PVC binds to PV, how network policies behave with default-deny).
 - Address edge cases, default settings (e.g. default restartPolicy, backoffLimit, DNS resolution formats).
 - Describe relationships between Kubernetes primitives (e.g., Service selector matching Pod labels).
@@ -111,4 +100,3 @@ Ensure notes comprehensively cover all 5 official CKAD domains:
 - Vim configuration snippet (`set ts=2 sw=2 et`).
 - Official documentation search terms and direct doc links permitted during the exam.
 - Critical pitfall checklists (e.g., forgetting container ports, wrong selector labels, missing namespace flags).
-
