@@ -9,6 +9,12 @@
 2. **NodeSelector vs Affinity**: NodeSelector is simple equality; affinity supports richer operators.
 3. **Taints repel by default**: Node tainted without toleration = Pods won't schedule.
 
+## Kubeconfig Tips
+- Before editing the kubeconfig, copy it as a backup: `cp ~/.kube/config ~/.kube/config.bak`
+- To verify the kubeconfig after changes: `kubectl config view`
+- The kubeconfig is freshly read at every `kubectl` command, so it doesn't need to be reloaded — changes take effect immediately.
+- If you switch context, `kubectl` itself may be slow on the first run — it has to do a fresh TLS handshake to the new cluster and/or mint a new token via an exec-based credential plugin. Either pre-authenticate before switching (e.g. `aws sso login` or `gcloud auth login`) or just wait until it works again. `kubectl get nodes` is the fast test to confirm it's ready. Use `kubectl get nodes -v=6` to see where the delay is coming from.
+
 ## Time-Saver
 ```bash
 alias k=kubectl
