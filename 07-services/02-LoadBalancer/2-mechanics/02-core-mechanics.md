@@ -1,0 +1,160 @@
+# Services - LoadBalancer - Core Mechanics
+
+The LoadBalancer Service type extends NodePort by asking the cloud provider to provision an external load balancer that forwards traffic to the nodePort on each node. This is the standard way to expose Kubernetes workloads in cloud environments.
+
+## How LoadBalancer Works
+
+When you create a Service of type `LoadBalancer`, the Kubernetes control plane performs the following steps:
+
+```mermaid
+flowchart TD
+    A[Create Service with type: LoadBalancer] --> B{API Server validates spec}
+    B --> C[Create ClusterIP internally]
+    C --> D[Allocate NodePort from range 30000-32767]
+    D --> E[Cloud Controller Manager detects new Service]
+    E --> F[CCM calls cloud provider API to create LB]
+    F --> G[Cloud provider provisions external LB]
+    G --> H[Cloud LB gets external IP/hostname]
+    H --> I[External IP is set on Service status]
+    I --> J[Cloud LB health-checks node:nodePort]
+    J --> K[Cloud LB forwards traffic to healthy nodes]
+    K --> L[kube-proxy on node DNATs to ClusterIP]
+    L --> M[kube-proxy DNATs to PodIP:targetPort]
+```
+
+## The Cloud Controller Manager (CCM)
+
+The Cloud Controller Manager is the component responsible for integrating Kubernetes with cloud providers. It runs as a pod in the `kube-system` namespace and handles:
+
+- **Node discovery**: Identifying nodes in the cloud and their properties.
+- **Route management**: Setting up cloud networking routes.
+- **Service management**: Creating and deleting cloud load balancers for LoadBalancer Services.
+
+```bash
+# Check if CCM is running
+kubectl get pods -n kube-system | grep cloud-controller
+
+# Check CCM logs for LoadBalancer-related activity
+kubectl logs -n kube-system deployment/cloud-controller-manager | grep -i "loadbalancer\|service"
+
+# Check the cloud provider configuration on the API server
+ps aux | grep kube-apiserver | grep cloud-provider
+```
+
+## Step-by-Step Traffic Flow
+
+```mermaid
+flowchart LR
+    Internet((Internet)) -->|"1. Connect to LB IP:80"| CloudLB[Cloud Load Balancer]
+    CloudLB -->|"2. Health check passes"| Node1[Node 1:30080]
+    CloudLB -->|"2. Health check passes"| Node2[Node 2:30080]
+    Node1 -->|"3. kube-proxy DNAT"| ClusterIP1[ClusterIP:80]
+    Node2 -->|"3. kube-proxy DNAT"| ClusterIP2[ClusterIP:80]
+    ClusterIP1 -->|"4. DNAT to Pod"| Pod1[Pod 10.244.1.5:8080]
+    ClusterIP1 -->|"4. DNAT to Pod"| Pod2[Pod 10.244.2.7:8080]
+    ClusterIP2 -->|"4. DNAT to Pod"| Pod1
+    ClusterIP2 -->|"4. DNAT to Pod"| Pod2
+```
+
+### Step 1: Client connects to the cloud load balancer's external IP.
+The cloud LB has a static (or ephemeral) external IP assigned by the cloud provider.
+
+### Step 2: The cloud LB performs health checks on each node's nodePort.
+If a node's nodePort is not responding (e.g., no healthy Pods on that node), the cloud LB stops sending traffic to that node.
+
+### Step 3: The cloud LB forwards traffic to a healthy node's nodePort.
+kube-proxy on that node intercepts the traffic and DNATs it to the ClusterIP.
+
+### Step 4: kube-proxy DNATs the traffic to a backend Pod.
+The Pod receives the request, processes it, and sends the response back through the same path.
+
+## Health Checking
+
+Cloud load balancers perform health checks on each node's nodePort to determine which nodes are healthy:
+
+```mermaid
+flowchart TD
+    CloudLB[Cloud Load Balancer] -->|"Health check TCP to Node1:30080"| Node1[Node 1]
+    CloudLB -->|"Health check TCP to Node2:30080"| Node2[Node 2]
+    Node1 -->|"NodePort responds"| Healthy1[✓ Healthy]
+    Node2 -->|"NodePort does not respond"| Unhealthy[✗ Unhealthy]
+    CloudLB -->|"Send traffic only to"| Healthy1
+```
+
+The health check is a simple TCP connection attempt to the nodePort. If the connection succeeds, the node is considered healthy. If it fails, the cloud LB stops routing traffic to that node.
+
+**Important**: The health check does not verify that the application is healthy — only that something is listening on the nodePort. If kube-proxy is running and the nodePort is open, the health check passes even if the backend Pods are not ready.
+
+## Layer 4 Operation
+
+LoadBalancer Services operate at **Layer 4 (Transport Layer)** of the OSI model. This means:
+
+- They load balance based on IP addresses and TCP/UDP ports.
+- They do not inspect HTTP headers, URLs, or hostnames.
+- They cannot perform path-based or host-based routing.
+- TLS termination must happen at the backend Pods or at a Layer 7 proxy (like Ingress).
+
+```yaml
+# LoadBalancer is purely Layer 4
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: tcp-app
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 8443
+```
+
+For Layer 7 (HTTP/HTTPS) routing with host/path rules, use **Ingress** instead.
+
+## Cloud Provider-Specific Behavior
+
+### AWS
+
+- Creates an **Application Load Balancer (ALB)** for HTTP/HTTPS or a **Network Load Balancer (NLB)** for TCP/UDP.
+- Supports annotations for internal LB, scheme, subnets, and security groups.
+- The external IP is an DNS name (e.g., `k8s-web-abc123.elb.amazonaws.com`), not a static IP.
+
+```bash
+# Check the LoadBalancer status
+kubectl get svc web-lb -o jsonpath='{.status.loadBalancer.ingress}'
+# Output: [{"hostname": "k8s-web-abc123.elb.amazonaws.com"}]
+```
+
+### GCP
+
+- Creates a **Google Cloud Load Balancer** (HTTP(S) LB for HTTP, Network LB for TCP/UDP).
+- Supports annotations for internal LB, static IP, and backend config.
+- The external IP is a static IP allocated from the GCP project.
+
+```bash
+# Check the LoadBalancer status
+kubectl get svc web-lb -o jsonpath='{.status.loadBalancer.ingress}'
+# Output: [{"ip": "203.0.113.50"}]
+```
+
+### Azure
+
+- Creates an **Azure Load Balancer** (Standard SKU recommended).
+- Supports annotations for internal LB, SKU, and frontend IP configuration.
+- The external IP is a public IP resource allocated from the Azure subscription.
+
+```bash
+# Check the LoadBalancer status
+kubectl get svc web-lb -o jsonpath='{.status.loadBalancer.ingress}'
+# Output: [{"ip": "20.30.40.50"}]
+```
+
+## Key Takeaways
+
+- LoadBalancer creates a NodePort internally and asks the cloud provider for an external LB.
+- The cloud provider's CCM handles the provisioning and configuration.
+- Health checks are performed on each node's nodePort.
+- LoadBalancer operates at Layer 4 (TCP/UDP).
+- For Layer 7 routing, use Ingress instead.
+- Each LoadBalancer Service provisions a real cloud load balancer with associated costs.
