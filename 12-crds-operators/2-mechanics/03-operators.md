@@ -1,10 +1,10 @@
 # Operators
 
-An Operator is a method of packaging, deploying, and managing a Kubernetes application. It extends Kubernetes by using Custom Resources and custom controllers to automate operational tasks that would otherwise require human intervention.
+An Operator is a controller packaged with a CRD to automate the full lifecycle of a complex application. It encodes operational knowledge (how to deploy, configure, backup, scale, and recover an application) into software. The controller code runs inside a Pod—a Kubernetes compute unit that holds the container executing the reconciliation loop. An Operator is not a new mechanism; it is the name given to the bundle of a CRD plus a custom controller written to manage it.
 
 ## What is an Operator?
 
-An Operator is a controller that watches Custom Resources and automates the full lifecycle of a complex application. It encodes operational knowledge (how to deploy, configure, backup, scale, and recover an application) into software.
+An Operator is a controller packaged with a CRD that watches Custom Resources and automates the full lifecycle of a complex application. It encodes operational knowledge (how to deploy, configure, backup, scale, and recover an application) into software. The controller code runs inside a Pod—a Kubernetes compute unit that holds the container executing the reconciliation loop.
 
 ### Operator Pattern
 

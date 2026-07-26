@@ -21,3 +21,13 @@
 
 4. **CR Not Accepted**
    *Root Cause*: API version mismatch, kind mismatch, or missing required spec fields.
+
+## Additional Troubleshooting
+
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| CRD not appearing in `kubectl get crds` | API server extension server not ready | Wait a few seconds; check API server health |
+| `schema is empty` | CRD created without `openAPIV3Schema` | Add validation schema to CRD definition |
+| Custom resource rejected | Does not match CRD schema | Validate YAML against `openAPIV3Schema` |
+| `stored object is too large` | Resource exceeds `maxRequestBytes` | Reduce resource size or adjust API server limit |
+| `no matches for kind` | CRD not applied or not established | Verify CRD exists: `kubectl get crd <name>` |

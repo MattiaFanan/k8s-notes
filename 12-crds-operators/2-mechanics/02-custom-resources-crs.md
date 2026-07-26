@@ -1,6 +1,6 @@
 # Custom Resources (CRs)
 
-Custom Resources (CRs) are instances of Custom Resource Definitions (CRDs). They are Kubernetes API objects stored in `etcd` just like native resources (Pods, Services, etc.), but their schema is defined by a CRD rather than by the Kubernetes core API.
+Custom Resources (CRs) are instances of Custom Resource Definitions (CRDs). They are Kubernetes API objects stored in etcd just like native resources (Pods, Services, etc.), but their schema is defined by a CRD rather than by the Kubernetes core API. A CR is inert without a controller — it is just declarative configuration data that does nothing on its own.
 
 ## CRs vs Native Resources
 

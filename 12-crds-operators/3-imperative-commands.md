@@ -1,4 +1,4 @@
-# CRDs & Operators - Imperative Commands
+# CRDs & Operators - Imperative Commands (example crontab CRD)
 
 ```bash
 # Create CRD
@@ -33,4 +33,13 @@ kubectl get crontab my-new-cron -o jsonpath='{.status}'
 ```bash
 kubectl delete crontab my-new-cron
 kubectl delete crd crontabs.stable.example.com
+```
+
+## Inspect CRD Fields
+
+```bash
+# Explain CRD fields after applying
+kubectl explain crontab
+kubectl explain crontab.spec
+kubectl explain crontab.spec.cronSpec
 ```

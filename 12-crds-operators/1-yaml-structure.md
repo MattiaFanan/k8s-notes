@@ -1,6 +1,6 @@
 # CRDs & Operators - YAML Structure
 
-Custom Resource Definitions (CRDs) let you extend Kubernetes with custom resource types, and Operators use custom resources to automate complex application lifecycle management. A CRD defines the schema and group for a new resource kind, while a custom resource is an instance of that kind. Operators typically run as Deployments that watch for custom resources and reconcile the desired state. The examples below show a CRD definition, a custom resource instance, and a simple operator Deployment.
+Custom Resource Definitions (CRDs) register a new resource kind with the Kubernetes API server, making that name available in the cluster. A CRD is a schema definition — nothing runs. A custom resource (CR) is an inert instance of that schema stored in etcd. The actual work — watching CRs and reconciling desired state — is done by a controller running inside a Pod (typically a Deployment). Together, the CRD (schema) and the controller (logic in a Pod) packaged as a bundle are called an Operator. The examples below show a CRD definition, a custom resource instance, and the Deployment that runs the controller.
 
 ## CustomResourceDefinition (CRD)
 
@@ -50,7 +50,7 @@ spec:
   replicas: 3
 ```
 
-## Operator Example: Deployment-Based Operator
+## Runtime: Deployment Running the Controller
 
 ```yaml
 apiVersion: apps/v1
@@ -68,7 +68,7 @@ spec:
         app: my-operator
     spec:
       containers:
-  - name: operator
+      - name: operator
         image: my-operator:1.0
 ```
 

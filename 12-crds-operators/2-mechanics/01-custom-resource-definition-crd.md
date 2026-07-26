@@ -1,6 +1,6 @@
 # Custom Resource Definitions (CRDs)
 
-Custom Resource Definitions extend the Kubernetes API by defining new resource types. CRDs are the foundation of the Kubernetes extensibility model and are the first step in building an Operator.
+Custom Resource Definitions extend the Kubernetes API by defining new resource types. A CRD makes a new name available in Kubernetes — registering a resource kind with the API server so users can create, read, update, and delete instances of that type. A CRD is a schema definition. Nothing runs. CRDs are the foundation of the Kubernetes extensibility model and the first step in building an Operator (a CRD plus a custom controller).
 
 ## What is a CRD?
 
