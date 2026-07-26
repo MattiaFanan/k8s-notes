@@ -143,6 +143,76 @@ kubectl get events -n production --field-selector reason=FailedCreate
 | `storage.k8s.io/v1beta1` | `storage.k8s.io/v1` | StorageClass |
 | `admissionregistration.k8s.io/v1beta1` | `admissionregistration.k8s.io/v1` | ValidatingWebhookConfiguration, MutatingWebhookConfiguration |
 
+## API Group Version Reference
+
+Current stable API versions for each resource group:
+
+| API Group | Stable Version | Resource Types |
+|---|---|---|
+| `core` (no group) | `v1` | Pod, Service, ConfigMap, Secret, PersistentVolume, PersistentVolumeClaim, Namespace, Node, Event, ServiceAccount, ResourceQuota, LimitRange, Namespace, Node, PersistentVolume, PersistentVolumeClaim, Pod, PodTemplate, ReplicationController, ResourceQuota, Secret, Service, ServiceAccount |
+| `apps` | `v1` | Deployment, DaemonSet, ReplicaSet, StatefulSet |
+| `batch` | `v1` | Job, CronJob |
+| `policy` | `v1` | PodSecurityPolicy |
+| `networking.k8s.io` | `v1` | Ingress, NetworkPolicy |
+| `storage.k8s.io` | `v1` | StorageClass, VolumeAttachment, CSIStorageCapacity |
+| `autoscaling` | `v2` | HorizontalPodAutoscaler |
+| `admissionregistration.k8s.io` | `v1` | ValidatingWebhookConfiguration, MutatingWebhookConfiguration |
+| `rbac.authorization.k8s.io` | `v1` | Role, ClusterRole, RoleBinding, ClusterRoleBinding |
+| `apiextensions.k8s.io` | `v1` | CustomResourceDefinition |
+| `apiextensions.k8s.io` | `v1beta1` | CustomResourceDefinition (beta, being migrated to v1) |
+| `coordination.k8s.io` | `v1` | Lease |
+| `flowcontrol.apiserver.k8s.io` | `v1beta3` | FlowSchema, PriorityLevelConfiguration |
+| `node.k8s.io` | `v1` | RuntimeClass |
+| `scheduling.k8s.io` | `v1` | PriorityClass |
+| `authentication.k8s.io` | `v1` | TokenRequest |
+| `authorization.k8s.io` | `v1` | LocalSubjectAccessReview, SelfSubjectAccessReview, SelfSubjectRulesReview, SubjectAccessReview |
+| `certificates.k8s.io` | `v1` | CertificateSigningRequest |
+| `discovery.k8s.io` | `v1` | EndpointSlice |
+| `events.k8s.io` | `v1` | Event |
+| `metrics.k8s.io` | `v1beta1` | NodeMetrics, PodMetrics |
+| `snapshot.storage.k8s.io` | `v1` | VolumeSnapshot, VolumeSnapshotContent, VolumeSnapshotClass |
+
+> **Key insight**: The `apiVersion` field in a YAML manifest is the **manifest version**. The **storage version** is set by the author of the resource — specifically, whoever defines the resource with `storage: true` in its specification. For built-in Kubernetes resources, the SIG authors designate one version as the storage version, typically GA. When a standard resource is created, the API server stores it at that designated GA storage version internally. As a result, the user has no say in the storage version for standard resources; they can only control the manifest version in their YAML.
+
+## Two Roles of `apiVersion`
+
+Kubernetes uses `apiVersion` in two distinct ways:
+
+### 1. Storage Version (etcd)
+
+The **storage version** is the version used to persist objects in etcd. It is the canonical internal format. All API versions are converted to the storage version when written to etcd, and converted back when read.
+
+- For built-in resources, the storage version is always the current GA version (e.g., `apps/v1`, `storage.k8s.io/v1`, `batch/v1`) as designated by the resource author (the SIG or maintainers) using `storage: true` in the resource's specification. **The user has no control over this** — it is set at the resource definition level.
+- For Custom Resource Definitions (CRDs), the `storage: true` flag within `spec.versions` determines which version is the persistent storage format. Exactly one version must have `storage: true`. This is set by whoever authors the CRD (the operator developer), not the end user.
+- When the storage version changes (e.g., during migration), the API server performs a one-time conversion of all stored objects.
+
+### 2. Manifest Version (client-side)
+
+The **manifest `apiVersion`** is the version specified in YAML files when creating or updating resources. It determines which API group/version the API server uses to validate and process the request.
+
+- Can be any served version (alpha, beta, or GA) for that resource type.
+- The API server converts the manifest version to the storage version before persisting.
+- Example: A manifest with `apiVersion: apps/v1` is converted to the storage version internally.
+
+### How They Relate
+
+```
+Manifest (apiVersion: apps/v1beta1)
+    │
+    ▼
+API Server (validates against apps/v1beta1 schema)
+    │
+    ▼
+Convert to storage version (apps/v1)
+    │
+    ▼
+etcd (persisted as apps/v1)
+```
+
+When reading back, the API server converts from the storage version to the version requested by the client (or the version the resource was originally created with).
+
+> **Pitfall**: If a beta API version is removed, resources stored in that version can no longer be read or managed. This is why migrations to the GA storage version must happen before the beta version is removed from the API server.
+
 ## Using kubectl convert
 
 `kubectl convert` can automatically migrate resources between API versions.

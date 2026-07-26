@@ -79,7 +79,7 @@ spec:
 | CRD `spec.group` | Required | Yes | DNS label for the API group (e.g. `stable.example.com`). Must be a valid RFC 1123 subdomain. |
 | CRD `spec.versions[].name` | Required | Yes | Version identifier (e.g. `v1`). Multiple versions can be served simultaneously. |
 | CRD `spec.versions[].served` | Required | Yes | Must be `true` for the version to be served by the API server. |
-| CRD `spec.versions[].storage` | Required | Yes | Exactly one version must have `storage: true`. Determines which version persists etcd data. |
+| CRD `spec.versions[].storage` | Required | Yes | Exactly one version must have `storage: true`. Set by the CRD author (operator developer), not end users. This determines which version persists etcd data as the canonical GA format. |
 | CRD `spec.versions[].schema` | Important | Yes | Contains the `openAPIV3Schema` used for CR validation and pruning. |
 | CRD `spec.scope` | Required | Yes | Either `Namespaced` or `Cluster`. Determines whether CRs live in a namespace or at cluster scope. |
 | CRD `spec.names.plural` | Required | Yes | Plural name used in the API path (e.g. `crontabs`). Must be a valid DNS subdomain. |

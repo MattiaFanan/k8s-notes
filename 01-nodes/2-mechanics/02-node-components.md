@@ -64,6 +64,8 @@ ps aux | grep kubelet | grep config
 | Flag | Default | Purpose |
 | :--- | :--- | :--- |
 | `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials (see [`06-kubeconfig.md`](../06-kubeconfig.md) for full kubeconfig reference) |
+| `--feature-gates` | (empty) | Comma-separated list of feature gates to enable/disable (e.g., `GracefulNodeShutdown=true`, `CSIMigration=true`) |
+| `--runtime-config` | (empty) | Comma-separated list of API versions to enable/disable (e.g., `api/all=true`, `apps/v1beta1=true`, `api/v1=false`). Deprecated in 1.20; use `--feature-gates` instead |
 | `--container-runtime` | `remote` | CRI socket endpoint |
 | `--container-runtime-endpoint` | `unix:///var/run/containerd/containerd.sock` | CRI socket |
 | `--image-service-endpoint` | `unix:///var/run/containerd/containerd.sock` | Image service socket |

@@ -166,7 +166,7 @@ spec:
 ```
 
 - **`served: true`**: The version is available via the API server.
-- **`storage: true`**: The version is the persistent storage format (exactly one version must have `storage: true`).
+- **`storage: true`**: This version is the persistent storage format in etcd (exactly one version must have `storage: true`). It is set by whoever authors the CRD (the operator developer), not by end users. Once set to `true` for a GA version like `v1`, the API server uses that as the canonical internal format.
 - **Migration**: When `storage` is changed from one version to another, the API server converts stored data to the new version.
 
 > **Pitfall**: Changing `storage: true` from one version to another triggers a conversion. If no conversion webhook is configured, the stored data may be incompatible with the new schema, causing read errors.
