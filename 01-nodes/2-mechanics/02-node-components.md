@@ -63,7 +63,7 @@ ps aux | grep kubelet | grep config
 
 | Flag | Default | Purpose |
 | :--- | :--- | :--- |
-| `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials |
+| `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials (see [`06-kubeconfig.md`](../06-kubeconfig.md) for full kubeconfig reference) |
 | `--container-runtime` | `remote` | CRI socket endpoint |
 | `--container-runtime-endpoint` | `unix:///var/run/containerd/containerd.sock` | CRI socket |
 | `--image-service-endpoint` | `unix:///var/run/containerd/containerd.sock` | Image service socket |
@@ -320,7 +320,7 @@ kubectl rollout restart daemonset -n kube-system calico-node
 # Check kubelet logs for auth errors
 journalctl -u kubelet -f | grep -i "forbidden\|unauthorized\|connection refused"
 
-# Common cause: kubeconfig expired or rotated
+# Common cause: kubeconfig expired or rotated (see [`06-kubeconfig.md`](../06-kubeconfig.md) for kubeconfig reference)
 # Check kubelet.conf validity
 openssl x509 -in /var/lib/kubelet/kubelet.conf -text -noout | grep Not
 ```

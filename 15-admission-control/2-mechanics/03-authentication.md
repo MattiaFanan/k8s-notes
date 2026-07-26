@@ -78,6 +78,8 @@ kubectl config set-credentials my-user \
   --auth-provider-arg=refresh-token=<refresh_token>
 ```
 
+> For a full reference on kubeconfig commands and fields, see [`../../01-nodes/2-mechanics/06-kubeconfig.md`](../../01-nodes/2-mechanics/06-kubeconfig.md).
+
 - The IdP issues an ID token and optionally an access token.
 - The API server validates the ID token against the IdP's public keys.
 - The `oidc-username-claim` maps the token's claim to the Kubernetes username.
@@ -249,8 +251,8 @@ flowchart TD
 
 ## Troubleshooting
 
-- **`x509: certificate signed by unknown authority`**: The CA certificate is not trusted. Check `--certificate-authority` in the kubectl config.
-- **`client certificate required`**: No client certificate was provided. Check kubectl configuration for `client-certificate` and `client-key`.
+- **`x509: certificate signed by unknown authority`**: The CA certificate is not trusted. Check `--certificate-authority` in the kubectl config (see [`06-kubeconfig.md`](../../01-nodes/2-mechanics/06-kubeconfig.md) for kubeconfig reference).
+- **`client certificate required`**: No client certificate was provided. Check kubectl configuration for `client-certificate` and `client-key` (see [`06-kubeconfig.md`](../../01-nodes/2-mechanics/06-kubeconfig.md)).
 - **`token expired`**: The bearer token or OIDC token has expired. Re-authenticate or refresh the token.
 - **`service account token not found`**: The service account may not have a secret. Create one or use `kubectl create token`.
 - **`authentication failed`**: The authentication method may not be configured correctly on the API server. Check the API server logs.
