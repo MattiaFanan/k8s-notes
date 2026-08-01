@@ -34,12 +34,11 @@
 | `07-services/04-Ingress/5-ckad-tips.md` | Ingress CKAD tips | Services and Networking (SN-03) |
 | `08-networkpolicies/5-ckad-tips.md` | NetworkPolicies CKAD tips | Services and Networking (SN-01) |
 | `09-rbac/5-ckad-tips.md` | RBAC CKAD tips | Application Environment (CS-02, CS-06) |
-| `10-security/5-ckad-tips.md` | Security contexts CKAD tips | Application Environment (CS-07) |
-| `11-pod-security/5-ckad-tips.md` | Pod Security Standards CKAD tips | Application Environment (CS-07) |
-| `12-crds-operators/5-ckad-tips.md` | CRDs/Operators CKAD tips | Application Environment (CS-01) |
-| `13-helm-kustomize/5-ckad-tips.md` | Helm/Kustomize CKAD tips | Application Deployment (AD-03, AD-04) |
-| `14-observability/5-ckad-tips.md` | Observability CKAD tips | Observability (OM-01 to OM-05) |
-| `15-admission-control/5-ckad-tips.md` | Admission control CKAD tips | Application Environment (CS-02) |
+| `02-pods/2-mechanics/04-security/5-ckad-tips.md` | Pod Security Standards, security contexts & probes CKAD tips | Application Environment (CS-07) |
+| `10-crds-operators/5-ckad-tips.md` | CRDs/Operators CKAD tips | Application Environment (CS-01) |
+| `11-helm-kustomize/5-ckad-tips.md` | Helm/Kustomize CKAD tips | Application Deployment (AD-03, AD-04) |
+| `12-observability/5-ckad-tips.md` | Observability CKAD tips | Observability (OM-01 to OM-05) |
+| `13-admission-control/5-ckad-tips.md` | Admission control CKAD tips | Application Environment (CS-02) |
 
 ## Exam Time-Savers
 
@@ -57,7 +56,7 @@
 ## CKAD Domain Mapping
 
 - **Application Design and Build (20%)**: `02-pods/`, `03-deployments/`, `04-daemonsets/`
-- **Application Deployment (20%)**: `03-deployments/`, `13-helm-kustomize/`
-- **Application Observability and Maintenance (15%)**: `14-observability/`
-- **Application Environment, Configuration and Security (25%)**: `05-storage/`, `06-configmaps-secrets/`, `09-rbac/`, `10-security/`, `11-pod-security/`, `15-admission-control/`
+- **Application Deployment (20%)**: `03-deployments/`, `11-helm-kustomize/`
+- **Application Observability and Maintenance (15%)**: `12-observability/`
+- **Application Environment, Configuration and Security (25%)**: `05-storage/`, `06-configmaps-secrets/`, `09-rbac/`, `02-pods/2-mechanics/04-security/`, `13-admission-control/`
 - **Services and Networking (20%)**: `07-services/`, `08-networkpolicies/`

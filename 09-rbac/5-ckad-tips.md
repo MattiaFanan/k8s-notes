@@ -30,4 +30,4 @@ k auth can-i --list --as=dev-user -n production
 - [RBAC YAML Structure](1-yaml-structure.md)
 - [RBAC Core Components](2-mechanics/03-core-components.md)
 - [RBAC Common Exam Patterns](2-mechanics/02-common-exam-patterns.md)
-- [Admission Control](../../15-admission-control/2-mechanics/01-admission-controllers.md)
+- [Admission Control](../../13-admission-control/2-mechanics/01-admission-controllers.md)

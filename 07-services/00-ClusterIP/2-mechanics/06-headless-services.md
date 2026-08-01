@@ -139,4 +139,4 @@ kubectl exec -it debug-pod -- nslookup headless-svc.default.svc.cluster.local
 
 - [ClusterIP CKAD Tips](00-ClusterIP/5-ckad-tips.md)
 - [Services Overview](../../0-overview.md)
-- [StatefulSets](../../12-crds-operators/2-mechanics/03-operators.md)
+- [StatefulSets](../../10-crds-operators/2-mechanics/03-operators.md)

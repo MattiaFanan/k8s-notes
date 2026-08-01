@@ -35,4 +35,4 @@ kubectl patch sa default -p '{"imagePullSecrets": [{"name": "my-registry-cred"}]
 - [Authentication](2-mechanics/03-authentication.md)
 - [Authorization](2-mechanics/04-authorization.md)
 - [ImagePullSecrets](2-mechanics/06-imagepullsecrets.md)
-- [Pod Security Standards](../../11-pod-security/1-yaml-structure.md)
+- [Pod Security Standards](../../02-pods/2-mechanics/04-security/1-yaml-structure.md)

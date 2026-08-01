@@ -154,5 +154,5 @@ kubectl get secret regcred -n myns -o jsonpath='{.data.\.dockerconfigjson}' | ba
 
 ## See also
 
-- [ImagePullSecrets](../../15-admission-control/2-mechanics/06-imagepullsecrets.md)
+- [ImagePullSecrets](../../13-admission-control/2-mechanics/06-imagepullsecrets.md)
 - [Pods - YAML Structure](../../02-pods/1-yaml-structure.md)
