@@ -83,6 +83,7 @@ spec:
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   startingDeadlineSeconds: 300
+  suspend: false
   jobTemplate:
     spec:
       backoffLimit: 1
@@ -95,6 +96,28 @@ spec:
             image: cleanup:1.0
             command: ["/bin/cleanup.sh"]
 ```
+
+### suspend
+
+The `suspend` field controls whether the CronJob controller creates new Jobs. When `suspend` is `true`, the controller will not create new Jobs, but existing Jobs will continue to run.
+
+```bash
+# Suspend a CronJob
+kubectl patch cronjob daily-cleanup -p '{"spec": {"suspend": true}}'
+
+# Resume a CronJob
+kubectl patch cronjob daily-cleanup -p '{"spec": {"suspend": false}}'
+
+# Check if a CronJob is suspended
+kubectl get cronjob daily-cleanup -o jsonpath='{.spec.suspend}'
+```
+
+**When to use `suspend`:**
+- Temporarily pausing a CronJob without deleting it
+- Preventing a CronJob from running during maintenance windows
+- Debugging issues with a CronJob without it creating new Jobs
+
+**Important:** `suspend` only affects the creation of new Jobs. Existing Jobs and their Pods continue to run.
 
 ### Cron Syntax Reference
 

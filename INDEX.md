@@ -41,6 +41,7 @@
 | `02-pods/2-mechanics/00-multi-container-pods/5-ckad-tips.md` | Multi-container pod CKAD tips | Application Design and Build (DB-03) |
 | `02-pods/2-mechanics/01-core-mechanics-lifecycle.md` | Pod lifecycle and phases | Application Design and Build |
 | `02-pods/2-mechanics/01-scheduling-taints-tolerations/1-yaml-structure.md` | Taints/tolerations YAML structure | Application Environment (CS-03) |
+| `02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/00-node-selector.md` | Node selector scheduling | Application Environment (CS-03) |
 | `02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/01-common-exam-patterns.md` | Taint/toleration exam patterns | Application Environment (CS-03) |
 | `02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/02-core-concepts.md` | Taints and tolerations core concepts | Application Environment (CS-03) |
 | `02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/03-taint-format.md` | Taint format syntax | Application Environment (CS-03) |
@@ -76,7 +77,7 @@
 | `02-pods/2-mechanics/04-security/3-imperative-commands.md` | Security imperative commands | Application Environment (CS-07) |
 | `02-pods/2-mechanics/04-security/4-debugging.md` | Security debugging | Application Environment (CS-07) |
 | `02-pods/2-mechanics/04-security/5-ckad-tips.md` | Pod security CKAD tips | Application Environment (CS-07) |
-| `02-pods/2-mechanics/05-ephemeral-volumes.md` | Ephemeral volumes | Application Design and Build (DB-04) |
+| `02-pods/2-mechanics/05-ephemeral-volumes.md` | Ephemeral volumes (emptyDir, CSI, ConfigMap/Secret, kubectl debug) | Application Design and Build (DB-04) |
 | `02-pods/3-imperative-commands.md` | Pod imperative commands | Application Design and Build |
 | `02-pods/4-debugging.md` | Pod debugging | Application Observability (OM-05) |
 | `02-pods/5-ckad-tips.md` | Pods CKAD tips | Application Design and Build |
@@ -101,6 +102,7 @@
 | `05-storage/2-mechanics/02-common-ckad-storage-types.md` | Common CKAD storage types | Application Design and Build (DB-04) |
 | `05-storage/2-mechanics/03-reclaim-policies.md` | Storage reclaim policies | Application Design and Build (DB-04) |
 | `05-storage/2-mechanics/04-volume-lifecycle-binding.md` | Volume lifecycle and binding | Application Design and Build (DB-04) |
+| `05-storage/2-mechanics/05-storageclass.md` | StorageClass deep dive | Application Design and Build (DB-04) |
 | `05-storage/3-imperative-commands.md` | Storage imperative commands | Application Design and Build (DB-04) |
 | `05-storage/4-debugging.md` | Storage debugging | Application Design and Build (DB-04) |
 | `05-storage/5-ckad-tips.md` | Storage CKAD tips | Application Design and Build (DB-04) |
@@ -121,7 +123,7 @@
 | `07-services/00-ClusterIP/2-mechanics/06-headless-services.md` | Headless services | Services and Networking (SN-02) |
 | `07-services/00-ClusterIP/3-imperative-commands.md` | ClusterIP imperative commands | Services and Networking (SN-02) |
 | `07-services/00-ClusterIP/4-debugging.md` | ClusterIP debugging | Services and Networking (SN-02) |
-| `07-services/00-ClusterIP/5-ckad-tips.md` | ClusterIP CKAD tips | Services and Networking (SN-02) |
+| `07-services/00-ClusterIP/5-ckad-tips.md` | ClusterIP CKAD tips (endpoints, DNS, pitfalls) | Services and Networking (SN-02) |
 | `07-services/01-NodePort/1-yaml-structure.md` | NodePort YAML structure | Services and Networking (SN-02) |
 | `07-services/01-NodePort/2-mechanics/01-common-ckad-patterns.md` | NodePort common CKAD patterns | Services and Networking (SN-02) |
 | `07-services/01-NodePort/2-mechanics/02-core-mechanics.md` | NodePort core mechanics | Services and Networking (SN-02) |

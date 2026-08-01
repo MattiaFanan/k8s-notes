@@ -182,3 +182,103 @@ spec:
 - The nodePort range is configurable but defaults to 30000-32767.
 - kube-proxy handles the forwarding in iptables or IPVS mode.
 - Readiness probes determine which Pods receive traffic, not the nodePort itself.
+
+## externalTrafficPolicy
+
+The `externalTrafficPolicy` field controls how traffic from external clients is routed to backend Pods. It affects the source IP address preserved in the request and the routing behavior.
+
+### Values
+
+| Value | Behavior | Source IP Preserved |
+|-------|----------|---------------------|
+| `Cluster` (default) | Traffic is routed to any node, then forwarded to the backend Pod. | No — the source IP is replaced with the node's IP. |
+| `Local` | Traffic is routed only to nodes that have at least one healthy backend Pod. | Yes — the original client source IP is preserved. |
+
+### externalTrafficPolicy: Cluster (Default)
+
+With the default `Cluster` policy, external traffic can arrive at any node in the cluster. kube-proxy on that node forwards the traffic to a backend Pod, which may be on a different node. The source IP is replaced with the node's IP.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  externalTrafficPolicy: Cluster
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30080
+```
+
+**Behavior:**
+- Traffic can arrive at any node.
+- kube-proxy forwards to any healthy Pod, regardless of which node it runs on.
+- The source IP seen by the Pod is the node's IP, not the original client IP.
+- Health checks from the cloud LB are only to the nodePort (not the Pod).
+
+### externalTrafficPolicy: Local
+
+With `Local`, traffic is only sent to nodes that have at least one healthy backend Pod running on them. The source IP is preserved end-to-end.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30080
+```
+
+**Behavior:**
+- Traffic is sent only to nodes running healthy Pods for this Service.
+- The source IP seen by the Pod is the original client IP.
+- If a node has no healthy Pods, it is removed from the cloud LB's backend pool.
+- Health checks from the cloud LB may target the Pod's readiness endpoint directly (depending on the cloud provider).
+
+### When to Use Each Policy
+
+| Scenario | Recommended Policy | Reason |
+|----------|-------------------|--------|
+| General web serving, no IP preservation needed | `Cluster` | Simpler, distributes load across all nodes |
+| Need client IP in application logs/firewall rules | `Local` | Preserves source IP |
+| High throughput with many nodes | `Cluster` | Better distribution across all nodes |
+| Few nodes, need precise health checks | `Local` | Cloud LB only targets nodes with healthy Pods |
+| Using a Service Mesh (Istio, Linkerd) | `Cluster` | The mesh handles source IP preservation |
+
+### Internal Traffic Policy
+
+The `internalTrafficPolicy` field controls how traffic from within the cluster is routed:
+
+| Value | Behavior |
+|-------|----------|
+| `Cluster` (default) | Traffic is routed to any node with healthy Pods |
+| `Local` | Traffic is routed only to nodes with healthy Pods running locally |
+
+```yaml
+spec:
+  internalTrafficPolicy: Local
+```
+
+**When to use `internalTrafficPolicy: Local`:**
+- You want to avoid extra network hops for intra-cluster traffic.
+- You want Pods to prefer backends on the same node.
+
+### Common Pitfalls
+
+1. **`externalTrafficPolicy: Local` with too few nodes**: If you have fewer nodes than the cloud LB's minimum backend count, the LB may report no healthy backends.
+2. **`externalTrafficPolicy: Local` and DaemonSets**: If a DaemonSet Pod is the backend, every node has a healthy Pod, so `Local` behaves similarly to `Cluster`.
+3. **Source IP loss with `Cluster` policy**: The Pod sees the node's IP, not the client's IP. Use `Local` or a Service Mesh if you need the real client IP.
+4. **Health check failures with `Local`**: If a node has no healthy Pods, the cloud LB may mark it unhealthy and stop sending traffic. This is expected behavior, not a bug.

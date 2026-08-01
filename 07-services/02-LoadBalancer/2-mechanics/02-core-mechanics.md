@@ -158,3 +158,59 @@ kubectl get svc web-lb -o jsonpath='{.status.loadBalancer.ingress}'
 - LoadBalancer operates at Layer 4 (TCP/UDP).
 - For Layer 7 routing, use Ingress instead.
 - Each LoadBalancer Service provisions a real cloud load balancer with associated costs.
+
+## externalTrafficPolicy
+
+The `externalTrafficPolicy` field controls how traffic from external clients is routed to backend Pods. It affects the source IP address preserved in the request and the routing behavior.
+
+### Values
+
+| Value | Behavior | Source IP Preserved |
+|-------|----------|---------------------|
+| `Cluster` (default) | Traffic is routed to any node, then forwarded to the backend Pod. | No — the source IP is replaced with the node's IP. |
+| `Local` | Traffic is routed only to nodes that have at least one healthy backend Pod. | Yes — the original client source IP is preserved. |
+
+### When to Use Local
+
+`externalTrafficPolicy: Local` is recommended when:
+- You need the original client IP in your application (e.g., for logging, rate limiting, or firewall rules).
+- You want to reduce network hops by keeping traffic on the same node.
+- You are using a Service Mesh that needs source IP preservation.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-lb
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+```
+
+### Common Pitfall: Local with Fewer Nodes Than Backends
+
+If you set `externalTrafficPolicy: Local` and a node has no healthy Pods, the cloud LB may mark that node as unhealthy and stop sending traffic to it. In clusters with few nodes, this can reduce capacity significantly.
+
+### Internal Traffic Policy
+
+The `internalTrafficPolicy` field controls how traffic from within the cluster is routed:
+
+| Value | Behavior |
+|-------|----------|
+| `Cluster` (default) | Traffic is routed to any node with healthy Pods |
+| `Local` | Traffic is routed only to nodes with healthy Pods running locally |
+
+```yaml
+spec:
+  internalTrafficPolicy: Local
+```
+
+**When to use `internalTrafficPolicy: Local`:**
+- You want to avoid extra network hops for intra-cluster traffic.
+- You want Pods to prefer backends on the same node.
