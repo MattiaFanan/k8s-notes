@@ -130,12 +130,188 @@ kubectl create deployment web-green --image=nginx:1.27 --replicas=3
 kubectl patch svc web -p '{"spec":{"selector":{"version":"green"}}}'
 ```
 
+#### Blue/Green Step-by-Step (Imperative)
+
+```bash
+# 1. Create the green deployment
+kubectl create deployment web-green --image=nginx:1.27 --replicas=3 -n myns --dry-run=client -o yaml > web-green.yaml
+
+# 2. Edit web-green.yaml to add the version label
+#    Add label: version: green to metadata.labels and template.metadata.labels
+
+# 3. Apply the green deployment
+kubectl apply -f web-green.yaml -n myns
+
+# 4. Verify green pods are running
+kubectl get pods -n myns -l version=green
+
+# 5. Switch the Service selector to point to green
+kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"green"}}}'
+
+# 6. Verify traffic is flowing to green pods
+kubectl get pods -n myns -l version=green -o wide
+
+# 7. If issues, switch back to blue
+kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
+
+# 8. Delete the green deployment after confirming stability
+kubectl delete deployment web-green -n myns
+```
+
+#### Blue/Green YAML Pattern
+
+```yaml
+# Blue deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-blue
+  labels:
+    app: web
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: web
+        version: blue
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.26
+---
+# Green deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-green
+  labels:
+    app: web
+    version: green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+      version: green
+  template:
+    metadata:
+      labels:
+        app: web
+        version: green
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27
+---
+# Service that switches between blue and green
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+    version: blue  # Switch to "green" to route to green deployment
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+### Alternative: Canary via Weighted Traffic Splitting
+
+Canary deployments route a percentage of traffic to the new version. Kubernetes does not have a built-in canary primitive, but you can implement it using multiple Deployments and a Service with weighted endpoints (via ExternalName or by manually managing EndpointSlices).
+
+#### Canary Using Two Deployments and a Service
+
+```bash
+# 1. Deploy the stable (blue) version
+kubectl create deployment web-blue --image=nginx:1.26 --replicas=3 -n myns
+
+# 2. Deploy the canary (green) version with fewer replicas
+kubectl create deployment web-green --image=nginx:1.27 --replicas=1 -n myns
+
+# 3. Create a Service that selects both versions
+cat <<'EOF' | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-canary
+spec:
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 8080
+EOF
+
+# 4. Scale the canary up gradually while monitoring
+kubectl scale deployment web-green --replicas=2 -n myns
+# Monitor metrics and error rates
+kubectl scale deployment web-green --replicas=3 -n myns
+# Once stable, switch the Service selector to green only
+kubectl patch svc web-canary -n myns -p '{"spec":{"selector":{"app":"web","version":"green"}}}'
+# Delete the blue deployment
+kubectl delete deployment web-blue -n myns
+```
+
+#### Canary Using kubectl patch for incremental rollout
+
+```bash
+# Start with 1 canary replica
+kubectl scale deployment web-green --replicas=1 -n myns
+
+# Monitor for issues
+kubectl get pods -n myns -l version=green
+kubectl logs -n myns -l version=green --tail=20
+
+# If healthy, increase canary replicas
+kubectl scale deployment web-green --replicas=2 -n myns
+
+# Continue increasing until all traffic is on green
+kubectl scale deployment web-green --replicas=3 -n myns
+
+# Switch Service to green
+kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"green"}}}'
+
+# Rollback if needed: switch Service back to blue
+kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
+```
+
+### Alternative: Canary Using Service Mesh (SMI / Istio)
+
+For production-grade canary deployments, use a service mesh that supports traffic splitting:
+
+```yaml
+# SMI TrafficSplit example (conceptual)
+apiVersion: split.smi-spec.io/v1alpha4
+kind: TrafficSplit
+metadata:
+  name: web-canary
+spec:
+  service: web
+  backends:
+  - service: web-blue
+    weight: 90
+  - service: web-green
+    weight: 10
+```
+
+> **Note**: SMI TrafficSplit requires a service mesh controller (e.g., Istio, Linkerd) that implements the SMI specification. This is not a native Kubernetes primitive.
+
 ### Best Practices
 
 - **Default to RollingUpdate with `maxSurge: 1, maxUnavailable: 0`** for stateless HTTP services. It provides zero-downtime rollout with minimal resource overhead.
 - **Use `maxSurge: 25%, maxUnavailable: 25%`** for large replica counts (50+) to speed up rollouts while keeping disruption bounded.
 - **Never use `maxSurge: 0, maxUnavailable: 0`** — it creates an impossible constraint that the Deployment controller cannot resolve.
 - **Use Recreate only when necessary**: document the reason, test it in staging, and ensure readiness probes catch the "not yet ready" state.
+- **For Blue/Green**: Use separate Deployments with distinct labels and switch the Service selector to route traffic.
+- **For Canary**: Start with a small percentage of replicas on the new version, monitor metrics, and gradually increase. Use readiness probes to ensure the canary is healthy before scaling up.
 
 ### Common Pitfalls
 
@@ -143,3 +319,5 @@ kubectl patch svc web -p '{"spec":{"selector":{"version":"green"}}}'
 - **Pod disruption budgets (PDB) interact with rollout strategies**: a PDB with `minAvailable: 3` forces maxUnavailable to 0 if you only have 3 replicas, causing a stuck rollout.
 - **Recreate does not respect PDB**: because all Pods are killed first, a PDB cannot prevent the downtime.
 - **PreStop hooks must be brief** if you want fast rollouts. A 30-second PreStop on every Pod means a 3-minute minimum rollout for 3 replicas.
+- **Blue/Green: forgetting to update the Service selector** after creating the green deployment — traffic still routes to blue.
+- **Canary: not monitoring before scaling up** — always verify canary health before increasing traffic weight.

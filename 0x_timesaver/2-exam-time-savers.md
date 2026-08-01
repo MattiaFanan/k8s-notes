@@ -33,6 +33,11 @@ export do="--dry-run=client -o yaml"
 | Need to verify permissions | `kubectl auth can-i` |
 | Need to check DNS | `kubectl exec` into pod and run `nslookup` or `curl` |
 | Need to check connectivity | `kubectl exec` into pod and run `curl` or `wget` |
+| Need to debug a pod | `kubectl debug` with ephemeral container |
+| Need to check rollout status | `kubectl rollout status` |
+| Need to rollback a deployment | `kubectl rollout undo` |
+| Need to check API version | `kubectl api-versions` |
+| Need to convert deprecated APIs | `kubectl convert` |
 
 ## Namespace Discipline
 
@@ -139,6 +144,24 @@ kubectl create ingress web-ingress --class=nginx --rule="myapp.example.com/*=web
 kubectl debug mypod -n myns --image=busybox --target=app -it -- sh
 ```
 
+### "Check rollout status and history"
+```bash
+kubectl rollout status deployment/my-dep -n myns
+kubectl rollout history deployment/my-dep -n myns
+```
+
+### "Rollback a deployment"
+```bash
+kubectl rollout undo deployment/my-dep -n myns
+kubectl rollout undo deployment/my-dep -n myns --to-revision=2
+```
+
+### "Check for deprecated APIs"
+```bash
+kubectl apply --dry-run=server -f manifest.yaml 2>&1 | grep -i "deprecated"
+kubectl convert -f manifest.yaml --output-version apps/v1
+```
+
 ## Time Management
 
 - **Spend no more than 5 minutes** on any single task before moving on.
@@ -146,6 +169,7 @@ kubectl debug mypod -n myns --image=busybox --target=app -it -- sh
 - **If a pod is not ready**, check: `kubectl describe pod`, `kubectl logs`, `kubectl events`.
 - **If a deployment is stuck**, check: `kubectl rollout status`, `kubectl describe deploy`, events.
 - **If NetworkPolicy is blocking traffic**, check: DNS (port 53), namespace labels, pod labels, policyTypes.
+- **If API version is deprecated**, use `kubectl convert` or manually update the `apiVersion` field.
 
 ## Verification Checklist
 

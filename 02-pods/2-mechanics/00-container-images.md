@@ -61,6 +61,93 @@ containers:
   imagePullPolicy: IfNotPresent
 ```
 
+## Dockerfile / Containerfile Syntax
+
+The CKAD exam assumes working knowledge of container images. Understanding `Dockerfile` and `Containerfile` syntax is part of DB-01 (Define, build and modify container images).
+
+### Basic Dockerfile Structure
+
+```dockerfile
+# Base image
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy application source
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Run as non-root user
+USER node
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Entry point
+CMD ["node", "server.js"]
+```
+
+### Key Dockerfile Instructions
+
+| Instruction | Purpose | CKAD Relevance |
+|-------------|---------|----------------|
+| `FROM` | Base image | Always use specific tags, not `latest` |
+| `WORKDIR` | Set working directory | Avoids `cd` in shell commands |
+| `COPY` | Copy files from build context | Use `.dockerignore` to exclude unnecessary files |
+| `RUN` | Execute shell commands | Use `npm ci` instead of `npm install` for reproducible builds |
+| `EXPOSE` | Document listening port | Does not actually publish the port; use `kubectl expose` or Service |
+| `ENV` | Set environment variables | Can be overridden at runtime with `env` in Pod spec |
+| `USER` | Set UID for the process | Essential for security; avoid running as root |
+| `HEALTHCHECK` | Define container health check | Provides liveness probe equivalent at container level |
+| `CMD` | Default command | Can be overridden at runtime |
+| `ENTRYPOINT` | Immutable command prefix | Use exec form for signal handling |
+| `ARG` | Build-time variables | Not available at runtime |
+| `LABEL` | Metadata | Use for version, maintainer, description |
+
+### Multi-Stage Builds
+
+Multi-stage builds use multiple `FROM` statements in a Dockerfile to create smaller, more secure images. The CKAD exam does not require building images, but you should understand the concept.
+
+```dockerfile
+# Build stage
+FROM golang:1.21 AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o myapp .
+
+# Final stage
+FROM alpine:3.19
+COPY --from=builder /app/myapp /usr/local/bin/myapp
+ENTRYPOINT ["myapp"]
+```
+
+### .dockerignore
+
+A `.dockerignore` file excludes files from the build context, reducing image size and build time:
+
+```
+node_modules
+.git
+*.md
+.env
+Dockerfile
+.dockerignore
+```
+
+### Image Tagging Best Practices
+
+- Use semantic versioning (`v1.2.3`) or Git SHA (`abc123def`) for immutable references.
+- Avoid `:latest` in production — it makes rollbacks difficult and introduces non-determinism.
+- Use digest references (`@sha256:...`) for maximum reproducibility.
+
 ## Private Registry Authentication
 
 ### Creating ImagePullSecrets
@@ -98,23 +185,6 @@ kubectl patch serviceaccount default -n myns \
   -p '{"imagePullSecrets": [{"name": "regcred"}]}'
 ```
 
-## Multi-Stage Builds (Conceptual)
-
-Multi-stage builds use multiple `FROM` statements in a Dockerfile to create smaller, more secure images. The CKAD exam does not require building images, but you should understand the concept.
-
-```dockerfile
-# Build stage
-FROM golang:1.21 AS builder
-WORKDIR /app
-COPY . .
-RUN go build -o myapp .
-
-# Final stage
-FROM alpine:3.19
-COPY --from=builder /app/myapp /usr/local/bin/myapp
-ENTRYPOINT ["myapp"]
-```
-
 ## Image Scanning and Security
 
 - Scan images for vulnerabilities before deploying (e.g., Trivy, Snyk).
@@ -127,6 +197,8 @@ ENTRYPOINT ["myapp"]
 - Know image reference formats and how they affect `imagePullPolicy`.
 - Know how to create and reference ImagePullSecrets.
 - Understand the difference between tag-based and digest-based references.
+- Understand Dockerfile/Containerfile syntax (FROM, WORKDIR, COPY, RUN, EXPOSE, USER, CMD, ENTRYPOINT).
+- Understand multi-stage builds for smaller image sizes.
 
 ## Common Pitfalls
 
@@ -134,6 +206,8 @@ ENTRYPOINT ["myapp"]
 2. **Forgetting `imagePullPolicy: Always` with `:latest`**: The kubelet defaults to `Always` for `:latest`, but being explicit avoids confusion.
 3. **ImagePullSecret in wrong namespace**: Secrets must be in the same namespace as the pod.
 4. **Wrong registry credentials**: Verify the Docker config JSON is correct and the secret type is `kubernetes.io/dockerconfigjson`.
+5. **Running as root**: Always set `USER` in the Dockerfile to avoid running containers as root.
+6. **Missing `.dockerignore`**: Large build contexts slow down builds and increase image size.
 
 ## Commands
 
