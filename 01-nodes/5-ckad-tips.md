@@ -1,5 +1,7 @@
 # Kubernetes Nodes - CKAD Exam Tips
 
+> **CKAD Exam Version**: Kubernetes v1.35
+
 ## Shortcuts
 - `kubectl get nodes -o wide` shows OS, kernel, container runtime version.
 - `kubectl top node` requires metrics-server but shows resource usage quickly.
@@ -22,3 +24,10 @@ alias k=kubectl
 # Node resource snapshot
 k get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.capacity.cpu}{"\t"}{.status.capacity.memory}{"\n"}{end}'
 ```
+
+## See also
+
+- [Node YAML Structure](1-yaml-structure.md)
+- [Node Components](2-mechanics/02-node-components.md)
+- [Node Conditions](2-mechanics/03-node-conditions.md)
+- [Kubeconfig](2-mechanics/06-kubeconfig.md)

@@ -38,7 +38,7 @@ Ingress      = Layer 7 HTTP/HTTPS router; needs an Ingress Controller Pod + Clus
 - **ExternalName**: "I want to alias this name to some external host."
 - **Ingress**: "I want host/path-based routing to multiple backend apps."
 
-##ports Mental Model
+## Ports Mental Model
 
 | Concept | What it is |
 | :--- | :--- |

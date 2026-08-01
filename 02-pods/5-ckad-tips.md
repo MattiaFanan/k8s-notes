@@ -1,5 +1,7 @@
 # Pods - CKAD Exam Tips & Shortcuts
 
+> **CKAD Exam Version**: Kubernetes v1.35
+
 ## Speed Shortcuts & Setup
 
 ```bash
@@ -29,3 +31,26 @@ set expandtab
    k exec -it mypod -- sh
    ```
 4. **Deleting Pods slowly**: Use `--force --grace-period=0` if you need to delete a stuck pod instantly.
+5. **`kubectl run` creates a Deployment, not a Pod**: In modern Kubernetes, `kubectl run` creates a Deployment by default. Use `--restart=Never` for a Pod.
+6. **`kubectl run` does not create a Service**: You must create a Service separately to expose the pod.
+
+## Time-Saver
+
+```bash
+alias k=kubectl
+
+# Quick one-shot pod
+k run debug --image=busybox --restart=Never -it -- sh
+
+# Quick deployment with dry-run
+k create deployment web --image=nginx $do > deploy.yaml
+
+# Quick service
+k expose deployment web --port=80 --target-port=8080
+```
+
+## See also
+
+- [Pods YAML Structure](1-yaml-structure.md)
+- [Pod Lifecycle & Mechanics](2-mechanics/01-core-mechanics-lifecycle.md)
+- [Multi-Container Pods](2-mechanics/00-multi-container-pods/5-ckad-tips.md)

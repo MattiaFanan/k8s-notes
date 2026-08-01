@@ -1,5 +1,7 @@
 # Declarative vs Imperative - CKAD Exam Tips
 
+> **CKAD Exam Version**: Kubernetes v1.35
+
 ## Exam Guidance
 
 - **Declarative is preferred** for most CKAD tasks: safer, reproducible, and auditable.
@@ -40,6 +42,7 @@
 3. **Server-side apply ownership**: With multiple operators, field ownership can become complex.
 
 ## Time-Saver
+
 ```bash
 alias k=kubectl
 
@@ -48,3 +51,8 @@ k create deployment web --image=nginx --replicas=3 $do > deploy.yaml
 # edit deploy.yaml
 k apply -f deploy.yaml
 ```
+
+## See also
+
+- [YAML Structure](1-yaml-structure.md)
+- [Imperative Commands](3-imperative-commands.md)

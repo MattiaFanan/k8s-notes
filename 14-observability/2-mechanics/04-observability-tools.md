@@ -150,6 +150,42 @@ kubectl get events -n production -o json | jq '.items[] | {reason, message, type
 kubectl get events -n production --sort-by='.metadata.creationTimestamp' | tail -10
 ```
 
+## kubectl api-resources and kubectl api-versions
+
+`kubectl api-resources` lists all available API resources and their group/version. `kubectl api-versions` lists all API versions served by the API server.
+
+```bash
+# List all API resources
+kubectl api-resources
+
+# List API resources for a specific group
+kubectl api-resources --api-group=apps
+
+# List all API versions
+kubectl api-versions
+
+# Check if a specific resource is available
+kubectl api-resources | grep -i networkpolicy
+```
+
+## kubectl explain
+
+`kubectl explain` provides documentation for Kubernetes resource fields interactively.
+
+```bash
+# Explain a resource
+kubectl explain pod
+
+# Explain a specific field
+kubectl explain pod.spec.containers
+
+# Explain nested fields
+kubectl explain pod.spec.containers.resources
+
+# Recursively explain all fields
+kubectl explain pod --recursive
+```
+
 ## kubectl get with Output Formats
 
 `kubectl get` supports multiple output formats for different use cases.
