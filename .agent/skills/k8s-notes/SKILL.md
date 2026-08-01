@@ -7,14 +7,14 @@ description: Manages and curates a structured Kubernetes (CKAD) study notes proj
 
 This skill manages a structured set of Kubernetes study notes for the Certified Kubernetes Application Developer (CKAD) exam (aligned with official CNCF/Linux Foundation curriculum v1.35).
 
-> **Current date**: 2026-07-26
+> **Current date**: 2026-08-02
 
 ## Environment
 
 | Field | Value |
 |---|---|
 | Working directory | `/home/matti/k8s-notes` |
-| Workspace root | `/` |
+| Workspace root | `/home/matti/k8s-notes` |
 | Curriculum version | CNCF/Linux Foundation CKAD v1.35 |
 
 ## Organizational Principles

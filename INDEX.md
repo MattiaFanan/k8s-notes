@@ -175,12 +175,6 @@
 | `09-rbac/3-imperative-commands.md` | RBAC imperative commands | Application Environment (CS-02, CS-06) |
 | `09-rbac/4-debugging.md` | RBAC debugging | Application Environment (CS-02, CS-06) |
 | `09-rbac/5-ckad-tips.md` | RBAC CKAD tips | Application Environment (CS-02, CS-06) |
-| `02-pods/2-mechanics/04-security/2-mechanics/01-key-security-fields.md` | Key security context fields | Application Environment (CS-07) |
-| `02-pods/2-mechanics/04-security/2-mechanics/02-pss-basics.md` | Pod Security Standards basics | Application Environment (CS-07) |
-| `02-pods/2-mechanics/04-security/2-mechanics/03-limitrange-resourcequota.md` | LimitRange and ResourceQuota | Application Environment (CS-03) |
-| `02-pods/2-mechanics/04-security/2-mechanics/04-psa-configuration.md` | PSA configuration | Application Environment (CS-02) |
-| `02-pods/2-mechanics/04-security/2-mechanics/05-probes-behavior.md` | Probe behavior | Application Observability (OM-02) |
-| `02-pods/2-mechanics/04-security/2-mechanics/06-securitycontext-scoping.md` | SecurityContext scoping | Application Environment (CS-07) |
 | `10-crds-operators/1-yaml-structure.md` | CRD/Operator YAML structure | Application Environment (CS-01) |
 | `10-crds-operators/2-mechanics/01-custom-resource-definition-crd.md` | CRD deep dive | Application Environment (CS-01) |
 | `10-crds-operators/2-mechanics/02-custom-resources-crs.md` | Custom Resources | Application Environment (CS-01) |

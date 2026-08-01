@@ -1,5 +1,7 @@
 # LimitRange and ResourceQuota
 
+> **See also**: [ResourceQuota Behavior](../../03-resource-management/2-mechanics/06-resourcequota-behavior.md) — covers the scheduling/placement perspective with quota scopes and cross-namespace behavior.
+
 LimitRange and ResourceQuota are namespace-level mechanisms that constrain resource consumption. They prevent noisy-neighbor problems, enforce resource governance, and are essential for multi-tenant clusters.
 
 ## LimitRange

@@ -2,6 +2,8 @@
 
 ## ResourceQuota Behavior
 
+> **See also**: [LimitRange and ResourceQuota](../../04-security/2-mechanics/03-limitrange-resourcequota.md) — covers the governance/security perspective alongside LimitRange.
+
 A `ResourceQuota` limits the **aggregate resource consumption** of a namespace. It acts as the second line of defense (after LimitRange) to prevent a single project or team from consuming excessive cluster capacity.
 
 ### What ResourceQuota Can Limit

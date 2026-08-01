@@ -11,7 +11,7 @@
 | Application Design and Build | 20% | `02-pods/`, `03-deployments/` |
 | Application Deployment | 20% | `03-deployments/`, `11-helm-kustomize/` |
 | Application Observability and Maintenance | 15% | `12-observability/` |
-| Application Environment, Configuration and Security | 25% | `05-storage/`, `06-configmaps-secrets/`, `09-rbac/`, `02-pods/2-mechanics/04-security/`, `13-admission-control/` |
+| Application Environment, Configuration and Security | 25% | `05-storage/`, `06-configmaps-secrets/`, `09-rbac/`, `10-crds-operators/`, `02-pods/2-mechanics/04-security/`, `13-admission-control/` |
 | Services and Networking | 20% | `07-services/`, `08-networkpolicies/` |
 
 ## Directory Structure
@@ -19,13 +19,13 @@
 | Directory | Topic |
 |-----------|-------|
 | `00-declarative-imperative/` | Declarative vs imperative workflows |
-| `01-nodes/` | Nodes, kubeconfig, API versions |
+| `01-nodes/` | Nodes, node components, conditions, lifecycle, kubeconfig, API versions |
 | `02-pods/` | Pods, multi-container patterns, scheduling, resource management, security contexts, probes |
 | `03-deployments/` | Deployments, Jobs, CronJobs |
 | `04-daemonsets/` | DaemonSets |
 | `05-storage/` | PV, PVC, StorageClass, volumes |
 | `06-configmaps-secrets/` | ConfigMaps and Secrets |
-| `07-services/` | ClusterIP, NodePort, LoadBalancer, ExternalName, Ingress |
+| `07-services/` | ClusterIP (incl. headless), NodePort, LoadBalancer, ExternalName, Ingress |
 | `08-networkpolicies/` | NetworkPolicies |
 | `09-rbac/` | RBAC and ServiceAccounts |
 | `02-pods/2-mechanics/04-security/` | Pod Security Standards, security contexts, probes, limits, quotas |
