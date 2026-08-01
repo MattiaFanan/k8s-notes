@@ -22,6 +22,10 @@ k create ds node-logger --image=fluentbit $do > ds.yaml
 k apply -f ds.yaml
 k get pods -l app=node-logger -o wide
 
+# Rollout status and history
+k rollout status daemonset/node-logger
+k rollout history daemonset/node-logger
+
 # Rollback DaemonSet
 k rollout undo daemonset/node-logger
 ```

@@ -82,7 +82,52 @@ spec:
 
 > **Common pitfall**: Applications that write PID files to `/var/run/` or lock files to `/var/lock/` will fail on a read-only root filesystem. Mount `emptyDir` volumes at these paths or configure the application to use alternative writable locations.
 
-## `capabilities`
+## `privileged`
+
+- Setting `privileged: true` grants the container full access to the host's kernel capabilities and devices.
+- This is equivalent to running the container with `--privileged` flag in Docker.
+- **Never use `privileged: true` in production workloads** unless the container needs direct access to host devices (e.g., CNI plugins, device managers).
+- A privileged container can access all host devices, mount any filesystem, and modify kernel parameters.
+
+```yaml
+spec:
+  containers:
+    - name: privileged-app
+      image: myapp:1.0
+      securityContext:
+        privileged: true
+```
+
+> **Pitfall**: `privileged: true` bypasses all container isolation. It is the equivalent of running the container as root on the host. Use only for system-level components that truly need host access.
+
+### Privileged vs Non-Privileged
+
+| Aspect | `privileged: false` (default) | `privileged: true` |
+|--------|-------------------------------|---------------------|
+| Host device access | No | Yes |
+| Kernel capability manipulation | No | Yes |
+| Mount host filesystems | No | Yes |
+| Modify kernel parameters | No | Yes |
+| Network namespace isolation | Yes | No |
+| PID namespace isolation | Yes | No |
+| IPC namespace isolation | Yes | No |
+
+### When Privileged Is Needed
+
+- CNI plugins (e.g., Calico, Cilium) that need to manipulate network interfaces
+- Device managers that need access to `/dev`
+- Storage drivers that need direct block device access
+- Performance monitoring tools that need access to hardware counters
+
+### Security Best Practice
+
+1. **Never use `privileged: true`** unless you have a documented, justified need.
+2. **Use specific capabilities instead** — e.g., `NET_ADMIN` for network configuration instead of full privileged mode.
+3. **Use PSA to enforce restrictions** — the `restricted` PSS policy forbids privileged containers.
+4. **Audit regularly** — scan for privileged containers in your cluster:
+   ```bash
+   kubectl get pods -A -o json | jq -r '.items[] | select(.spec.containers[].securityContext.privileged == true) | .metadata.name + " " + .metadata.namespace'
+   ```
 
 - Linux capabilities divide the privileges of root into discrete units. Instead of running as full root, you can drop all capabilities and add back only the ones your application needs.
 - `drop: ["ALL"]` removes all capabilities; `add` selectively grants specific ones.

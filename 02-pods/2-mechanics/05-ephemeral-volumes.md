@@ -22,7 +22,7 @@ CSI drivers can provide ephemeral volumes that are created on-demand and attache
 volumes:
 - name: sidecar-tool
   csi:
-    driver: sidecar.injector.example.com
+    driver: ebs.csi.aws.com
     volumeAttributes:
       tool: "debug"
 ```
