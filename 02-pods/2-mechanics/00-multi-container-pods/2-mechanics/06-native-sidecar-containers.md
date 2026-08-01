@@ -1,6 +1,6 @@
 # Native Sidecar Containers (Kubernetes v1.28+)
 
-Kubernetes v1.28 introduced native sidecar containers as a GA feature. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use the `restartPolicy: Always` field on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
+Kubernetes v1.28 introduced native sidecar containers as a GA feature. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use `restartPolicy: Always` on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
 
 ## Traditional Sidecar vs Native Sidecar
 
@@ -9,9 +9,7 @@ Kubernetes v1.28 introduced native sidecar containers as a GA feature. Unlike tr
 | Container type | Regular container in `spec.containers` | Init container with `restartPolicy: Always` |
 | Lifecycle | Runs alongside main container for Pod lifetime | Runs alongside main container for Pod lifetime |
 | Start order | Starts in parallel with main container | Starts after all regular init containers complete, then runs alongside main container |
-| Restart behavior | Follows Pod `restartPolicy` | Follows Pod `restartPolicy` |
 | Use case | Service mesh proxies, log shippers | Same, but with guaranteed startup ordering |
-| API version | `v1` Pod spec | `v1` Pod spec with `restartPolicy: Always` on init container |
 
 ## Why Native Sidecars Matter
 

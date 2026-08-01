@@ -21,7 +21,17 @@ strategy:
 
 ### How RollingUpdate Works
 
-The Deployment controller calculates which ReplicaSet needs to be scaled up/down. It respects `maxSurge` and `maxUnavailable` as **upper bounds**, not exact counts.
+The Deployment controller manages the rollout by coordinating two ReplicaSets: the old (current) and the new (updated). It does not simply kill old Pods and create new ones in sequence. Instead, it calculates the desired number of replicas for each ReplicaSet based on `maxSurge` and `maxUnavailable`, treating them as **upper bounds** rather than exact targets.
+
+The controller's decision process at each step:
+1. **Calculate the desired number of new Pods**: `replicas + maxSurge` (capped at the total desired replicas).
+2. **Calculate how many old Pods can be removed**: `replicas - maxUnavailable` (floored at 0).
+3. **Scale the new ReplicaSet up** to the desired count.
+4. **Wait for new Pods to become Ready** (passing readiness probes).
+5. **Scale the old ReplicaSet down** by the allowed number of unavailable Pods.
+6. **Repeat** until the old ReplicaSet reaches 0 replicas.
+
+This means the controller always ensures at least `replicas - maxUnavailable` Pods are available during the rollout. With the default `maxSurge: 25%, maxUnavailable: 25%`, the total Pod count temporarily exceeds `replicas` by up to 25%.
 
 ```mermaid
 sequenceDiagram
@@ -39,6 +49,8 @@ sequenceDiagram
     S-->>RS_new: 3 Pods Running
     D->>RS_old: Scale to 0
 ```
+
+> **Important**: The controller respects readiness probes. A new Pod is not counted as available until its readiness probe succeeds. If readiness probes fail, the rollout pauses and the old Pods continue serving traffic. This prevents routing traffic to Pods that are not yet ready to accept requests.
 
 ### maxSurge vs maxUnavailable Explained
 
@@ -225,7 +237,7 @@ spec:
 
 ### Alternative: Canary via Weighted Traffic Splitting
 
-Canary deployments route a percentage of traffic to the new version. Kubernetes does not have a built-in canary primitive, but you can implement it using multiple Deployments and a Service with weighted endpoints (via ExternalName or by manually managing EndpointSlices).
+Canary deployments route a percentage of traffic to the new version. Kubernetes does not have a built-in canary primitive, but you can implement it using multiple Deployments and a Service with weighted endpoints.
 
 #### Canary Using Two Deployments and a Service
 
@@ -282,27 +294,6 @@ kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"green"}}}'
 # Rollback if needed: switch Service back to blue
 kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
 ```
-
-### Alternative: Canary Using Service Mesh (SMI / Istio)
-
-For production-grade canary deployments, use a service mesh that supports traffic splitting:
-
-```yaml
-# SMI TrafficSplit example (conceptual)
-apiVersion: split.smi-spec.io/v1alpha4
-kind: TrafficSplit
-metadata:
-  name: web-canary
-spec:
-  service: web
-  backends:
-  - service: web-blue
-    weight: 90
-  - service: web-green
-    weight: 10
-```
-
-> **Note**: SMI TrafficSplit requires a service mesh controller (e.g., Istio, Linkerd) that implements the SMI specification. This is not a native Kubernetes primitive.
 
 ### Best Practices
 

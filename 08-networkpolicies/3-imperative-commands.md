@@ -1,5 +1,7 @@
 # NetworkPolicies - Imperative Commands
 
+NetworkPolicies control pod-to-pod traffic at the network layer. They are additive: any matching allow rule overrides a default-deny policy. Always allow DNS (port 53) when applying egress default-deny policies.
+
 ## Create NetworkPolicies
 
 ```bash
@@ -17,8 +19,9 @@ kubectl apply -f netpol.yaml
 
 ## Default-Deny Ingress
 
+Blocks all ingress traffic to pods in the namespace. The `podSelector: {}` matches all pods.
+
 ```bash
-# Deny all ingress to pods in a namespace
 cat <<'EOF' | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -34,8 +37,9 @@ EOF
 
 ## Default-Deny Egress
 
+Blocks all egress traffic from pods in the namespace. **Always add DNS rules first** or pods will lose name resolution.
+
 ```bash
-# Deny all egress from pods in a namespace
 cat <<'EOF' | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -50,6 +54,8 @@ EOF
 ```
 
 ## Allow Ingress from a Specific Namespace
+
+Use `namespaceSelector` to allow traffic from pods in a labeled namespace. The target namespace must have the matching label.
 
 ```bash
 cat <<'EOF' | kubectl apply -f -
@@ -74,6 +80,8 @@ EOF
 
 ## Allow Ingress from a Specific Pod Label
 
+Use `podSelector` to allow traffic from pods with a specific label.
+
 ```bash
 cat <<'EOF' | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
@@ -96,6 +104,8 @@ EOF
 ```
 
 ## Allow Egress to a Specific CIDR
+
+Use `ipBlock` to allow egress to a specific IP range. The `except` field further restricts within the CIDR.
 
 ```bash
 cat <<'EOF' | kubectl apply -f -
@@ -123,6 +133,8 @@ EOF
 ```
 
 ## Allow DNS Egress (Critical for Default-Deny)
+
+DNS uses both UDP and TCP on port 53. Without this rule, default-deny egress breaks all name resolution.
 
 ```bash
 cat <<'EOF' | kubectl apply -f -

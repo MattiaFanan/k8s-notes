@@ -103,7 +103,7 @@ CMD ["node", "server.js"]
 | `WORKDIR` | Set working directory | Avoids `cd` in shell commands |
 | `COPY` | Copy files from build context | Use `.dockerignore` to exclude unnecessary files |
 | `RUN` | Execute shell commands | Use `npm ci` instead of `npm install` for reproducible builds |
-| `EXPOSE` | Document listening port | Does not actually publish the port; use `kubectl expose` or Service |
+| `EXPOSE` | Document listening port | Does not publish the port; use `kubectl expose` or Service |
 | `ENV` | Set environment variables | Can be overridden at runtime with `env` in Pod spec |
 | `USER` | Set UID for the process | Essential for security; avoid running as root |
 | `HEALTHCHECK` | Define container health check | Provides liveness probe equivalent at container level |
@@ -187,9 +187,47 @@ kubectl patch serviceaccount default -n myns \
 
 ## Image Scanning and Security
 
-- Scan images for vulnerabilities before deploying (e.g., Trivy, Snyk).
-- Use image digests for reproducibility and security.
-- Avoid `:latest` in production — it makes rollbacks difficult and introduces non-determinism.
+Container images should be scanned for vulnerabilities before deployment. Scanning tools analyze image layers against known vulnerability databases (CVEs) and produce severity reports.
+
+### Trivy
+
+Trivy is a widely used open-source scanner that detects OS package vulnerabilities, misconfigurations, and secrets in container images.
+
+```bash
+# Scan an image for vulnerabilities
+trivy image nginx:1.25
+
+# Scan with severity filter
+trivy image --severity HIGH,CRITICAL nginx:1.25
+
+# Scan a local Dockerfile
+trivy config .
+```
+
+### Snyk
+
+Snyk provides container image scanning with integration into CI/CD pipelines. It offers both free and enterprise tiers.
+
+```bash
+# Scan an image with Snyk CLI
+snyk container test nginx:1.25
+```
+
+### Docker Scout
+
+Docker Scout is Docker's built-in image scanning tool, integrated with Docker Hub.
+
+```bash
+# Scan an image with Docker Scout
+docker scout quickview nginx:1.25
+```
+
+### Scanning Best Practices
+
+- Scan images in CI/CD pipelines before pushing to production registries.
+- Use severity thresholds (e.g., block HIGH and CRITICAL) to prevent vulnerable images from being deployed.
+- Prefer images from trusted base images (distroless, Alpine) that have smaller attack surfaces.
+- Use image digests (`@sha256:...`) to ensure the scanned image is exactly what gets deployed.
 
 ## Exam Relevance
 

@@ -84,7 +84,7 @@ spec:
 
 ## `privileged`
 
-- Setting `privileged: true` grants the container full access to the host's kernel capabilities and devices.
+- Setting `privileged: true` grants the container full access to the host's kernel capabilities and devices, effectively disabling all container isolation.
 - This is equivalent to running the container with `--privileged` flag in Docker.
 - **Never use `privileged: true` in production workloads** unless the container needs direct access to host devices (e.g., CNI plugins, device managers).
 - A privileged container can access all host devices, mount any filesystem, and modify kernel parameters.
@@ -99,18 +99,6 @@ spec:
 ```
 
 > **Pitfall**: `privileged: true` bypasses all container isolation. It is the equivalent of running the container as root on the host. Use only for system-level components that truly need host access.
-
-### Privileged vs Non-Privileged
-
-| Aspect | `privileged: false` (default) | `privileged: true` |
-|--------|-------------------------------|---------------------|
-| Host device access | No | Yes |
-| Kernel capability manipulation | No | Yes |
-| Mount host filesystems | No | Yes |
-| Modify kernel parameters | No | Yes |
-| Network namespace isolation | Yes | No |
-| PID namespace isolation | Yes | No |
-| IPC namespace isolation | Yes | No |
 
 ### When Privileged Is Needed
 
@@ -129,7 +117,40 @@ spec:
    kubectl get pods -A -o json | jq -r '.items[] | select(.spec.containers[].securityContext.privileged == true) | .metadata.name + " " + .metadata.namespace'
    ```
 
-- Linux capabilities divide the privileges of root into discrete units. Instead of running as full root, you can drop all capabilities and add back only the ones your application needs.
+### Pod Security Standards and Privileged Containers
+
+Pod Security Standards (PSS) define three levels of security enforcement that directly restrict privileged containers:
+
+| PSS Level | Effect on Privileged Containers |
+|---|---|
+| **Privileged** | No restrictions; any container can run as privileged |
+| **Baseline** | Blocks privileged containers; restricts host namespaces and filesystem mounts |
+| **Restricted** | Blocks privileged containers; enforces the strictest security hardening (non-root, read-only root filesystem, dropped capabilities) |
+
+When a PSS policy is enforced via a Pod Security Admission (PSA) controller, any pod that violates the policy is rejected at admission time. In CKAD scenarios, the `restricted` policy is the most commonly tested configuration.
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myns
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+```
+
+Under the `restricted` policy, the following are enforced:
+- `privileged: true` is forbidden
+- `runAsNonRoot: true` is required
+- `readOnlyRootFilesystem: true` is required
+- All capabilities must be dropped (`capabilities: { drop: ["ALL"] }`)
+- `allowPrivilegeEscalation: false` is required
+
+## Linux Capabilities
+
+Linux capabilities divide the privileges of root into discrete units. Instead of running as full root, you can drop all capabilities and add back only the ones your application needs.
+
 - `drop: ["ALL"]` removes all capabilities; `add` selectively grants specific ones.
 - The `CAP_NET_BIND_SERVICE` capability is commonly needed for binding to privileged ports (1–1024).
 

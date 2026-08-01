@@ -47,22 +47,22 @@ export do="--dry-run=client -o yaml"
 
 ## Common Exam Patterns
 
-### "Create a deployment with 3 replicas"
+### Create a deployment with 3 replicas
 ```bash
 kubectl create deployment web --image=nginx:1.25 --replicas=3 -n myns
 ```
 
-### "Expose a deployment on port 80"
+### Expose a deployment on port 80
 ```bash
 kubectl expose deployment web --port=80 --target-port=8080 -n myns
 ```
 
-### "Create a configmap from a file"
+### Create a configmap from a file
 ```bash
 kubectl create configmap app-config --from-file=config.properties -n myns
 ```
 
-### "Mount a configmap as a volume"
+### Mount a configmap as a volume
 ```yaml
 volumes:
 - name: config
@@ -73,12 +73,12 @@ volumeMounts:
   mountPath: /etc/config
 ```
 
-### "Create a secret from literals"
+### Create a secret from literals
 ```bash
 kubectl create secret generic db-creds --from-literal=username=admin --from-literal=password=secret -n myns
 ```
 
-### "Mount a secret as a volume"
+### Mount a secret as a volume
 ```yaml
 volumes:
 - name: secret
@@ -89,7 +89,7 @@ volumeMounts:
   mountPath: /etc/secret
 ```
 
-### "Create a NetworkPolicy that denies all ingress"
+### Default-deny ingress NetworkPolicy
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -102,7 +102,7 @@ spec:
   - Ingress
 ```
 
-### "Create a NetworkPolicy that allows ingress from a specific namespace"
+### Allow ingress from a specific namespace
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -122,41 +122,41 @@ spec:
           name: frontend
 ```
 
-### "Create a ServiceAccount and bind it to a Role"
+### Create a ServiceAccount and bind it to a Role
 ```bash
 kubectl create serviceaccount my-sa -n myns
 kubectl create role my-role --verb=get,list,watch --resource=pods -n myns
 kubectl create rolebinding my-binding --role=my-role --serviceaccount=myns:my-sa -n myns
 ```
 
-### "Verify a ServiceAccount can perform an action"
+### Verify a ServiceAccount can perform an action
 ```bash
 kubectl auth can-i get pods --as=system:serviceaccount:myns:my-sa -n myns
 ```
 
-### "Create an Ingress"
+### Create an Ingress
 ```bash
 kubectl create ingress web-ingress --class=nginx --rule="myapp.example.com/*=web-service:80" -n myns
 ```
 
-### "Debug a pod with an ephemeral container"
+### Debug a pod with an ephemeral container
 ```bash
 kubectl debug mypod -n myns --image=busybox --target=app -it -- sh
 ```
 
-### "Check rollout status and history"
+### Check rollout status and history
 ```bash
 kubectl rollout status deployment/my-dep -n myns
 kubectl rollout history deployment/my-dep -n myns
 ```
 
-### "Rollback a deployment"
+### Rollback a deployment
 ```bash
 kubectl rollout undo deployment/my-dep -n myns
 kubectl rollout undo deployment/my-dep -n myns --to-revision=2
 ```
 
-### "Check for deprecated APIs"
+### Check for deprecated APIs
 ```bash
 kubectl apply --dry-run=server -f manifest.yaml 2>&1 | grep -i "deprecated"
 kubectl convert -f manifest.yaml --output-version apps/v1
