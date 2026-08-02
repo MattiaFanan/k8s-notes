@@ -261,8 +261,8 @@ webhooks:
 | `rules` | Which resources and operations the webhook applies to |
 | `clientConfig` | The webhook service URL or CA bundle |
 | `admissionReviewVersions` | Supported AdmissionReview versions |
-| `sideEffects` | Whether the webhook has side effects (`None`, `Unknown`, `Some`) |
-| `timeoutSeconds` | Webhook timeout (1-10 seconds) |
+| `sideEffects` | Whether the webhook has side effects (`None`, `NoneOnDryRun`, `Some`, `Unknown`) |
+| `timeoutSeconds` | Webhook timeout (1-30 seconds) |
 | `failurePolicy` | `Fail` or `Ignore` |
 | `matchPolicy` | `Exact` or `Equivalent` |
 | `namespaceSelector` | Selects which namespaces the webhook applies to |
@@ -285,7 +285,7 @@ webhooks:
 | `webhook timeout` | The webhook service is not responding within the timeout | Check the webhook pod status and logs |
 | `webhook not found` | The webhook service or CA bundle is misconfigured | Verify the `clientConfig` in the webhook configuration |
 | `request rejected by admission controller` | A webhook or built-in controller rejected the request | Check the API server logs for the specific rejection reason |
-| `webhook has side effects` | The webhook is configured with `sideEffects: Unknown` or `Some` | Set `sideEffects: None` if possible |
+| `webhook has side effects` | The webhook is configured with `sideEffects: Unknown` or `Some` | Set `sideEffects: None` or `NoneOnDryRun` if possible |
 | `failurePolicy: Ignore` allowing bad requests | When the webhook is down, requests bypass the policy | Consider switching to `failurePolicy: Fail` |
 | Webhook causing high API server latency | The webhook is too slow | Optimize the webhook service or increase `timeoutSeconds` |
 

@@ -131,7 +131,7 @@ spec:
 When the CRD exposes the `/status` subresource, the controller updates `.status` independently of `.spec`. This separation is important because:
 
 - Status updates do not trigger spec reconciliation loops.
-- The API server does not require the user to have permission to update `.status` (it can be granted separately via RBAC).
+- The API server does require the user/controller to have permission to update `.status` (it should be granted separately via RBAC, e.g., `verbs: ["update"]` on the `status` subresource).
 - The `resourceVersion` does not change on status updates, preventing unnecessary watch events.
 
 ```bash

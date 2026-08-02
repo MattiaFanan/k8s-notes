@@ -81,10 +81,10 @@ Use a `ClusterRole` with a `ClusterRoleBinding` to grant permissions across all 
 flowchart TD
     A["ClusterRole"] -->| grants | B["ClusterRoleBinding"]
     B -->| binds | C["Subject: User/Group/ServiceAccount"]
-    C -->| effective | D[Permissions across ALL namespaces"]
+    C -->| effective | D[Permissions across ALL namespaces]
     D --> E["CRUD on pods in any namespace"]
     D --> F["Get nodes cluster-wide"]
-    D --> G["Read cluster-scoped resources\nDeployments, DaemonSets, etc.""]
+    D --> G["Read cluster-scoped resources\nDeployments, DaemonSets, etc."]
 ```
 
 ### Concrete Example
@@ -148,7 +148,7 @@ flowchart TD
     C -->| effective permissions | D["Only in namespace-x"]
 ```
 
-**Important**: A `ClusterRoleBinding` is cluster-scoped, but the effective permissions are only as broad as the `ClusterRole` itself. However, the subject gets the role's permissions across all namespaces — you cannot scope a ClusterRoleBinding to a single namespace directly. Instead, use a `RoleBinding` that references a `ClusterRole` to scope cluster-permission rules to one namespace.
+**Important**: A `ClusterRoleBinding` is cluster-scoped, but a `ClusterRole`'s permissions apply across all namespaces. You cannot scope a ClusterRoleBinding to a single namespace directly. Instead, use a `RoleBinding` that references a `ClusterRole` to scope cluster-level permission rules to one namespace. Note that a ClusterRoleBinding referencing a Role is technically possible but the Role's namespace-scoped rules still apply only within the Role's namespace, making this pattern confusing and rarely useful.
 
 ### Concrete Example (Correct Way: RoleBinding + ClusterRole)
 

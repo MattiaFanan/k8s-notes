@@ -172,7 +172,7 @@ The node controller runs in the `kube-controller-manager` and monitors node heal
 
 ```bash
 # Controller manager flags (on control plane nodes):
---node-monitor-grace-period=40s       # Duration after which unreachable node is marked NotReady
+--node-monitor-grace-period=50s       # Duration after which unreachable node is marked NotReady
 --node-monitor-period=5s              # How often node controller checks all nodes
 --pod-eviction-timeout=5m             # Duration after which pods are evicted from NotReady node
 --node-eviction-rate=0.1              # Number of nodes per second that can be evicted (0.1 = 1 per 10s)
@@ -185,7 +185,7 @@ The node controller runs in the `kube-controller-manager` and monitors node heal
 ```mermaid
 flowchart TD
     A["Node Controller"] -->|"Every 5s (node-monitor-period)"| B["Check all nodes"]
-    B --> C{"Last heartbeat<br/>< 40s ago?"}
+     B --> C{"Last heartbeat<br/>< 50s ago?"}
     C -->|"Yes"| D["Node is healthy"]
     C -->|"No"| E["Set condition Ready=False"]
     E --> F["Reason: KubeletStopped"]
@@ -223,7 +223,7 @@ When a node is evicted, the controller handles different pod types differently:
 # 1. Node controller sets Ready=False
 kubectl get node node-2
 # NAME     STATUS     ROLES    AGE   VERSION
-# node-2   NotReady   <none>   10d   v1.28.0
+# node-2   NotReady   <none>   10d   v1.35.0
 
 # 2. After 5 minutes, pods are evicted
 kubectl get pods -o wide
@@ -289,7 +289,7 @@ spec:
   containers:
   - command:
     - kube-controller-manager
-    - --node-monitor-grace-period=40s
+    - --node-monitor-grace-period=50s
     - --pod-eviction-timeout=5m
     - --node-eviction-rate=0.1
     - --secondary-node-eviction-rate=0.01

@@ -4,7 +4,7 @@ The Container Runtime Interface (CRI) is a plugin interface that enables kubelet
 
 ## How CRI Works
 
-When kubelet needs to run a pod, it communicates with the CRI runtime via a Unix socket (typically `/var/run/dockershim.sock` for Docker, `/run/containerd/containerd.sock` for containerd, or `/var/run/crio/crio.sock` for CRI-O).
+When kubelet needs to run a pod, it communicates with the CRI runtime via a Unix socket (typically `/run/containerd/containerd.sock` for containerd or `/var/run/crio/crio.sock` for CRI-O).
 
 ```mermaid
 flowchart TD
@@ -35,7 +35,7 @@ containerd is a high-performance container runtime that implements the CRI inter
 - Supports snapshotters for efficient image extraction
 - Runs as a systemd service (`containerd`)
 - Exposes a Unix socket at `/run/containerd/containerd.sock`
-- Supports sandboxed containers (Kata, gVisor) via the `io.containerd.kind` annotation
+- Supports sandboxed containers (Kata, gVisor) via RuntimeClass
 
 **Architecture:**
 

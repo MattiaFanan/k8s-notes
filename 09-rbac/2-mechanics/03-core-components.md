@@ -155,14 +155,14 @@ flowchart TD
 
 ### ClusterRoleBinding Details
 
-A `ClusterRoleBinding` is a cluster-scoped resource that grants the permissions of a `ClusterRole` to a Subject across the entire cluster. It can also use a `Role` as reference (effectively granting it cluster-wide, though Roles are typically namespace-scoped).
+A `ClusterRoleBinding` is a cluster-scoped resource that grants the permissions of a `ClusterRole` to a Subject across the entire cluster. It can technically reference a `Role` as well, but since a `Role`'s rules are scoped to the Role's own namespace, the effective permissions still apply only within that namespace even when bound via a ClusterRoleBinding. Avoid this pattern as it is confusing.
 
 ```mermaid
 flowchart TD
     A["ClusterRoleBinding (cluster-scoped)"] --> B["Subject: User/Group/SA"]
     A --> C["References ClusterRole"]
     C --> D["Permissions apply across ALL namespaces"]
-    A -.->| Can also reference | E["Role (rare, scope is the Role's namespace)"]
+    A -.->| Rarely references | E["Role (permissions still limited to Role's namespace)"]
 ```
 
 ### Concrete Examples

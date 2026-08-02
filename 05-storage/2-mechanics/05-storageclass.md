@@ -220,7 +220,7 @@ kubectl delete storageclass fast-ssd
 1. **PVC stuck in `Pending` with zone mismatch**: The StorageClass uses `Immediate` binding with a zonal provisioner. Switch to `WaitForFirstConsumer`.
 2. **Data lost after PVC deletion**: The reclaim policy is `Delete`. Switch to `Retain` for critical data.
 3. **Expansion fails**: The StorageClass does not have `allowVolumeExpansion: true`, or the CSI driver does not support expansion.
-4. **Multiple default StorageClasses**: Only one default StorageClass is allowed. Delete or unset the default annotation on extra classes.
+4. **Multiple default StorageClasses**: Multiple default StorageClasses can coexist. When more than one is marked as default, Kubernetes uses the most recently created one. Use only one default to avoid unexpected PVC binding behavior.
 5. **Wrong provisioner**: The provisioner name must match an installed CSI driver. Check with `kubectl get csidrivers`.
 
 ## Troubleshooting

@@ -38,7 +38,7 @@ spec:
 | `spec.ports[].port` | Required | Yes | Cluster-internal port. |
 | `spec.ports[].targetPort` | Required | Yes | Container port on Pod; relationship same as ClusterIP. |
 | `spec.ports[].protocol` | Optional | Yes | Typically `TCP` or `UDP`. |
-| `spec.selector` | Important | No | Immutable; determines which Pods receive traffic. |
+| `spec.selector` | Important | Yes | Mutable; determines which Pods receive traffic. Use `kubectl set selector` or `kubectl patch` to change. |
 | `spec.externalTrafficPolicy` | Optional | Yes | `Cluster` (default) does not preserve source IP; use `Local` to keep client source IP on the node. |
 | `spec.clusterIP` | Optional | No | Typically left empty to allocate a cluster-internal IP; immutable after creation. |
-| `spec.healthCheckNodePort` | Optional | Yes | Custom health check port for nodes when `externalTrafficPolicy` is `Local`; auto-assigned if omitted. |
+| `spec.healthCheckNodePort` | Optional | Yes | Custom health check port for nodes; only used when `type` is `LoadBalancer` and `externalTrafficPolicy` is `Local`. Auto-assigned if omitted. |

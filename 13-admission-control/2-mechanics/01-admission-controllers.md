@@ -50,7 +50,7 @@ Enforces Pod Security Standards (PSS) at the pod level. Replaces the deprecated 
 
 ### NodeRestriction
 
-Restricts kubelets to only modifying their own node resources. Prevents a compromised kubelet from modifying other nodes. **Not enabled by default** — enable with `--enable-admission-plugins=NodeRestriction`.
+Restricts kubelets to only modifying their own node resources. Prevents a compromised kubelet from modifying other nodes. **Enabled by default**.
 
 ### AlwaysPullImages
 

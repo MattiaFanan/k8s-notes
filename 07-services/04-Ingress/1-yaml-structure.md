@@ -33,7 +33,7 @@ spec:
 | :--- | :---: | :--- |
 | `spec.rules[].host` | Conditional | Required if exposing by domain. |
 | `spec.rules[].http.paths[].path` | Yes | URL path regex/prefix. |
-| `spec.rules[].http.paths[].pathType` | Yes | `Prefix` (default), `Exact`, `ImplementationSpecific`. |
+| `spec.rules[].http.paths[].pathType` | Yes | `Prefix`, `Exact`, `ImplementationSpecific`. Required; no default in networking.k8s.io/v1. |
 | `spec.ingressClassName` | Conditional | Required if cluster has default ingress class configured. |
 
 ## Field Reference

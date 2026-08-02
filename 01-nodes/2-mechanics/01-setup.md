@@ -67,9 +67,9 @@ kubectl get componentstatuses
 # View node roles
 kubectl get nodes -o wide
 # NAME     STATUS   ROLES           AGE   VERSION   INTERNAL-IP
-# cp-1     Ready    control-plane   10d   v1.28.0   10.0.0.1
-# worker-1 Ready    <none>          10d   v1.28.0   10.0.0.2
-# worker-2 Ready    <none>          10d   v1.28.0   10.0.0.3
+# cp-1     Ready    control-plane   10d   v1.35.0   10.0.0.1
+# worker-1 Ready    <none>          10d   v1.35.0   10.0.0.2
+# worker-2 Ready    <none>          10d   v1.35.0   10.0.0.3
 
 # The control plane node has the role "control-plane"
 kubectl get nodes -l node-role.kubernetes.io/control-plane
@@ -121,8 +121,8 @@ sudo systemctl enable --now containerd
 
 # 2. Install kubeadm, kubelet, kubectl
 sudo apt-get install -y apt-transport-https ca-certificates curl
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.35/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
@@ -164,7 +164,7 @@ chmod 600 ~/.kube/config
 # Verify
 kubectl get nodes
 # NAME    STATUS   ROLES                  AGE   VERSION
-# server  Ready    control-plane,master   1m    v1.28.3+k3s1
+# server  Ready    control-plane,master   1m    v1.35.3+k3s1
 ```
 
 ### Option 3: kind (Local Development)
@@ -218,8 +218,8 @@ sudo kubeadm join 10.0.0.1:6443 --token abcdef.0123456789abcdef \
 # Verify from control plane
 kubectl get nodes
 # NAME     STATUS   ROLES    AGE   VERSION
-# cp-1     Ready    control-plane   10d   v1.28.0
-# worker-1 Ready    <none>          5s    v1.28.0
+# cp-1     Ready    control-plane   10d   v1.35.0
+# worker-1 Ready    <none>          5s    v1.35.0
 ```
 
 ### k3s Agent Join
@@ -231,8 +231,8 @@ curl -sfL https://get.k3s.io | K3S_URL=https://<server-ip>:6443 K3S_TOKEN=<node-
 # Verify from server
 kubectl get nodes
 # NAME    STATUS   ROLES                  AGE   VERSION
-# server  Ready    control-plane,master   5m    v1.28.3+k3s1
-# agent   Ready    <none>                 10s   v1.28.3+k3s1
+# server  Ready    control-plane,master   5m    v1.35.3+k3s1
+# agent   Ready    <none>                 10s   v1.35.3+k3s1
 ```
 
 ### Post-Join Configuration

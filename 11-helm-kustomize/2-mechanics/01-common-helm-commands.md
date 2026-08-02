@@ -37,7 +37,7 @@ helm install my-release myrepo/mychart --version 1.2.3
 
 ### Install Behavior
 
-- Helm creates a `Release` object in the release namespace (by default) that tracks the release state.
+- Helm stores release metadata as Secrets in the release namespace (by default) that tracks the release state.
 - Helm renders the chart templates and sends the resulting manifests to the Kubernetes API server.
 - Resources are created in the order they appear in the rendered YAML (or in dependency order for charts with dependencies).
 
@@ -81,7 +81,7 @@ helm upgrade my-release ./my-chart --cleanup-on-fail
 ### Upgrade Behavior
 
 - Helm performs a three-way merge between the previous release, the new release, and the current cluster state.
-- Resources that are removed from the chart are deleted from the cluster (unless `--keep-history` is used with `--atomic`).
+- Resources that are removed from the chart are deleted from the cluster.
 - Helm uses `kubectl` under the hood to apply the rendered manifests.
 
 > **Best practice**: Use `--atomic` for production upgrades. This ensures that if the upgrade fails, Helm automatically rolls back to the previous release.
@@ -183,7 +183,7 @@ helm template my-release ./my-chart -f custom-values.yaml
 helm template my-release ./my-chart -f custom-values.yaml --set replicaCount=3
 
 # Render with a specific release name and namespace
-helm template my-release ./my-chart --release-name my-release --namespace production
+helm template my-release ./my-chart --namespace production
 
 # Render with a specific chart version
 helm template my-release ./my-chart --version 1.2.3
@@ -255,7 +255,7 @@ flowchart TD
 
 - **`release already exists`**: The release name is already in use. Use a different name or uninstall the existing release first.
 - **`chart not found`**: The chart path or repository is incorrect. Run `helm repo update` to refresh the cache.
-- **`rendered manifests contain a resource that already exists`**: The chart is trying to create a resource that already exists in the cluster. Use `--replace` or check for conflicting resources.
+- **`rendered manifests contain a resource that already exists`**: The chart is trying to create a resource that already exists in the cluster. Use `--force-replace` to force resource updates through replacement, or check for conflicting resources.
 - **Upgrade hangs**: Resources may be stuck in a pending state. Check `kubectl get pods` and `kubectl describe` for issues.
 - **Rollback fails**: The previous revision's templates may reference resources that no longer exist. Check the revision history with `helm history`.
 - **`helm template` output differs from cluster state**: Helm templates only render the chart; it does not reflect existing cluster state or values overrides applied during install.

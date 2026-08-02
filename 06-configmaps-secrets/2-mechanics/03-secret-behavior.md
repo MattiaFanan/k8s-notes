@@ -53,6 +53,8 @@ kubectl create secret generic env-secret \
 
 Automatically created by the ServiceAccount controller. Contains a JWT token used for authenticating with the API server.
 
+> **Deprecated since Kubernetes 1.24**: ServiceAccount token Secrets are deprecated in favor of the TokenRequest API. Use `TokenRequest` to generate short-lived tokens instead.
+
 ```bash
 kubectl get secret -n default | grep serviceaccount
 # You typically do not need to create these manually
@@ -247,7 +249,7 @@ flowchart TD
     subgraph Security[Security]
         S1["RBAC controls"]
         S2["Encryption at rest (optional)"]
-        S3["Immutable (K8s 1.24+)"]
+        S4["Immutable (K8s 1.21+)"]
         S4["Audit logging"]
     end
 

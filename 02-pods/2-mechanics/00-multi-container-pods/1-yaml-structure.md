@@ -70,20 +70,20 @@ spec:
 
 | Field | Required/Optional/Important | Editable with `kubectl edit` | Notes & Best Usage |
 |---|---|---|---|
-| `apiVersion` | Required | Yes | Must be `v1` for Pods. |
-| `kind` | Required | Yes | Must be `Pod` for this resource type. |
-| `metadata.name` | Required | Yes | Unique name within the namespace. |
-| `spec.containers` | Required | Yes | Each container must have a unique `name` within the Pod. |
-| `spec.containers[].name` | Required | Yes | Used to reference the container in `volumeMounts` and `dependsOn`. |
-| `spec.containers[].image` | Required | Yes | Image reference (tag or digest). |
-| `spec.containers[].volumeMounts` | Optional | Yes | `name` must match a volume in `spec.volumes`. Shared volumes allow sidecars to read/write the same data. |
-| `spec.containers[].command` | Optional | Yes | Overrides the container's default entrypoint. |
-| `spec.containers[].ports` | Optional | Yes | Declares the network port the container listens on. |
-| `spec.containers[].env` | Optional | Yes | Environment variables passed to the container. |
-| `spec.initContainers` | Optional | **No** (non-editable after creation) | Run to completion before app containers start. Cannot be modified after Pod creation; delete and recreate the Pod to change them. |
-| `spec.volumes` | Optional | Yes | Defines shared storage. Volume `name` must match `volumeMounts.name` across all containers that share it. |
-| `spec.volumes[].name` | Required | Yes | Must match the `name` in every container's `volumeMounts` that needs access to that volume. |
-| `spec.volumes[].emptyDir` | Optional | Yes | Ephemeral storage shared across containers in the Pod. |
+| `apiVersion` | Required | No | Must be `v1` for Pods. Immutable after creation. |
+| `kind` | Required | No | Must be `Pod` for this resource type. Immutable after creation. |
+| `metadata.name` | Required | No | Unique name within the namespace. Immutable after creation. |
+| `spec.containers` | Required | No | At least one container must be defined. Containers cannot be added or removed after creation. |
+| `spec.containers[].name` | Required | No | Unique within the Pod. Immutable after creation. |
+| `spec.containers[].image` | Required | **Yes** | Image reference (tag or digest). Can be updated in a running Pod. |
+| `spec.containers[].volumeMounts` | Optional | No | Mount points into container filesystem. Must match a defined volume. Immutable after creation. |
+| `spec.containers[].command` | Optional | No | Overrides the container's default entrypoint. Immutable after creation. |
+| `spec.containers[].ports` | Optional | No | Declares the network port the container listens on. Immutable after creation. |
+| `spec.containers[].env` | Optional | No | Environment variables passed to the container. Immutable after creation. |
+| `spec.initContainers` | Optional | No | Init containers cannot be added or modified after Pod creation; delete and recreate the Pod. |
+| `spec.volumes` | Optional | No | Defines shared storage. Immutable after creation. |
+| `spec.volumes[].name` | Required | No | Must match the `name` in every container's `volumeMounts`. Immutable after creation. |
+| `spec.volumes[].emptyDir` | Optional | No | Ephemeral storage shared across containers in the Pod. Immutable after creation. |
 
 ### Multi-Container Pattern Notes
 

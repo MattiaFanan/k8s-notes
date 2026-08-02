@@ -15,7 +15,7 @@
 
 - **Job Restart Policy**: Pods managed by Jobs MUST set `restartPolicy: OnFailure` or `Never`. `Always` will fail validation!
 - **Match Labels**: Deployments created with `kubectl create deployment` automatically set `app=<name>` matchLabels. If modifying manually, do not break label alignment.
-- **CronJob `startingDeadlineSeconds`**: If a CronJob misses its scheduled time (e.g., cluster was down), it will run once the deadline is reached. Default is not set (no deadline).
+- **CronJob `startingDeadlineSeconds`**: If a CronJob misses its scheduled time (e.g., cluster was down), it will run only if the deadline has not yet passed; otherwise, the run is skipped. Default is not set (no deadline).
 - **Job `ttlSecondsAfterFinished`**: Set this to automatically clean up completed Jobs and their Pods. Without it, completed Jobs accumulate in etcd.
 - **Deployment `selector` is immutable**: You cannot change `spec.selector` after creating a Deployment. Ensure labels match `spec.template.metadata.labels`.
 - **`maxUnavailable: 0` + `maxSurge: 0` is a deadlock**: The Deployment controller cannot make progress. Never set both to 0 for RollingUpdate.

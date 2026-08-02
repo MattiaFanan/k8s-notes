@@ -20,7 +20,7 @@
 
 1. **Wrong `kind` / `apiVersion`**: CRs must reference exact CRD `kind` and version.
 2. **CRD Plural Mismatch**: Plural in `spec.names.plural` becomes cli noun.
-3. **Validation not retroactive**: Adding or updating `openAPIV3Schema` constraints does not invalidate existing bad CRs. You must delete and recreate them.
+3. **Validation is retroactive for structural schemas**: Adding or updating `openAPIV3Schema` constraints **does** validate existing CRs against the new schema in Kubernetes v1.16+ (including v1.35). Existing CRs that fail validation will be rejected on update. For non-structural schemas, behavior may differ.
 4. **Only one `storage: true` version**: Set by the CRD author, not by end users.
 
 ## Time-Saver

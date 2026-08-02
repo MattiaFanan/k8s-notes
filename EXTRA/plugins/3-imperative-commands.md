@@ -30,8 +30,8 @@ kubectl get csidrivers
 kubectl get storageclass gp2 -o jsonpath='{.provisioner}'
 # ebs.csi.aws.com
 
-# Verify CSI migration is enabled (for in-tree to CSI transition)
-kubectl get nodes -o jsonpath='{.items[*].status.features}'
+# Verify CSI drivers are available
+kubectl get csidrivers
 ```
 
 ## Admission Plugins

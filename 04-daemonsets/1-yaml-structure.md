@@ -44,10 +44,9 @@ spec:
         image: prom/node-exporter:latest
       nodeSelector:
         node-role.kubernetes.io/worker: ""
-        tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          effect: NoSchedule
-          operator: Exists
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
  ```
 
 ## Field Reference
@@ -57,9 +56,9 @@ spec:
 | `spec.selector` | Required | No (immutable) | Must match `template.metadata.labels`. Immutable after creation to prevent overlapping DaemonSets. |
 | `spec.template` | Required | Yes (partial) | Pod spec; same structure as a Pod spec. `template.metadata.labels` must match `spec.selector.matchLabels`. |
 | `spec.template.spec.containers` | Required | Yes | Standard container spec. |
-| `spec.strategy.type` | Optional | Yes | `RollingUpdate` (default) or `OnDelete`. |
-| `spec.strategy.rollingUpdate.maxUnavailable` | Optional | Yes | Used with `RollingUpdate`. Controls how many pods can be unavailable during an update. |
-| `spec.strategy.rollingUpdate.maxSurge` | Optional | Yes | Used with `RollingUpdate`. Controls how many pods can be created above the desired count during an update. |
+| `spec.updateStrategy.type` | Optional | Yes | `RollingUpdate` (default) or `OnDelete`. |
+| `spec.updateStrategy.rollingUpdate.maxUnavailable` | Optional | Yes | Used with `RollingUpdate`. Controls how many pods can be unavailable during an update. |
+| `spec.updateStrategy.rollingUpdate.maxSurge` | Optional | Yes | Used with `RollingUpdate`. Controls how many pods can be created above the desired count during an update. |
 | `spec.template.spec.nodeSelector` | Optional | Yes | Targets specific nodes for pod scheduling. |
 | `spec.template.spec.tolerations` | Optional | Yes | Allows pods to be scheduled on nodes with taints (e.g., control plane nodes). |
 | `updateStrategy` rolling update fields | Optional | Yes | Fields under `rollingUpdate` are editable via `kubectl edit`. |

@@ -131,7 +131,7 @@ spec:
 ```
 
 - `Cluster` (default): Traffic arriving at any node is forwarded to any backend Pod, even on other nodes. Source IP is lost.
-- `Local`: Traffic is only forwarded to Pods on the same node. Source IP is preserved. If a node has no Pods, traffic is dropped (unless `externalTrafficPolicy` is combined with `healthCheckNodePort`).
+- `Local`: Traffic is only forwarded to Pods on the same node. Source IP is preserved. If a node has no Pods, traffic to that node's nodePort is dropped (for NodePort Services, there is no cloud load balancer health check to redirect traffic; `healthCheckNodePort` only applies when `type` is `LoadBalancer`).
 
 ```bash
 # Verify the traffic policy

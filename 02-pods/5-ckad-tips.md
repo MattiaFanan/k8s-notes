@@ -31,7 +31,7 @@ set expandtab
    k exec -it mypod -- sh
    ```
 4. **Deleting Pods slowly**: Use `--force --grace-period=0` if you need to delete a stuck pod instantly.
-5. **`kubectl run` creates a Deployment, not a Pod**: In modern Kubernetes, `kubectl run` creates a Deployment by default. Use `--restart=Never` for a Pod.
+5. **`kubectl run` creates a Pod, not a Deployment**: In modern Kubernetes (v1.18+), `kubectl run` creates a Pod by default. Use `kubectl create deployment` for Deployments.
 6. **`kubectl run` does not create a Service**: You must create a Service separately to expose the pod.
 
 ## Time-Saver

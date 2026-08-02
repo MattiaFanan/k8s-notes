@@ -37,17 +37,16 @@ The `podSelector` field defines **which pods the policy applies to**. It is a st
 
 ### Empty Selector (`{}`)
 
-An empty selector `{}` matches **all pods** in the namespace. This is distinct from using no selector — a policy with no selector applies to no pods (because there's no filtering criterion).
+An empty selector `{}` matches **all pods** in the namespace. The `podSelector` field is **optional** — if it is omitted, Kubernetes defaults to an empty selector `{}` (which matches all pods). This means there is no valid way to write a NetworkPolicy that selects "no pods" via omission; you must use a selector that matches nothing (e.g., `matchLabels` with a non-existent key) to target zero pods.
 
 ```yaml
-# Matches ALL pods in the namespace
+# Matches ALL pods in the namespace (explicit empty selector)
 spec:
   podSelector: {}
 
-# Matches NO pods (no selector means empty match set)
-# This is actually invalid — every NetworkPolicy must have a podSelector
-# when policyTypes references rules that depend on it
-```
+# Also matches ALL pods in the namespace (selector omitted, defaults to {})
+spec:
+  podSelector: {}
 
 ```bash
 # See which pods in a namespace match a given selector

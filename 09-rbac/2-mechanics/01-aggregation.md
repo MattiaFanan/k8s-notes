@@ -14,7 +14,7 @@ A `ClusterRole` with `aggregationRule` acts as a **computed union** of rules fro
 flowchart TD
     A["ClusterRole: admin-role\naggregationRule"] -->| labelSelector: role=admin | B["ClusterRole: read-only<br/>rules: get, list, watch"]
     A -->| labelSelector: role=admin | C["ClusterRole: edit-role<br/>rules: create, update, delete"]
-    A -->| labelSelector: role=admin | D["ClusterRole: audit-role<br/>rules: get, list on logs]
+    A -->| labelSelector: role=admin | D["ClusterRole: audit-role<br/>rules: get, list on logs"]
     B --> E["Effective Aggregated Rules"]
     C --> E
     D --> E
@@ -57,7 +57,7 @@ flowchart TL
 ### Key Rules of Aggregation
 
 1. **Aggregation only works for `ClusterRole`** — `Role` resources cannot aggregate other roles. The `aggregationRule` field is only valid on `ClusterRole`.
-2. **The aggregating ClusterRole has no static `rules`** — If you include both `rules` and `aggregationRule`, the aggregation still works, but the static `rules` field is ignored by Kubernetes.
+2. **The aggregating ClusterRole can include both static `rules` and `aggregationRule`** — If you include both, Kubernetes applies both the static rules and the aggregated rules (union). The static rules are NOT ignored; they are combined with the aggregated rules to form the effective rule set.
 3. **Aggregation happens automatically** — When a source ClusterRole's labels or rules change, the aggregated ClusterRole's effective rules are updated automatically. There is no manual re-sync needed.
 4. **Rules are merged (union)** — If two source ClusterRoles define rules for the same API group and resource with overlapping verbs, the union of all verbs is taken. There is no conflict — more permissions are always added.
 5. **Label matching is exact** — The `clusterRoleSelectors` use standard label selector syntax. Labels must match exactly (including casing).
@@ -182,10 +182,10 @@ kubectl describe clusterrole aggregate-to-view | grep -A20 "Rules:"
 
 ### Pitfall 3: Confusing Aggregation with Static Rules
 
-If a ClusterRole has both `rules` and `aggregationRule`, Kubernetes ignores the static `rules` for aggregated ClusterRoles. All permissions come from the aggregation sources only.
+If a ClusterRole has both `rules` and `aggregationRule`, Kubernetes **combines** them — the effective rules are the union of the static rules AND the aggregated rules from matching source ClusterRoles. The static rules are NOT ignored.
 
 ```yaml
-# This: static rules are IGNORED
+# This: static rules are COMBINED with aggregated rules
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -194,7 +194,7 @@ aggregationRule:
   clusterRoleSelectors:
     - matchLabels:
         role: aggregator
-# Effective rules: ONLY those from matching source ClusterRoles, NOT the static rules
+# Effective rules: static rules [get on secrets] UNION aggregated rules from matching sources
 ```
 
 ### Pitfall 4: Overlapping Rules from Multiple Sources

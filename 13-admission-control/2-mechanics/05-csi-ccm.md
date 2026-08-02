@@ -98,7 +98,7 @@ CSI migration allows in-tree cloud provider plugins (e.g., `aws-ebs`, `gce-pd`) 
 kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo}' | grep -i csi
 ```
 
-> **Best practice**: Use CSI drivers for all storage needs. In-tree plugins are deprecated and will be removed in future Kubernetes versions. CSI migration is enabled by default and the feature gates are no longer configurable.
+> **Best practice**: Use CSI drivers for all storage needs. In-tree cloud provider plugins have been removed from Kubernetes. CSI migration is enabled by default and the feature gates are no longer configurable.
 
 ## CCM (Cloud Controller Manager)
 
@@ -210,7 +210,7 @@ flowchart TD
 
 ## Best Practices
 
-1. **Use CSI drivers for all storage**: In-tree plugins are deprecated and will be removed.
+1. **Use CSI drivers for all storage**: In-tree cloud provider plugins have been removed from Kubernetes.
 2. **Enable CSI migration**: When migrating from in-tree plugins to CSI drivers, enable CSI migration for a transparent transition.
 3. **Use CCM for cloud providers**: CCM allows cloud providers to release independently of Kubernetes.
 4. **Secure cloud credentials**: Use IAM roles for service accounts (IRSA) instead of embedding credentials in config files.

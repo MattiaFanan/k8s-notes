@@ -106,14 +106,14 @@ spec:
 
 | Type | Behavior |
 |------|----------|
-| `Directory` | Must exist on the node |
-| `DirectoryOrCreate` | Create directory if it does not exist |
-| `File` | Must exist on the node |
-| `FileOrCreate` | Create file if it does not exist |
-| `Socket` | Must exist and be a Unix socket |
-| `CharDevice` | Must exist and be a character device |
-| `BlockDevice` | Must exist and be a block device |
-| `Unset` | Default — no validation performed |
+ | `Directory` | Must exist on the node |
+ | `DirectoryOrCreate` | Create directory if it does not exist |
+ | `File` | Must exist on the node |
+ | `FileOrCreate` | Create file if it does not exist |
+ | `Socket` | Must exist on the node |
+ | `CharDevice` | Must exist and be a character device (Linux nodes only) |
+ | `BlockDevice` | Must exist and be a block device (Linux nodes only) |
+ | `""` (empty) | Default — no validation performed |
 
 **When to use:**
 - Mounting `/proc` or `/sys` for debugging or monitoring tools

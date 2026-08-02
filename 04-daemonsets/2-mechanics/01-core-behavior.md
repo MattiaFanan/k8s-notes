@@ -46,7 +46,6 @@ spec:
       tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
-        effect: NoSchedule
       containers:
       - name: node-exporter
         image: prom/node-exporter:v1.8

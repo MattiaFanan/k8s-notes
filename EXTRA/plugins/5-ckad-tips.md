@@ -12,7 +12,7 @@
 1. **Assuming NetworkPolicy works without a CNI that enforces it**: Flannel does not enforce NetworkPolicies. Calico, Cilium, and Antrea do.
 2. **In-tree provisioner vs CSI mismatch**: A StorageClass using `kubernetes.io/aws-ebs` requires the in-tree cloud provider; modern clusters use `ebs.csi.aws.com`.
 3. **Webhook caBundle mismatch**: If you recreate a webhook service, the `caBundle` may become stale and cause `failed calling webhook`.
-4. **CSI migration disabled**: Clusters running older CSI drivers may need explicit CSI migration enablement.
+4. **CSI migration is automatic**: Since Kubernetes 1.25, CSI migration is enabled by default and the `CSIMigration` feature gates were removed in v1.27.
 5. **Plugin binary not in PATH**: `kubectl plugin list` is the fastest way to verify plugin visibility in the exam environment.
 
 ## Time-Saver

@@ -127,13 +127,15 @@ A common misconception is that `ReadWriteOnce` means only one pod in the entire 
 ### ROX and RWX Are Not Universally Supported
 
 Not all storage providers support all access modes. For example:
-- **AWS EBS** supports only `ReadWriteOnce`
-- **GCE PD** supports only `ReadWriteOnce`
-- **Azure Disk** supports only `ReadWriteOnce`
+- **AWS EBS CSI** supports `ReadWriteOnce` and `ReadWriteOncePod`
+- **GCE PD CSI** supports `ReadWriteOnce` and `ReadOnlyMany` (ROX via snapshot/clone)
+- **Azure Disk CSI** supports `ReadWriteOnce` only
 - **NFS** supports all three modes (`RWO`, `ROX`, `RWX`)
 - **AWS EFS** supports all three modes
 
 If you request a mode your storage class does not support, the PVC will remain in `Pending` state indefinitely.
+
+Note: For CSI drivers, access mode support depends on the driver. For example, the **GCE PD CSI driver** supports both `ReadWriteOnce` and `ReadOnlyMany` (the latter via snapshot/clone). The **AWS EBS CSI driver** supports `ReadWriteOnce` and `ReadWriteOncePod`, but not `ReadOnlyMany` or `ReadWriteMany`. For the CKAD exam, the common simplification is that block storage backends (EBS, GCE PD, Azure Disk) support `ReadWriteOnce` only, while file storage backends (NFS, EFS, Azure Files) support `ReadWriteMany`.
 
 ### Access Modes vs. Volume Mode
 
@@ -179,6 +181,6 @@ spec:
 
 ## Community Knowledge
 
-- **EBS CSI Driver** (for AWS): Supports only RWO. If you need RWX on AWS, use EFS with the EFS CSI driver.
+- **EBS CSI Driver** (for AWS): Supports `ReadWriteOnce` and `ReadWriteOncePod`. If you need `ReadWriteMany` on AWS, use EFS with the EFS CSI driver.
 - **NFS as a quick RWX solution**: For testing or small workloads, you can set up an NFS server and use the NFS plugin to expose RWX storage. Not recommended for production without proper hardening.
 - **ReadWriteOncePod (RWOP)**: A newer access mode for volumes that should be mountable by only a single pod (regardless of node). This is more restrictive than RWO and is useful for volumes backed by local storage or when you want stronger guarantees. GA since v1.29. Supported by CSI drivers that implement the `SINGLE_NODE_MULTI_WRITER` capability.

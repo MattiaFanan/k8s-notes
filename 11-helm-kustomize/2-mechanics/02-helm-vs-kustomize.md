@@ -83,7 +83,7 @@ helm upgrade myapp ./mychart -f production-values.yaml --set image.tag=2.0
 
 - **Template complexity**: Go templates can become difficult to debug.
 - **Not built into kubectl**: Requires separate installation.
-- **Release namespace**: Helm stores release state in the `helm` namespace, adding cluster state.
+- **Release namespace**: Helm v3 stores release state as Secrets in the release namespace (where the app is installed), not in a separate namespace.
 - **Template rendering surprises**: `helm template` may not perfectly represent what Helm will apply.
 
 ## Kustomize: Pure YAML Overlay System

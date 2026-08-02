@@ -42,7 +42,7 @@ binaryData:
 **Limitations:**
 - A single ConfigMap can be at most **1 MiB** in size
 - Keys in `data` and `binaryData` must not overlap
-- Keys must be valid DNS subdomain names (lowercase alphanumeric, `-`, `.`)
+  - Keys must consist of alphanumeric characters, `-`, `_`, or `.`
 
 ## Consumption Methods
 
@@ -69,7 +69,7 @@ envFrom:
       name: app-config
 ```
 
-This creates one environment variable for each key in the ConfigMap's `data` section. Keys become upper-case environment variable names (dots and dashes are replaced with underscores by some runtimes).
+This creates one environment variable for each key in the ConfigMap's `data` section. The key from the ConfigMap becomes the environment variable name in the Pod exactly as-is — Kubernetes does **not** uppercase keys or replace dots/dashes with underscores. Keys that are not valid environment variable names are skipped (recorded in the event log as `InvalidVariableNames`).
 
 **⚠ Important:** `envFrom` does **not** inject `binaryData` keys — only `data` keys are available as environment variables.
 

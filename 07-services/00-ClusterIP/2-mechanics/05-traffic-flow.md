@@ -61,7 +61,7 @@ kube-proxy runs on **every node** and installs networking rules. It supports thr
 | Mode | Mechanism | Pros | Cons |
 |------|-----------|------|------|
 | **iptables** | Random iptables rules | Simple, deterministic | `O(n)` rule scaling |
-| **nftables** | nftables sets (K8s 1.25+) | Better performance, cleaner | Newer, less tooling |
+| **nftables** | nftables sets (alpha 1.29 / GA 1.33, not default) | Better performance, cleaner | Newer, less tooling |
 | **IPVS** | L4 load balancer | L7 scheduling, real health checks | Extra dependency, more complex |
 
 ### iptables / nftables Flow
@@ -209,13 +209,10 @@ sudo iptables-save | grep <cluster-ip>
 
 ## Performance Considerations
 
-1. **Service Topology Awareness**: Use `topologyKeys` to prefer backends in the same zone/region, reducing latency.
+1. **Traffic Distribution**: Use `trafficDistribution: PreferSameZone` (or `PreferSameNode`) to prefer backends in the same zone/node, reducing latency. Replaces the removed `topologyKeys` field (deprecated 1.21, removed 1.22).
    ```yaml
    spec:
-     topologyKeys:
-       - "topology.kubernetes.io/zone"
-       - "topology.kubernetes.io/region"
-       - "*"
+     trafficDistribution: PreferSameZone
    ```
 
 2. **External Traffic Policy**: Set `externalTrafficPolicy: Local` on NodePort/LoadBalancer to preserve client source IP and avoid extra hop.

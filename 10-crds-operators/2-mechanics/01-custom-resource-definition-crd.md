@@ -70,7 +70,7 @@ spec:
 | `spec.names` | Yes | Plural, singular, kind, and shortNames |
 | `spec.validation` | No | OpenAPI v3 schema for validation |
 | `spec.subresources` | No | Exposes `/status` and/or `/scale` subresources |
-| `spec.printColumn` | No | Additional columns in `kubectl get` output |
+| `spec.additionalPrinterColumns` | No | Additional columns in `kubectl get` output |
 
 ## Validation (OpenAPI v3 Schema)
 

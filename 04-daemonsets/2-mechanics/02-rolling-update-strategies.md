@@ -44,16 +44,9 @@ Unlike Deployments, `maxSurge` creates a **temporary extra Pod** on the node (no
 | `0` | `All` | All old Pods terminate, then new Pods create. Downtime if Pod collects logs |
 | `1` | `0` | New Pod runs alongside old Pod during update. Zero disruption but doubles resource usage briefly |
 
-### Specifying Node Order
+### Node Update Order
 
-Since K8s 1.21, the DaemonSet controller supports `nodeSelector` based ordering if `nodeSelector` is set. It also supports **alpha** features like `nodeAffinity` ordering.
-
-```yaml
-spec:
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 1
-```
+The DaemonSet controller updates nodes in an **undefined order** (the order it iterates the node cache). Do not rely on any specific order. To control the order of updates across zones, you can deploy separate DaemonSets per zone and manage their rollouts individually.
 
 ### OnDelete (Legacy / Explicit)
 
@@ -112,7 +105,6 @@ spec:
       tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
-        effect: NoSchedule
       containers:
       - name: node-exporter
         image: prom/node-exporter:v1.8
@@ -136,6 +128,6 @@ kubectl rollout status daemonset/node-exporter --timeout=5m
 
 ### Common Pitfalls
 
-- **`maxSurge` on DaemonSets is per-node, not cluster-wide**: a DaemonSet with `maxSurge: 1` and 100 nodes creates 100 extra Pods during rollout.
+- **`maxSurge` on DaemonSets is measured in nodes, not per-node**: a DaemonSet with `maxSurge: 1` creates at most 1 extra Pod (on 1 node) during rollout, regardless of total node count. To surge on all nodes, use `maxSurge: 100%` or an absolute count equal to the number of nodes. Both `maxSurge` and `maxUnavailable` can be non-zero simultaneously; at least one must be non-zero.
 - **OnDelete requires you to know which Pods are stale**: without manual tracking, you might miss nodes that were added after the last OnDelete update.
 - **RollingUpdate on a node that just rebooted** creates a new Pod immediately, potentially before the node is ready (ensure node readiness gates exist).

@@ -40,23 +40,7 @@ kubectl get pods -l app=node-exporter -o wide
 
 ### Rolling Update Order
 
-By default, the DaemonSet controller updates nodes in an **undefined order** (the order it iterates the node cache). Do not rely on any specific order unless you explicitly configure it.
-
-You can influence order using:
-
-```yaml
-spec:
-  template:
-    spec:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: topology.kubernetes.io/zone
-              operator: In
-              values:
-              - us-east-1a    # Nodes in zone 'a' are iterated first
-```
+By default, the DaemonSet controller updates nodes in an **undefined order** (the order it iterates the node cache). Do not rely on any specific order.
 
 ### Status and Readiness
 
@@ -115,8 +99,7 @@ kubectl cordon worker-2
 # Drain a node (evicts Pods gracefully)
 kubectl drain worker-2 --ignore-daemonsets --delete-emptydir-data
 
-# --ignore-daemonsets: skip evicting DaemonSet Pods
-# DaemonSet controller recreates them automatically
+# --ignore-daemonsets: skip evicting DaemonSet Pods (they stay running)
 
 # Force delete a DaemonSet and recreate
 kubectl delete daemonset fluentd --grace-period=0 --force

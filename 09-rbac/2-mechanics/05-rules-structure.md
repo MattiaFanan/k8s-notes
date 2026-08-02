@@ -62,8 +62,8 @@ rules:
     resources: ["pods", "deployments", "jobs"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
-# Rule that explicitly denies everything (wildcard API group)
-# Note: This pattern is used in admission control, not in standard RBAC rules
+# Rule that grants all verbs on all resources (use with extreme caution)
+# This pattern is valid in standard RBAC rules (e.g., cluster-admin ClusterRole)
 rules:
   - apiGroups: ["*"]
     resources: ["*"]
@@ -105,7 +105,6 @@ The `verbs` field specifies which actions the rule permits. The available verbs 
 | `bind` | Bind a ClusterRole to a subject | Yes |
 | `escalate` | Elevate own permissions | Yes |
 | `proxy` | Proxy requests to subresources | No |
-| `exec` | Execute commands in a container (subresource) | Yes |
 
 ```yaml
 # ReadOnly access

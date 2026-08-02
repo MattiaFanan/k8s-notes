@@ -4,9 +4,6 @@
 # Generate DaemonSet YAML
 kubectl create daemonset node-logger --image=fluentbit:latest --dry-run=client -o yaml > ds.yaml
 
-# Scale DaemonSet (update replica count)
-kubectl scale daemonset node-logger --replicas=5
-
 # Rolling update
 kubectl rollout status daemonset node-logger
 kubectl rollout history daemonset node-logger

@@ -88,7 +88,7 @@ kubectl exec -n production <pod> -- cat /var/run/secrets/kubernetes.io/serviceac
 
 ## Token Automounting
 
-By default, Kubernetes automatically mounts a ServiceAccount token into every Pod at `/var/run/secrets/kubernetes.io/serviceaccount/`. This token is used for API authentication.
+By default, Kubernetes automatically mounts a ServiceAccount projected volume token into every Pod at `/var/run/secrets/kubernetes.io/serviceaccount/` (Kubernetes v1.24+). This token is used for API authentication. In older versions, a ServiceAccount secret was mounted; since v1.24, projected volume tokens are the default mechanism.
 
 ### How Token Automounting Works
 
@@ -267,18 +267,18 @@ By default, tokens are always automounted unless explicitly disabled. This means
 
 If the ServiceAccount has `automountServiceAccountToken: false` and the Pod needs API access, the Pod will not have a token. You must either enable automounting or use a projected volume for the token.
 
-### "ServiceAccount created but Pod still uses default"
+### "ServiceAccount specified but Pod still uses default"
 
-If a Pod explicitly declares `serviceAccountName` but that ServiceAccount doesn't exist yet, Kubernetes creates it automatically. However, if the ServiceAccount name has a typo, the Pod will use the non-existent SA name and fail to start. Always verify the SA name matches exactly.
+If a Pod explicitly declares `serviceAccountName` but that ServiceAccount doesn't exist, Kubernetes **does NOT** create the ServiceAccount automatically. The Pod will fail to start with a "serviceaccount not found" error. Always verify the ServiceAccount exists before referencing it in a Pod spec.
 
 ```bash
 # Check if the specified ServiceAccount exists
 kubectl get serviceaccount <name> -n <ns>
 
-# If it doesn't exist, Kubernetes will create it automatically
-# BUT it will have NO permissions
+# If it doesn't exist, create it explicitly
+kubectl create serviceaccount <name> -n <ns>
 
-# Fix: Create the ServiceAccount explicitly or correct the name
+# Then reference it in the Pod spec
 ```
 
 ## Exam Tips

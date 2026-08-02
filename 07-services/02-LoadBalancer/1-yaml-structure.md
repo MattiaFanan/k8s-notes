@@ -36,7 +36,7 @@ spec:
 | :--- | :--- | :--- | :--- |
 | `spec.type` | Required | Yes | Must be `LoadBalancer`. Triggers cloud CCM to provision an external load balancer. |
 | `metadata.name` | Required | Yes | Service name used for DNS discovery within the cluster. |
-| `spec.selector` | Important | No (immutable) | Labels used to select target Pods. Immutable after creation; changing requires deleting and recreating the Service. |
+| `spec.selector` | Important | Yes | Labels used to select target Pods. Mutable; changing requires a patch or `kubectl set selector`, but is a live update (no delete/recreate needed). | |
 | `spec.ports[].port` | Required | Yes | The external port exposed by the Service. |
 | `spec.ports[].targetPort` | Required | Yes | The port on which the container is listening inside the Pod. |
 | `spec.ports[].nodePort` | Optional | Yes | If omitted, Kubernetes assigns one dynamically. Only needed for fixed port requirements. |

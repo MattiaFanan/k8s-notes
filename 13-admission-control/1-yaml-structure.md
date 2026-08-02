@@ -13,7 +13,8 @@ metadata:
     kubernetes.io/service-account.name: default
     kubernetes.io/service-account.uid: uid-here
 type: kubernetes.io/service-account-token
-```
+
+> **Deprecated since Kubernetes 1.24**: ServiceAccount token Secrets are deprecated in favor of the TokenRequest API. Use `TokenRequest` to generate short-lived tokens instead.
 
 ## ValidatingWebhookConfiguration
 

@@ -81,7 +81,7 @@ NETWORK_UNAVAILABLE:.status.conditions[?(@.type=='NetworkUnavailable')].status
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--node-status-update-frequency` | `10s` | How often kubelet posts NodeStatus |
-| `--node-monitor-grace-period` | `40s` | Duration after which node is marked NotReady if no heartbeat |
+| `--node-monitor-grace-period` | `50s` | Duration after which node is marked NotReady if no heartbeat |
 | `--node-status-report-frequency` | `5m` | Frequency of status updates from kubelet |
 | `--pod-eviction-timeout` | `5m` | How long node controller waits before evicting Pods from Unknown node |
 | `--eviction-pressure-transition-period` | `5m` | How long a pressure condition must persist before triggering eviction |

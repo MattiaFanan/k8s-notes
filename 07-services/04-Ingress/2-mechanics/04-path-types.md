@@ -116,7 +116,7 @@ flowchart TD
 ### Mistake 1: Omitting `pathType` and Relying on Default
 
 ```yaml
-# BAD: pathType is optional but omitting it in newer K8s versions may cause issues
+# BAD: pathType is required in networking.k8s.io/v1; omitting it fails validation
 paths:
   - path: /
     backend:
@@ -126,7 +126,7 @@ paths:
           number: 80
 ```
 
-In Kubernetes 1.18+ (networking.k8s.io/v1), omitting `pathType` will fail validation; `"Exact"`, `"Prefix"`, or `"ImplementationSpecific"` must be specified explicitly.
+In Kubernetes 1.18+ (networking.k8s.io/v1), omitting `pathType` will fail validation; `"Exact"`, `"Prefix"`, or `"ImplementationSpecific"` must be specified explicitly. (In the older `networking.k8s.io/v1beta1` API, `ImplementationSpecific` was the default, but the v1beta1 API was removed in Kubernetes 1.22.)
 
 ```yaml
 # GOOD: Explicit pathType

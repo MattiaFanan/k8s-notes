@@ -35,7 +35,7 @@ spec:
 | Field | Required/Optional/Important | Editable with `kubectl edit` | Notes & Best Usage |
 | :--- | :--- | :--- | :--- |
 | `spec.type` | Optional | Yes | Defaults to `ClusterIP`. Explicitly declaring it is a best practice for clarity. |
-| `spec.selector` | Required | No | Immutable after creation. Endpoint discovery is automatic via selector matching Pod labels; changing the selector requires `kubectl patch` or replace. |
+| `spec.selector` | Required | Yes | Matches Pod `labels` to determine endpoints. Mutable; use `kubectl set selector` or `kubectl patch` to change. |
 | `spec.ports[].port` | Required | Yes | Editable via `kubectl edit`; changes take effect immediately. |
 | `spec.ports[].targetPort` | Required | Yes | Editable via `kubectl edit`; referenced Pod containerPort must exist. |
 | `spec.ports[].name` | Important | Yes | Required when multiple ports are exposed. Used by DNS SRV records and health probes. |

@@ -64,9 +64,9 @@ ps aux | grep kubelet | grep config
 | Flag | Default | Purpose |
 | :--- | :--- | :--- |
 | `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials (see [`06-kubeconfig.md`](../06-kubeconfig.md) for full kubeconfig reference) |
-| `--feature-gates` | (empty) | Comma-separated list of feature gates to enable/disable (e.g., `GracefulNodeShutdown=true`, `CSIMigration=true`) |
-| `--runtime-config` | (empty) | Comma-separated list of API versions to enable/disable (e.g., `api/all=true`, `apps/v1beta1=true`, `api/v1=false`). Deprecated in 1.20; use `--feature-gates` instead |
-| `--container-runtime-endpoint` | `unix:///var/run/containerd/containerd.sock` | CRI socket endpoint (configure via KubeletConfiguration; `--container-runtime` flag was removed in v1.27) |
+| `--feature-gates` | (empty) | Comma-separated list of feature gates to enable/disable (e.g., `GracefulNodeShutdown=true`) |
+| `--runtime-config` | (empty) | Comma-separated list of API versions to enable/disable (e.g., `api/all=true`, `apps/v1beta1=true`, `api/v1=false`). Controls which API groups are enabled or disabled |
+| `--container-runtime-endpoint` | `unix:///run/containerd/containerd.sock` | CRI socket endpoint (can be configured via KubeletConfiguration; the `--container-runtime` flag was removed in v1.27, but `--container-runtime-endpoint` still exists as a CLI flag) |
 | `--image-service-endpoint` | `unix:///var/run/containerd/containerd.sock` | Image service socket |
 | `--register-node` | `true` | Auto-register node with cluster |
 | `--node-status-update-frequency` | `10s` | How often to post node status |
@@ -82,7 +82,7 @@ ps aux | grep kubelet | grep config
 # Verify kubelet is running and healthy
 kubectl get nodes
 # NAME     STATUS   ROLES    AGE   VERSION
-# node-1   Ready    <none>   10d   v1.28.0
+# node-1   Ready    <none>   10d   v1.35.0
 
 # Check kubelet metrics (if metrics-server is installed)
 kubectl top node node-1
@@ -121,7 +121,7 @@ ipvsadm -Ln
 | :--- | :--- | :--- | :--- |
 | **iptables** | Random NAT rules in iptables chains | Simple, widely supported | Performance degrades with many services (O(n) lookup) |
 | **ipvs** | IP Virtual Server with scheduling algorithms | Better performance (O(1) lookup), load balancing algorithms | More complex, requires ipvsadm |
-| **nftables** | Modern replacement for iptables | Cleaner syntax, better performance | Newer, less battle-tested |
+| **nftables** | Modern replacement for iptables | GA in v1.35, recommended replacement for IPVS, better performance | Requires kernel 5.13+ |
 
 **How kube-proxy works**:
 

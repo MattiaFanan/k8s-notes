@@ -82,7 +82,7 @@ spec:
 |---|---|---|---|
 | `data` | Optional | Yes | Key-value map for ConfigMaps; keys must be strings. For Secrets, values must be base64-encoded or use `stringData` for plain-text convenience. |
 | `metadata.name` | Required | Yes | Name of the resource within the namespace. Must be a valid DNS subdomain name. |
-| `type` | Optional (defaults to `Opaque` for Secrets) | Yes | Only applies to Secrets. Other types: `kubernetes.io/service-account-token`, `kubernetes.io/dockerconfigjson`, `kubernetes.io/basic-auth`. |
+| `type` | Optional (defaults to `Opaque` for Secrets) | Yes | Only applies to Secrets. Other types: `kubernetes.io/dockerconfigjson`, `kubernetes.io/basic-auth`. `kubernetes.io/service-account-token` is deprecated since K8s 1.24 in favor of the TokenRequest API. |
 | `stringData` | Optional | Yes | Accepts plain-text values for Secrets; automatically base64-encodes them at creation. Mutually exclusive with `data` for the same key. |
 | `immutable` | Optional | Yes | Set to `true` to prevent changes to the data field after creation. Useful for audit-critical ConfigMaps/Secrets. |
 
@@ -97,6 +97,6 @@ spec:
 | Type | Description |
 |---|---|
 | `Opaque` | Generic base64-encoded secret data (default). |
-| `kubernetes.io/service-account-token` | Service account token with `token`, `ca.crt`, and `namespace` fields. |
+| `kubernetes.io/service-account-token` | **Deprecated since K8s 1.24** — Use TokenRequest API instead. Service account token Secret with `token`, `ca.crt`, and `namespace` fields. |
 | `kubernetes.io/dockerconfigjson` | Docker registry credentials stored as a JSON `dockerconfigjson` string. |
 | `kubernetes.io/basic-auth` | Basic authentication credentials with `username` and `password` fields. |

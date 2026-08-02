@@ -4,11 +4,11 @@
 
 1. **Node NotReady**
    ```bash
-   kubectl describe node node-1
-   kubectl get events --sort-by=.metadata.creationTimestamp
-   kubectl systemctl status kubelet
-   ```
-   *Root Causes*: kubelet down, CNI plugin down, network unreachable, disk pressure, PID pressure.
+    kubectl describe node node-1
+    kubectl get events --sort-by=.metadata.creationTimestamp
+    systemctl status kubelet
+    ```
+    *Root Causes*: kubelet down, CNI plugin down, network unreachable, disk pressure, PID pressure.
 
 2. **Pod Stuck Pending (Unschedulable)**
    ```bash

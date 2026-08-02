@@ -116,7 +116,6 @@ A typical Corefile includes the `kubernetes` plugin that intercepts DNS queries 
 kubernetes cluster.local in-addr.arpa ip6.arpa {
     pods insecure
     fallthrough in-addr.arpa ip6.arpa
-    svc_tcp /etc/coredns/db.cluster.local
 }
 ```
 
@@ -169,7 +168,7 @@ flowchart TD
         IPTABLES --> RANDOM["Random selection<br/>O(n) rules per endpoint"]
     end
 
-    subgraph nftables "nftables Mode (K8s 1.25+)"
+    subgraph nftables "nftables Mode (alpha 1.29 / GA 1.33)"
         NFT --> SETS["nftables set-based matching<br/>Faster than iptables at scale"]
     end
 
@@ -207,7 +206,7 @@ sudo iptables -t nat -L KUBE-SVC-XXXXX -n -v
 # Note: The output can be very large in clusters with many services
 ```
 
-#### nftables Mode (Kubernetes 1.25+)
+#### nftables Mode (Kubernetes 1.33+, stable)
 
 nftables mode replaces iptables with nftables sets, offering better performance at scale. It is available but not yet the default in most distributions.
 
