@@ -41,8 +41,10 @@ kubectl api-versions | grep apps/v1
 # Check a manifest for deprecated APIs
 kubectl apply --dry-run=server -f my-manifest.yaml 2>&1 | grep -i "deprecated\|deprecated"
 
-# Use kubectl convert to check for deprecated APIs
-kubectl convert -f my-manifest.yaml --output-version apps/v1
+# Note: kubectl convert is a separate plugin (kubectl-convert) that must be installed separately.
+# It was part of kubectl itself prior to Kubernetes 1.24.
+# Use `kubectl-convert` instead, or manually update apiVersion in manifests.
+kubectl convert -f my-manifest.yaml --output-version apps/v1 || echo "Install kubectl-convert plugin first"
 ```
 
 ### Check Cluster API Resources
@@ -136,7 +138,8 @@ kubectl get events -n production --field-selector reason=FailedCreate
 | `apps/v1beta1` | `apps/v1` | Deployment, DaemonSet, ReplicaSet |
 | `apps/v1beta2` | `apps/v1` | Deployment, DaemonSet, ReplicaSet |
 | `batch/v1beta1` | `batch/v1` | CronJob |
-| `policy/v1beta1` | `policy/v1` | PodSecurityPolicy |
+| `policy/v1beta1` | `policy/v1` | PodDisruptionBudget |
+| `policy/v1beta1` | *Removed in v1.25* | PodSecurityPolicy (migrated to Pod Security Admission, not `policy/v1`) |
 | `networking.k8s.io/v1beta1` | `networking.k8s.io/v1` | Ingress |
 | `autoscaling/v2beta1` | `autoscaling/v2` | HorizontalPodAutoscaler |
 | `autoscaling/v2beta2` | `autoscaling/v2` | HorizontalPodAutoscaler |
@@ -152,16 +155,15 @@ Current stable API versions for each resource group:
 | `core` (no group) | `v1` | Pod, Service, ConfigMap, Secret, PersistentVolume, PersistentVolumeClaim, Namespace, Node, Event, ServiceAccount, ResourceQuota, LimitRange, Namespace, Node, PersistentVolume, PersistentVolumeClaim, Pod, PodTemplate, ReplicationController, ResourceQuota, Secret, Service, ServiceAccount |
 | `apps` | `v1` | Deployment, DaemonSet, ReplicaSet, StatefulSet |
 | `batch` | `v1` | Job, CronJob |
-| `policy` | `v1` | PodSecurityPolicy |
+| `policy` | `v1` | PodDisruptionBudget |
 | `networking.k8s.io` | `v1` | Ingress, NetworkPolicy |
 | `storage.k8s.io` | `v1` | StorageClass, VolumeAttachment, CSIStorageCapacity |
 | `autoscaling` | `v2` | HorizontalPodAutoscaler |
 | `admissionregistration.k8s.io` | `v1` | ValidatingWebhookConfiguration, MutatingWebhookConfiguration |
 | `rbac.authorization.k8s.io` | `v1` | Role, ClusterRole, RoleBinding, ClusterRoleBinding |
 | `apiextensions.k8s.io` | `v1` | CustomResourceDefinition |
-| `apiextensions.k8s.io` | `v1beta1` | CustomResourceDefinition (beta, being migrated to v1) |
 | `coordination.k8s.io` | `v1` | Lease |
-| `flowcontrol.apiserver.k8s.io` | `v1beta3` | FlowSchema, PriorityLevelConfiguration |
+| `flowcontrol.apiserver.k8s.io` | `v1` | FlowSchema, PriorityLevelConfiguration |
 | `node.k8s.io` | `v1` | RuntimeClass |
 | `scheduling.k8s.io` | `v1` | PriorityClass |
 | `authentication.k8s.io` | `v1` | TokenRequest |
@@ -215,10 +217,10 @@ When reading back, the API server converts from the storage version to the versi
 
 ## Using kubectl convert
 
-`kubectl convert` can automatically migrate resources between API versions.
+`kubectl convert` (via the separate `kubectl-convert` plugin, not built into kubectl since v1.24) can automatically migrate resources between API versions. The `kubectl-convert` binary must be installed separately from the standard kubectl package.
 
 ```bash
-# Convert a manifest to apps/v1
+# Convert a manifest to apps/v1 (requires kubectl-convert plugin installed)
 kubectl convert -f deployment.yaml --output-version apps/v1 -o yaml > deployment-v1.yaml
 
 # Convert all resources in a directory
@@ -228,7 +230,7 @@ kubectl convert -f ./manifests/ --output-version apps/v1 -o yaml > converted.yam
 kubectl get deployment myapp -o yaml | kubectl convert --output-version apps/v1 -o yaml
 ```
 
-> **Pitfall**: `kubectl convert` may not handle all schema changes correctly. Always review the converted output before applying.
+> **Pitfall**: `kubectl convert` (the standalone plugin) may not handle all schema changes correctly. Always review the converted output before applying.
 
 ## Mermaid: API Deprecation Lifecycle
 
@@ -310,8 +312,8 @@ kubectl api-versions
 # Check for deprecated APIs in a manifest
 kubectl apply --dry-run=server -f deployment.yaml
 
-# Convert a manifest to a new API version
-kubectl convert -f deployment.yaml --output-version apps/v1 -o yaml
+# Convert a manifest to a new API version (requires kubectl-convert plugin)
+kubectl-convert -f deployment.yaml --output-version apps/v1 -o yaml
 
 # Get the API version of a resource
 kubectl get deployment myapp -o jsonpath='{.apiVersion}'

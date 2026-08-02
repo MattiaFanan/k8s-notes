@@ -11,12 +11,14 @@ When a request arrives at the API server, it passes through the admission contro
 1. **Authentication**: The API server identifies the user or service account making the request.
 2. **Authorization**: The API server checks whether the user has permission to perform the requested action.
 3. **Admission Control**: Admission controllers intercept the request and apply policies.
-4. **Audit**: The request is logged for auditing purposes.
-5. **Persistence**: The request is written to `etcd`.
+4. **Persistence**: The request is written to `etcd`.
+5. **Audit**: The request is logged for auditing purposes.
 
 ## Built-in Admission Controllers
 
-Kubernetes includes several built-in admission controllers that are enabled by default.
+Kubernetes includes several built-in admission controllers. The ones **enabled by default** in v1.35 are:
+
+CertificateApproval, CertificateSigning, CertificateSubjectRestriction, DefaultIngressClass, DefaultStorageClass, DefaultTolerationSeconds, LimitRanger, MutatingAdmissionWebhook, NamespaceLifecycle, PersistentVolumeClaimResize, PodSecurity, Priority, ResourceQuota, RuntimeClass, ServiceAccount, StorageObjectInUseProtection, TaintNodesByCondition, ValidatingAdmissionPolicy, ValidatingAdmissionWebhook
 
 ### NamespaceLifecycle
 
@@ -40,7 +42,7 @@ Sets the `storageClassName` for PersistentVolumeClaims that do not specify one.
 
 ### DefaultTolerationSeconds
 
-Sets default tolerations for pods that have the `TolerationSeconds` field set.
+Sets default tolerations for `node.kubernetes.io/not-ready:NoExecute` and `node.kubernetes.io/unreachable:NoExecute` on pods that do not already tolerate them.
 
 ### PodSecurity
 
@@ -48,15 +50,11 @@ Enforces Pod Security Standards (PSS) at the pod level. Replaces the deprecated 
 
 ### NodeRestriction
 
-Restricts kubelets to only modifying their own node resources. Prevents a compromised kubelet from modifying other nodes.
+Restricts kubelets to only modifying their own node resources. Prevents a compromised kubelet from modifying other nodes. **Not enabled by default** — enable with `--enable-admission-plugins=NodeRestriction`.
 
 ### AlwaysPullImages
 
-Forces all containers to always pull images from the registry, even if the image is already present on the node.
-
-### DenyEscalatingExec
-
-Prevents users from executing commands in pods that have `allowPrivilegeEscalation: true` or are privileged.
+Forces all containers to always pull images from the registry, even if the image is already present on the node. **Not enabled by default**.
 
 ## Mutating Admission Webhooks
 
@@ -152,8 +150,8 @@ webhooks:
 | `rules` | Which resources and operations the webhook applies to |
 | `clientConfig` | The webhook service URL or CA bundle |
 | `admissionReviewVersions` | Supported AdmissionReview versions |
-| `sideEffects` | Whether the webhook has side effects (`None`, `Unknown`, `Some`) |
-| `timeoutSeconds` | Webhook timeout (1-10 seconds) |
+| `sideEffects` | Whether the webhook has side effects (`None`, `NoneOnDryRun`) |
+| `timeoutSeconds` | Webhook timeout (1-30 seconds) |
 | `failurePolicy` | `Fail` or `Ignore` |
 | `matchPolicy` | `Exact` or `Equivalent` |
 | `namespaceSelector` | Selects which namespaces the webhook applies to |
@@ -175,8 +173,8 @@ flowchart TD
     I --> J[Validating Webhooks]
     J --> K{Any Rejection?}
     K -->|Yes| D
-    K -->|No| L[Audit]
-    L --> M[Persist to etcd]
+    K -->|No| L[Persist to etcd]
+    L --> M[Audit]
     M --> N[Request Complete]
 ```
 
@@ -195,7 +193,7 @@ flowchart TD
 - **`webhook timeout`**: The webhook service is not responding within the timeout. Check the webhook pod status and logs.
 - **`webhook not found`**: The webhook service or CA bundle is misconfigured. Verify the `clientConfig` in the webhook configuration.
 - **`request rejected by admission controller`**: A webhook or built-in controller rejected the request. Check the API server logs for the specific rejection reason.
-- **`webhook has side effects`**: The webhook is configured with `sideEffects: Unknown` or `Some`, which prevents retries. Set `sideEffects: None` if possible.
+- **`webhook has side effects`**: The webhook is configured with `sideEffects: NoneOnDryRun`, which prevents retries for dry-run requests. Set `sideEffects: None` if possible (only `None` and `NoneOnDryRun` are valid for v1 webhooks).
 - **`failurePolicy: Ignore` allowing bad requests**: When the webhook is down, requests bypass the policy. Consider switching to `failurePolicy: Fail`.
 - **Webhook causing high API server latency**: The webhook is too slow. Optimize the webhook service or increase `timeoutSeconds`.
 

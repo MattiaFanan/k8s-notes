@@ -249,7 +249,7 @@ helm repo add antrea https://antrea-io.github.io/antrea/
 helm install antrea antrea/antrea -n kube-system
 
 # Using kubectl
-kubectl apply -f https://github.com/antrea-io/antrea/releases/download/v1.0.0/antrea.yml
+kubectl apply -f https://github.com/antrea-io/antrea/releases/download/v1.15.0/antrea.yml
 ```
 
 **Example Antrea-native policy:**

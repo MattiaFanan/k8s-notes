@@ -25,8 +25,8 @@
 ```bash
 alias k=kubectl
 
-# Quick ConfigMap creation
-k create configmap app-config --from-literal=APP_MODE=production --from-literal=DB_HOST=postgres.default.svc.cluster.local
+# Quick ConfigMap dry-run generation
+k create configmap app-config --from-literal=APP_MODE=production --dry-run=client -o yaml
 
 # Quick Secret creation
 k create secret generic db-creds --from-literal=username=admin --from-literal=password=s3cret

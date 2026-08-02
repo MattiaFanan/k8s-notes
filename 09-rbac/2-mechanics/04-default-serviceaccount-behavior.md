@@ -74,7 +74,6 @@ When a Pod runs with the `default` ServiceAccount, the kubelet attaches the Serv
 | Request Type | Behavior |
 |---|---|
 | API call with token | Authenticated as `system:serviceaccount:<ns>:default` |
-| API call without token | Unauthenticated (subject is `system:unauthenticated`) |
 | API call with --as flag | Overrides the default authentication (e.g., for testing) |
 
 ```bash
@@ -287,4 +286,4 @@ kubectl get serviceaccount <name> -n <ns>
 - When a CKAD question asks you to grant a Pod specific API access, create a dedicated ServiceAccount, grant it a Role with the minimum permissions, and set `serviceAccountName` on the Pod spec.
 - The `default` ServiceAccount is the answer when a question asks "what ServiceAccount are Pods assigned to by default."
 - Disabling `automountServiceAccountToken` is a security best practice but is not strictly required for RBAC functionality.
-- If a Pod runs with a ServiceAccount that has no bindings, the Pod can still make API requests as an unauthenticated user (subject: `system:unauthenticated`), which typically means no access.
+- If a Pod runs with a ServiceAccount that has no bindings, the Pod is authenticated as that ServiceAccount but has no permissions (403 Forbidden).

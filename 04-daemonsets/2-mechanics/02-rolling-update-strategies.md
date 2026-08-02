@@ -1,8 +1,8 @@
 # DaemonSets - In-Depth Mechanics
 
-## Rolling Update Strategies (K8s 1.25+)
+## Rolling Update Strategies
 
-DaemonSets support two update strategies since K8s 1.25 (GA in 1.28). Understanding when to use each is key for safe cluster-wide updates.
+DaemonSets support two update strategies: `RollingUpdate` (default) and `OnDelete`.
 
 ### RollingUpdate (Default)
 
@@ -40,7 +40,7 @@ Unlike Deployments, `maxSurge` creates a **temporary extra Pod** on the node (no
 
 | `maxSurge` | `maxUnavailable` | Effect |
 |-----------|------------------|--------|
-| `0` | `1` or percentage | Knave: old Pod deleted, new Pod created sequentially |
+| `0` | `1` or percentage | Slow: old Pod deleted, new Pod created sequentially |
 | `0` | `All` | All old Pods terminate, then new Pods create. Downtime if Pod collects logs |
 | `1` | `0` | New Pod runs alongside old Pod during update. Zero disruption but doubles resource usage briefly |
 

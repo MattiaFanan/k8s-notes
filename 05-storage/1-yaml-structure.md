@@ -43,7 +43,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: fast
-provisioner: kubernetes.io/aws-ebs
+provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
 reclaimPolicy: Delete
@@ -82,7 +82,7 @@ spec:
 | `spec.hostPath.path` (PV) | Required (for local PV) | No | Required when PV type is `hostPath`; path must exist on the node |
 | `spec.local.path` (PV) | Required (for local PV) | No | Required for `local` PV type; volume must be pre-provisioned on the node |
 | `spec.resources.requests.storage` (PVC) | Required | No (after binding) | Size of storage requested; must be ≤ PV capacity |
-| `spec.provisioner` (StorageClass) | Required | Yes | Identifier of the volume provisioner plugin (e.g., `kubernetes.io/aws-ebs`) |
+| `spec.provisioner` (StorageClass) | Required | Yes | Identifier of the volume provisioner plugin (e.g., `ebs.csi.aws.com`) |
 | `spec.reclaimPolicy` (StorageClass) | Important (default: Delete) | Yes | `Delete` removes backing storage when PVC is deleted; `Retain` preserves it |
 | `spec.allowVolumeExpansion` (StorageClass) | Important | Yes | Set to `true` to allow PVCs to be resized without recreating the PVC |
 | `spec.volumeBindingMode` (StorageClass) | Optional | Yes | `WaitForFirstConsumer` delays binding until a pod uses the PVC; useful for topology-aware provisioning |

@@ -123,4 +123,4 @@ kubectl rollout restart deployment/web
 
 - **Changing `replicas` or `labels` does NOT create a revision**: if you change `spec.replicas` from 3 to 5 and then try to rollback to "revision 2" thinking it had 5 replicas, you will be surprised — revisions only track template changes.
 - **Rollout history fills up etcd**: each revision record is stored as an annotation in the Deployment object. High-churn environments should set a lower limit.
-- **`kubectl rollout restart` bypasses revision tracking**: it triggers a recreate via an annotation but is not visible as a template change in rollout history.
+- **`kubectl rollout restart` creates a new revision**: it triggers a recreate via an annotation and IS visible as a template change in rollout history.

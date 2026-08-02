@@ -6,8 +6,8 @@
 # Create ServiceAccount
 kubectl create serviceaccount my-sa -n default
 
-# Get SA token Secret
-kubectl get sa my-sa -o jsonpath='{.secrets[0].name}'
+# Get SA token (K8s 1.24+)
+kubectl create token my-sa -n default
 ```
 
 ## ImagePullSecrets

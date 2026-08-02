@@ -84,7 +84,7 @@ spec:
 | Field | Required/Optional/Important | Editable with `kubectl edit` | Notes & Best Usage |
 |---|---|---|---|
 | `automountServiceAccountToken` | Important | Yes | Controls whether a ServiceAccount token is automatically mounted into pods. Set to `false` when tokens are not needed to reduce attack surface. |
-| `rules` (webhook) | Required | Yes | Defines which API resources, groups, versions, and operations the webhook intercepts. Omitting rules matches all resources. |
+| `rules` (webhook) | Required | Yes | Defines which API resources, groups, versions, and operations the webhook intercepts. To match all resources, use wildcards (`apiGroups: ["*"]`, `apiVersions: ["*"]`, `operations: ["*"]`, `resources: ["*"]`). |
 | `clientConfig.service.namespace` | Required | Yes | Namespace of the webhook service. Must match the service hosting the admission webhook endpoint. |
 | `clientConfig.service.name` | Required | Yes | Name of the Kubernetes Service that routes traffic to the webhook pod. |
 | `clientConfig.service.path` | Optional | Yes | URL path on the service to forward requests to (e.g., `/validate`, `/mutate`). Defaults to `/`. |

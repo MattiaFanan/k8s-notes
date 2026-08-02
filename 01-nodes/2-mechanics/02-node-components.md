@@ -66,13 +66,11 @@ ps aux | grep kubelet | grep config
 | `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials (see [`06-kubeconfig.md`](../06-kubeconfig.md) for full kubeconfig reference) |
 | `--feature-gates` | (empty) | Comma-separated list of feature gates to enable/disable (e.g., `GracefulNodeShutdown=true`, `CSIMigration=true`) |
 | `--runtime-config` | (empty) | Comma-separated list of API versions to enable/disable (e.g., `api/all=true`, `apps/v1beta1=true`, `api/v1=false`). Deprecated in 1.20; use `--feature-gates` instead |
-| `--container-runtime` | `remote` | CRI socket endpoint |
-| `--container-runtime-endpoint` | `unix:///var/run/containerd/containerd.sock` | CRI socket |
+| `--container-runtime-endpoint` | `unix:///var/run/containerd/containerd.sock` | CRI socket endpoint (configure via KubeletConfiguration; `--container-runtime` flag was removed in v1.27) |
 | `--image-service-endpoint` | `unix:///var/run/containerd/containerd.sock` | Image service socket |
 | `--register-node` | `true` | Auto-register node with cluster |
 | `--node-status-update-frequency` | `10s` | How often to post node status |
-| `--network-plugin` | `cni` | CNI plugin to use |
-| `--cgroup-driver` | `systemd` (recommended) | Cgroup driver for containers |
+| `--cgroup-driver` | `cgroupfs` (set to `systemd` if using systemd as init) | Cgroup driver for containers (configure via KubeletConfiguration; `--network-plugin` flag was removed; CNI is the only supported network plugin) |
 | `--eviction-hard` | `memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%` | Hard eviction thresholds |
 | `--eviction-soft` | (empty) | Soft eviction thresholds with grace period |
 | `--kube-reserved` | (empty) | Resources reserved for kube system |

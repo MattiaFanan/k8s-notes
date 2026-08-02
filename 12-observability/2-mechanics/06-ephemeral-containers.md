@@ -50,13 +50,13 @@ This creates a new pod `debug-mypod` with the same spec as `mypod` plus an ephem
 
 ### Replace Mode
 
-Replace the original pod with a debug copy:
+`--replace` must be used together with `--copy-to`. It deletes the original pod and creates a new one with an ephemeral container.
 
 ```bash
-kubectl debug mypod -n myns --image=busybox --replace -- sh
+kubectl debug mypod -n myns --image=busybox --copy-to=debug-mypod --replace -- sh
 ```
 
-This deletes the original pod and creates a new one with an ephemeral container.
+This creates a new pod `debug-mypod`, deletes the original pod `mypod`, and starts the debug pod with an ephemeral container.
 
 ## Ephemeral Container YAML
 

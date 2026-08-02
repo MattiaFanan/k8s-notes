@@ -99,7 +99,7 @@ flowchart TD
     D -->|No| F["Skipped"]
 
     G["Node cordoned (kubectl cordon)"] --> H["New Pods NOT scheduled<br/>Existing Pods stay"]
-    I["Node drained (kubectl drain)"] --> J["DaemonSet Pods deleted<br/>Node becomes un-cordoned automatically"]
+    I["Node drained (kubectl drain)"] --> J["DaemonSet Pods NOT evicted<br/>(--ignore-daemonsets)"]
     K["Node removed"] --> L["DaemonSet Pods deleted<br/>by garbage collection"]
 ```
 
@@ -131,6 +131,6 @@ kubectl delete daemonset fluentd --grace-period=0 --force
 
 ### Common Pitfalls
 
-- **DaemonSet Pods are recreated during `kubectl drain`** even with `--ignore-daemonsets`: the flag prevents eviction of existing Pods, but the controller may create a replacement immediately after.
+- **DaemonSet Pods are NOT recreated during `kubectl drain` with `--ignore-daemonsets`**: the flag prevents eviction of DaemonSet Pods, so the controller does not create replacements.
 - **Unschedulable nodes still have DaemonSet Pods running**: `cordon` does not remove DaemonSet Pods. Use `drain` if you want to remove Pods.
 - **Node selector misconfiguration silently reduces DESIRED count**: a mismatched `nodeSelector` label means DESIRED drops without error.

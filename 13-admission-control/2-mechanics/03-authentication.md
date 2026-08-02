@@ -37,7 +37,7 @@ kubectl --client-certificate=user.crt --client-key=user.key --certificate-author
 
 - The `CN` (Common Name) becomes the username.
 - The `O` (Organization) becomes the group name(s).
-- This is commonly used for cluster admin access (`O=system:masters` maps to the `cluster-admin` ClusterRole).
+- This is commonly used for cluster admin access (`O=system:masters` bypasses the authorization layer entirely, granting superuser privileges).
 
 > **Best practice**: Use x509 certificates for machine-to-machine authentication (e.g., CI/CD systems, monitoring agents). They provide strong cryptographic authentication.
 
@@ -104,8 +104,10 @@ spec:
 ```
 
 ```bash
-# Get the service account token
-kubectl get serviceaccount my-service-account -n production -o jsonpath='{.secrets[0].name}'
+# Get a service account token (K8s 1.24+)
+kubectl create token my-service-account -n production --duration=1h
+
+# For long-lived tokens, create a Secret manually with the service-account.name annotation
 kubectl get secret <secret-name> -n production -o jsonpath='{.data.token}' | base64 -d
 
 # Use the token
@@ -120,7 +122,8 @@ Static tokens are defined in a file on the API server and are used for authentic
 
 ```yaml
 # /etc/kubernetes/tokens.csv
-admin,admin,system:masters
+# Format: token,username,uid,optional_groups
+admin,admin,1001,system:masters
 ```
 
 ```bash
@@ -162,7 +165,7 @@ data:
 
 ### Bootstrap Tokens
 
-Bootstrap tokens are used to authenticate nodes during the `kubeadm join` process. They are time-limited and single-use.
+Bootstrap tokens are time-limited (default TTL of 24 hours) tokens used for authenticating nodes during the `kubeadm join` process. They can be used multiple times until they expire.
 
 ```bash
 # Create a bootstrap token
@@ -206,8 +209,8 @@ metadata:
 # Create a service account
 kubectl create serviceaccount app-sa -n production
 
-# Get the service account token
-kubectl get serviceaccount app-sa -n production -o jsonpath='{.secrets[0].name}'
+# Get a service account token (K8s 1.24+)
+kubectl create token app-sa -n production --duration=1h
 
 # Delete a service account
 kubectl delete serviceaccount app-sa -n production

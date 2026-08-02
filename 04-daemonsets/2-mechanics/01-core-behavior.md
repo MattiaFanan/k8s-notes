@@ -100,13 +100,17 @@ kubectl describe nodes | grep -B1 "Taints:"
 kubectl get pod -l app=node-exporter -o jsonpath='{.items[*].spec.tolerations}'
 ```
 
-### Pod Management Policy
+### Pod Management
 
-By default, DaemonSets use `Type: Continuous` (the controller actively manages Pods). Use `Type: Parallel` for faster bootup on large clusters.
+By default, a DaemonSet creates exactly one Pod on every node that matches its `nodeSelector` and `tolerations`. There is no `podManagementPolicy` field on DaemonSets — that concept belongs to StatefulSets. DaemonSets always ensure one Pod per eligible node.
 
-```yaml
-spec:
-  podManagementPolicy: Parallel  # Create Pods simultaneously
+```mermaid
+flowchart TD
+    A["DaemonSet created"] --> B["Node joins cluster?"]
+    B -->|Yes| C["Evaluate nodeSelector + tolerations"]
+    C -->|Match| D["Pod scheduled on new node"]
+    C -->|No match| E["Node skipped"]
+    F["Node removed"] --> G["Pod garbage-collected"]
 ```
 
 ### Best Practices
@@ -115,7 +119,7 @@ spec:
 - **Set explicit requests and limits** on DaemonSet containers to prevent node resource exhaustion.
 - **Use Node Affinity + Taints strategically**: not every DaemonSet needs to run on control-plane nodes unless it is a control-plane component.
 - **Separate DaemonSets by concern**: one for logging, one for monitoring, one for networking. This avoids a single failure domain.
-- **Name DaemonSet Pods deterministically with `podManagementPolicy: Parallel`** for faster cluster boot during control-plane restarts.
+- **Use `updateStrategy: RollingUpdate` with appropriate `maxUnavailable`** for controlled rollouts on large clusters.
 
 ### Common Pitfalls
 

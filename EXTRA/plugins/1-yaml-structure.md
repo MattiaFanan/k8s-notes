@@ -68,6 +68,6 @@ webhooks:
 | Field / Pattern | Required | Editable with `kubectl edit` | Notes |
 |---|---|---|---|
 | CNI ConfigMap `conf.json` | Cluster set-up | Yes | Defines the CNI plugin type and network parameters |
-| StorageClass `provisioner` | Required | Yes | Identifies the storage plugin (e.g., `kubernetes.io/aws-ebs`, `csi.storage.k8s.io`) |
+| StorageClass `provisioner` | Required | Yes | Identifies the storage plugin (e.g., `kubernetes.io/aws-ebs`, `ebs.csi.aws.com`) |
 | Webhook `rules[].operations` | Required | No (requires restart) | Determines when the admission plugin fires |
 | Scheduler `profile` flags | Kubelet arg | No (node-level) | Enables scheduler framework plugins like `NodeResourcesFit` |

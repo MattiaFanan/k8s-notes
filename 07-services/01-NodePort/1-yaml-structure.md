@@ -39,6 +39,6 @@ spec:
 | `spec.ports[].targetPort` | Required | Yes | Container port on Pod; relationship same as ClusterIP. |
 | `spec.ports[].protocol` | Optional | Yes | Typically `TCP` or `UDP`. |
 | `spec.selector` | Important | No | Immutable; determines which Pods receive traffic. |
-| `spec.externalTrafficPolicy` | Optional | Yes | `Cluster` (default) preserves source IP; use `Local` to keep client source IP on the node. |
-| `spec.clusterIP` | Optional | Yes | Typically left empty to allocate a cluster-internal IP; not needed for external-only NodePort access. |
+| `spec.externalTrafficPolicy` | Optional | Yes | `Cluster` (default) does not preserve source IP; use `Local` to keep client source IP on the node. |
+| `spec.clusterIP` | Optional | No | Typically left empty to allocate a cluster-internal IP; immutable after creation. |
 | `spec.healthCheckNodePort` | Optional | Yes | Custom health check port for nodes when `externalTrafficPolicy` is `Local`; auto-assigned if omitted. |

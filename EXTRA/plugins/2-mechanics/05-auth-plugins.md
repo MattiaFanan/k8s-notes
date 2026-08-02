@@ -316,7 +316,7 @@ kubectl get secret -o jsonpath='{.data.token}' | base64 -d
 
 # Verify current identity
 kubectl auth whoami
-kubectl config current-user
+kubectl config current-context
 
 # Check RBAC permissions for current user
 kubectl auth can-i get pods --all-namespaces

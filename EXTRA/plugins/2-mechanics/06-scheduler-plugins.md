@@ -106,8 +106,9 @@ Filters and scores nodes based on `podAffinity` and `podAntiAffinity` rules. Pla
 Filters out nodes that do not have sufficient CPU or memory to run the pod. Checks against `requests` and `limits` depending on the mode.
 
 **Modes:**
-- **`Reserved`** (default): Checks resource availability accounting for reservations and overhead.
-- **`LessCPU`**: Prefers nodes where the requested CPU is less than allocatable (not recommended for production).
+- **`LeastAllocated`** (default): Prefers nodes with the most free resources (spreads load).
+- **`MostAllocated`**: Prefers nodes with the least free resources (bin-packs load).
+- **`RequestedToCapacityRatio`**: Scores nodes based on a configured function of requested-to-capacity ratio.
 
 ### NodeResourcesBalancedAllocation
 

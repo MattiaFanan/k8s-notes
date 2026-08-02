@@ -120,7 +120,7 @@ Internet
 | Question | Answer |
 |---|---|
 | Can Ingress expose TCP/UDP services? | No — only HTTP/HTTPS | 
-| Can one Ingress route to Services in different namespaces? | Yes — use the `namespace` field in the backend reference (or the controller's specific annotation) |
+| Can one Ingress route to Services in different namespaces? | No — backend Services must be in the same namespace as the Ingress (some controllers support cross-namespace via custom annotations) |
 | Is Ingress a replacement for LoadBalancer? | For HTTP/S, yes. For non-HTTP protocols, use LoadBalancer or NodePort directly |
 | Does Ingress do TLS termination? | Yes, if TLS is configured in `spec.tls` |
 | Can I use Ingress without a cloud provider? | Yes — on-premises with NodePort or MetalLB + NGINX Ingress Controller |

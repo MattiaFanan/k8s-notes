@@ -4,11 +4,11 @@
 
 Access modes define how a volume can be mounted and accessed by pods. They are declared when a PersistentVolumeClaim (PVC) requests storage, and matched against the capabilities of available PersistentVolumes (PVs). The access mode is a fundamental constraint that determines which workloads can use a given volume and how many pods can share it simultaneously.
 
-## The Three Access Modes
+## The Four Access Modes
 
 ### ReadWriteOnce (RWO)
 
-The volume can be mounted as read-write by a single node. Only one pod can mount the volume at a time, though that pod can have multiple containers that all access it.
+The volume can be mounted as read-write by a single node. A single pod can mount the volume per node, though that pod can have multiple containers that all access it.
 
 ```yaml
 apiVersion: v1
@@ -181,4 +181,4 @@ spec:
 
 - **EBS CSI Driver** (for AWS): Supports only RWO. If you need RWX on AWS, use EFS with the EFS CSI driver.
 - **NFS as a quick RWX solution**: For testing or small workloads, you can set up an NFS server and use the NFS plugin to expose RWX storage. Not recommended for production without proper hardening.
-- **ReadWriteOncePod (RWOP)**: A newer access mode introduced for volumes that should be mountable by only a single pod (regardless of node). This is more restrictive than RWO and is useful for volumes backed by local storage or when you want stronger guarantees. Supported by CSI drivers that implement the `VolumeOwnership` capability.
+- **ReadWriteOncePod (RWOP)**: A newer access mode for volumes that should be mountable by only a single pod (regardless of node). This is more restrictive than RWO and is useful for volumes backed by local storage or when you want stronger guarantees. GA since v1.29. Supported by CSI drivers that implement the `SINGLE_NODE_MULTI_WRITER` capability.

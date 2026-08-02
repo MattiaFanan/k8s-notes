@@ -125,7 +125,7 @@ The GCE PD CSI driver provisions persistent disks on GCP GKE clusters or self-ma
 - Supports multi-writer for GKE Filestore (CIFS/NFS)
 - Supports volume resizing (pd-ssd and pd-extreme)
 - Supports snapshots and cloning
-- Uses `pd.csi.storage.gke.io` (GKE) or `com.google.csi.cdtpd` (self-managed)
+- Uses `pd.csi.storage.gke.io` (GKE and self-managed GCE)
 
 **Installation:**
 
@@ -318,7 +318,7 @@ spec:
 | azure-disk | `disk.csi.azure.com` | Azure | No | Yes | Yes | Yes | Azure AKS |
 | gce-pd | `pd.csi.storage.gke.io` | GCP | No | Yes | Yes | Yes | GCP GKE |
 | vSphere | `csi.vsphere.vmware.com` | vSphere | vSAN only | Yes | Yes | vSAN only | vSphere workloads |
-| Longhorn | `driver.longhorn.io` | Any | No | Yes | Yes | Yes | Bare-metal / on-prem |
+| Longhorn | `driver.longhorn.io` | Any | Yes (via NFS) | Yes | Yes | Yes | Bare-metal / on-prem |
 | TopoLVM | `topolvm.cybozu.com` | Any (LVM) | No | Yes | Yes | LUKS | LVM on bare-metal |
 
 ## Best Practices

@@ -37,7 +37,7 @@ helm install my-release myrepo/mychart --version 1.2.3
 
 ### Install Behavior
 
-- Helm creates a `Release` object in the `helm` namespace (by default) that tracks the release state.
+- Helm creates a `Release` object in the release namespace (by default) that tracks the release state.
 - Helm renders the chart templates and sends the resulting manifests to the Kubernetes API server.
 - Resources are created in the order they appear in the rendered YAML (or in dependency order for charts with dependencies).
 
@@ -108,7 +108,7 @@ helm rollback my-release 3 --wait --timeout 5m0s
 
 ### How Rollback Works
 
-- Helm stores each release revision in the `helm` namespace as a ConfigMap.
+- Helm stores each release revision in the release namespace as a Secret (Helm v3 default).
 - A rollback creates a new release revision that uses the templates and values from the specified revision.
 - The rollback is itself an upgrade operation, so it goes through the same rendering and application process.
 

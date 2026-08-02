@@ -198,7 +198,7 @@ webhooks:
         namespace: injection-system
         path: "/inject"
       caBundle: LS0t...
-    admissionReviewVersions: ["v1", "v1beta1"]
+    admissionReviewVersions: ["v1"]
     sideEffects: None
     timeoutSeconds: 5
 ```
@@ -241,7 +241,7 @@ webhooks:
         namespace: policy-system
         path: "/validate"
       caBundle: LS0t...
-    admissionReviewVersions: ["v1", "v1beta1"]
+    admissionReviewVersions: ["v1"]
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Fail

@@ -44,10 +44,10 @@ spec:
         image: prom/node-exporter:latest
       nodeSelector:
         node-role.kubernetes.io/worker: ""
-       tolerations:
-       - key: node-role.kubernetes.io/master
-         effect: NoSchedule
-         operator: Exists
+        tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+          operator: Exists
  ```
 
 ## Field Reference

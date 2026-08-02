@@ -33,5 +33,5 @@ kubectl delete storageclass fast
 
 ## Dry-run generation
 ```bash
-kubectl create pvc my-pvc --storage-class=standard --requests=storage=1Gi $do
+kubectl apply -f pvc.yaml --dry-run=client -o yaml
 ```

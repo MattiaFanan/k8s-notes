@@ -1,6 +1,6 @@
 # Native Sidecar Containers (Kubernetes v1.28+)
 
-Kubernetes v1.28 introduced native sidecar containers as a GA feature. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use `restartPolicy: Always` on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
+Kubernetes v1.28 introduced native sidecar containers as an alpha feature. The feature became stable in Kubernetes v1.33 and is enabled by default. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use `restartPolicy: Always` on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
 
 ## Traditional Sidecar vs Native Sidecar
 
@@ -49,7 +49,7 @@ spec:
 
 1. **Startup ordering**: Native sidecars start after all regular init containers complete, then run alongside the main container.
 2. **Shared namespace**: Like all containers in a Pod, native sidecars share the Pod's network namespace, IPC namespace, and volumes.
-3. **Restart behavior**: If a native sidecar crashes, it is restarted according to the Pod's `restartPolicy`.
+3. **Restart behavior**: Native sidecars have their own `restartPolicy: Always` and are restarted independently of the Pod's `restartPolicy`. They continue running for the Pod's lifetime regardless of the Pod-level restart policy.
 4. **Resource sharing**: Native sidecars compete for the same node resources as the main container. Always set `resources.requests` and `resources.limits`.
 
 ## When to Use Native Sidecars

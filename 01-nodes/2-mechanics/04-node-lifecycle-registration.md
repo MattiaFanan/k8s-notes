@@ -87,9 +87,8 @@ status:
 | `--node-labels` | (empty) | Labels to apply to the Node object |
 | `--node-taints` | (empty) | Taints to apply to the Node object |
 | `--register-with-taints` | (empty) | Taints applied at registration |
-| `--register-synchronously` | `false` | Wait for node registration before starting kubelet |
 | `--node-status-update-frequency` | `10s` | How often to post node status |
-| `--node-status-report-frequency` | `5m` | How often to report status if unchanged |
+| `--node-status-report-frequency` | `5m` | How often to report status if unchanged (KubeletConfiguration field, not a CLI flag since v1.26) |
 
 ### 2. CNI Initialization
 

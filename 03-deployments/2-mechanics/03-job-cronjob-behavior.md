@@ -53,7 +53,7 @@ flowchart LR
 
 The Job controller retries Pods with exponential backoff:
 
-- Delay = `6s, 12s, 24s, ...` doubling each time, capped at `6 minutes`.
+- Delay = `10s, 20s, 40s, ...` doubling each time, capped at `6 minutes`.
 - Retries continue until `backoffLimit` failures are reached.
 - **BackoffLimit counts failures across all Pods**, not per Pod.
 
@@ -200,7 +200,7 @@ kubectl get jobs --watch
 - **Always set `activeDeadlineSeconds`** on Jobs and CronJobs to prevent a runaway task from consuming resources indefinitely.
 - **Use `ttlSecondsAfterFinished`** on Jobs to automatically clean up completed resources.
 - **Set `successfulJobsHistoryLimit`** on CronJobs to control how many Job records to retain (default 3).
-- **Never use `restartPolicy: Never` with Jobs**: you lose the ability to retry failed Pods via the Job controller.
+- `restartPolicy: Never` is valid for Jobs. The Job controller creates new Pods to replace failed ones regardless of restartPolicy. With `OnFailure`, kubelet restarts the container within the same Pod; with `Never`, the Job controller creates a new Pod.
 - **Use `concurrencyPolicy: Forbid`** for Jobs that must not overlap (e.g., backups to the same volume).
 - **Prefer Jobs over imperative `kubectl run --restart=OnFailure`** in production: Jobs survive controller restarts and provide proper status tracking.
 
@@ -208,6 +208,6 @@ kubectl get jobs --watch
 
 - **CronJobs do not guarantee exact execution times**: they are triggered when the schedule is evaluated, which can be delayed by up to a few minutes if the API server is busy.
 - **`startingDeadlineSeconds` is for the whole CronJob, not each execution**: if a scheduled run cannot start by this deadline, it is skipped.
-- **A Job marked as Failed is not retried**: `backoffLimit` applies to Pod restarts, not to the overall Job lifecycle.
+- **A Job marked as Failed is permanent**: `backoffLimit` counts pod failures (or container restarts with `OnFailure`). Once the limit is reached, the Job is marked Failed and will not be retried. The Job controller creates new Pods to replace failed ones until `backoffLimit` failures are reached, then the Job enters a terminal Failed state.
 - **CronJob concurrency with Jobs in different namespaces**: concurrencyPolicy only tracks Jobs created by the same CronJob, not Jobs across the cluster.
 - **Volume mounts with Jobs**: if a Job completes and the Pod is removed, any writes to `emptyDir` are lost. Use PVCs or external storage for data retention.

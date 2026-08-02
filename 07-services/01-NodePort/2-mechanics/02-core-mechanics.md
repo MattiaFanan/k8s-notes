@@ -141,8 +141,7 @@ spec:
       nodePort: 30080
 ```
 
-- `ClientIP` (default for NodePort is `None`): Routes all requests from the same client IP to the same backend Pod.
-- `None`: Round-robin across all healthy backend Pods.
+- `None` (default): Round-robin across all healthy backend Pods.
 
 ## Health Checking
 

@@ -25,7 +25,6 @@ spec:
     operator: "Equal"
     value: "value"
     effect: NoSchedule
-  tolerations:
   - key: key
     operator: "Exists"
     effect: NoExecute

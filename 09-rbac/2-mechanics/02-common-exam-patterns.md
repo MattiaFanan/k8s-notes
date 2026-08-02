@@ -289,11 +289,10 @@ kubectl auth can-i --list --as=system:group:dev-team
 4. **Use Groups for organizational access** — Bind groups (e.g., `dev-team`, `ops-team`) rather than individual users to Roles/ClusterRoles. This simplifies access management when team members change.
 
 5. **Bind to special groups for built-in access levels**:
-   - `system:authenticated` — All authenticated users
-   - `system:unauthenticated` — All unauthenticated users
-   - `system:serviceaccounts` — All ServiceAccounts
-   - `system:masters` — Legacy superuser group (deprecated)
-   - `cluster-admins` — Common group for cluster administrators
+    - `system:authenticated` — All authenticated users
+    - `system:unauthenticated` — All unauthenticated users
+    - `system:serviceaccounts` — All ServiceAccounts
+    - `system:masters` — Legacy superuser group
 
 6. **Always use `--as` for testing** — `kubectl auth can-i --as=<subject>` is the best way to verify permissions before assigning them in production. It tests the authorization path end-to-end.
 

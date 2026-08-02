@@ -23,7 +23,7 @@ flowchart TD
 | kube-proxy involvement | Yes (iptables/IPVS) | None |
 | Endpoint controller | Yes | No |
 | Selector required | Yes | No |
-| Ports defined | Yes | No |
+| Ports defined | Yes | Informational only; not used for proxying |
 
 ## The CNAME Resolution Process
 

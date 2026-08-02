@@ -6,7 +6,7 @@ This document recaps the Kubernetes probe types and their mechanics in detail. P
 
 | Probe | Purpose | Action on Failure |
 |---|---|---|
-| **Startup Probe** | Detects slow-starting containers | Disables liveness/readiness until it succeeds; then container is restarted |
+| **Startup Probe** | Detects slow-starting containers | Disables liveness/readiness until it succeeds; if it fails failureThreshold times, container is restarted |
 | **Liveness Probe** | Detects deadlocked or hung containers | Container is killed and restarted |
 | **Readiness Probe** | Detects containers not ready for traffic | Pod removed from Service endpoints |
 
@@ -32,7 +32,7 @@ spec:
 - While the startup probe is running, liveness and readiness probes are disabled.
 - Once the startup probe succeeds, liveness and readiness probes are enabled.
 - If the startup probe fails `failureThreshold` times, the container is restarted.
-- `failureThreshold` defaults to 30 (allowing up to 5 minutes for startup with the default `periodSeconds` of 10).
+- `failureThreshold` defaults to 3. For startup probes, set it high enough to allow the container to start (e.g., `failureThreshold: 30` with `periodSeconds: 10` allows up to 5 minutes of startup time).
 
 > **Best practice**: Use startup probes for Java applications, applications with large dependency graphs, or any container that takes more than 10 seconds to become ready.
 
@@ -97,7 +97,7 @@ spec:
 | `initialDelaySeconds` | 0 | Seconds to wait before the first probe |
 | `periodSeconds` | 10 | Interval between probes |
 | `timeoutSeconds` | 1 | Seconds before the probe times out |
-| `successThreshold` | 1 | Consecutive successes for success (only relevant for readiness) |
+| `successThreshold` | 1 | Consecutive successes for success (must be 1 for liveness and startup probes) |
 | `failureThreshold` | 3 | Consecutive failures before the probe is considered failed |
 
 ### Parameter Interactions
@@ -169,7 +169,7 @@ flowchart TD
     N -->|Yes| O[Add to Endpoints]
     N -->|No| M
     M -->|Fails| P{Exceeded failureThreshold?}
-    P -->|Yes| G
+    P -->|Yes| M
     P -->|No| M
 ```
 

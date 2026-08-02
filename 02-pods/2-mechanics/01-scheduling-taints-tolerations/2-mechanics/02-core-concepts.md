@@ -76,7 +76,7 @@ flowchart TD
 
 ## Taint Key and Value Semantics
 
-- **Key**: A string label for the taint. Must be a valid Kubernetes label key (max 256 characters, alphanumeric, hyphens, underscores, dots).
+ - **Key**: A string label for the taint. Must be a valid Kubernetes label key (max 253 characters, alphanumeric, hyphens, underscores, dots).
 - **Value**: An optional string associated with the key. If no value is provided, the taint is still valid but tolerations using `operator: Equal` must also omit the value.
 - **Effect**: One of `NoSchedule`, `PreferNoSchedule`, or `NoExecute`.
 

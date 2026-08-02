@@ -30,7 +30,7 @@ stateDiagram-v2
 | `Ready` | Node is healthy and accepting Pods. `status` is `True`. | Normal operation. |
 | `MemoryPressure` | Node memory is low; eviction thresholds have been breached. `status` is `True`. | Memory pressure triggers eviction of BestEffort Pods first, then Burstable. |
 | `DiskPressure` | Node root filesystem or image filesystem is nearly full. `status` is `True`. | Prevents scheduling of new Pods that need ephemeral storage. |
-| `PIDPressure` | Too many processes on the node (exceeds `--pod-pids-limit` or system PID limit). `status` is `True`. | Process leaks or runaway containers spawning threads. |
+| `PIDPressure` | Too many processes on the node (exceeds `--pod-max-pids` or system PID limit). `status` is `True`. | Process leaks or runaway containers spawning threads. |
 | `NetworkUnavailable` | CNI plugin has not configured the node's network. `status` is `True` or `False`. | Should become `False` once CNI is ready. Stuck `True` indicates CNI failure. |
 
 ### How Conditions Are Set and Monitored

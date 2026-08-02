@@ -122,7 +122,7 @@ flowchart LR
 
 - **Run DaemonSet Pods with explicit resource requests/limits**: a misconfigured monitoring agent on 200 nodes can exhaust the cluster.
 - **Use hostPath volumes sparingly**: they are required for log/monitoring access but bypass Kubernetes volume security constraints. Document each usage.
-- **Set `podManagementPolicy: Parallel`** for DaemonSets that benefit from fast rollout on large clusters (be mindful of API server / node burst).
+- **Use `updateStrategy: RollingUpdate` with appropriate `maxUnavailable`** for DaemonSets that benefit from fast rollout on large clusters (be mindful of API server / node burst).
 - **Tag DaemonSet Pods with specific labels** and use a dedicated Service per DaemonSet type for clean service discovery.
 - **Namespace your DaemonSets**: put `node-exporter` in `monitoring`, `fluentd` in `logging`, etc.
 

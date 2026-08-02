@@ -140,6 +140,6 @@ kubectl apply --dry-run=server -f deployment.yaml
 ## Community Knowledge
 
 - **CNCF surveys** consistently show declarative (GitOps) as the dominant pattern for production clusters.
-- **Kubernetes Enhancement Proposals (KEPs)**: Server-side apply (KEP 2875) was introduced to solve field ownership conflicts in collaborative environments.
+- **Kubernetes Enhancement Proposals (KEPs)**: Server-side apply (KEP 555) was introduced to solve field ownership conflicts in collaborative environments.
 - **Google SRE book** emphasizes that declarative configuration enables automation, which is essential for managing large fleets.
 - **ArgoCD and Flux** have become the de facto GitOps tools because they continuously reconcile cluster state with Git, making declarative management scalable.

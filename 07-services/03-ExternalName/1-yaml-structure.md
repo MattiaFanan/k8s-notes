@@ -28,5 +28,5 @@ spec:
 | `spec.type` | Yes | Yes | Must be `ExternalName`. |
 | `spec.externalName` | Yes | Yes | DNS CNAME target. Editable, but changes propagate via DNS and may be cached by clients. |
 | `spec.selector` | No | — | Not allowed for ExternalName services. |
-| `spec.ports` / `spec.targetPort` | No | — | Not allowed for ExternalName services. |
+| `spec.ports` / `spec.targetPort` | No | — | Informational only; not used for proxying. |
 | `spec.clusterIP` | No | — | Ignored if specified. |

@@ -185,7 +185,7 @@ The toleration fields mirror the taint fields:
 ## Taint Format Validation
 
 Kubernetes validates taint keys and values against label constraints:
-- Keys must be a valid label key (max 256 characters, must be a qualified name or have a DNS subdomain prefix).
+- Keys must be a valid label key (max 253 characters for the DNS subdomain prefix, name part must be 63 characters or less, must be a qualified name or have a DNS subdomain prefix).
 - Values must be valid label values (max 63 characters, alphanumeric with hyphens, underscores, and dots).
 - Effects must be one of the three valid values: `NoSchedule`, `PreferNoSchedule`, `NoExecute`.
 

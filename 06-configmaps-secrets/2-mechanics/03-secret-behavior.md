@@ -265,9 +265,9 @@ flowchart TD
     S --> S4
 ```
 
-## Immutable Secrets (Kubernetes 1.24+)
+## Immutable Secrets
 
-Since Kubernetes 1.24, Secrets can be marked as immutable. Immutable Secrets cannot be modified after creation (you must delete and recreate them).
+Since Kubernetes 1.21, Secrets can be marked as immutable. Immutable Secrets cannot be modified after creation (you must delete and recreate them).
 
 ```yaml
 apiVersion: v1
@@ -310,7 +310,7 @@ flowchart TD
    - **HashiCorp Vault** with the Vault Agent Sidecar or CSI provider
    - **AWS Secrets Manager / Systems Manager Parameter Store** with External Secrets Operator
    - **Azure Key Vault** with the Azure Key Vault Provider for Secrets Store CSI Driver
-   - **Sealed Secrets** (booli) for gitOps workflows — encrypts secrets client-side
+    - **Sealed Secrets** (bitnami-labs/sealed-secrets) for gitOps workflows — encrypts secrets client-side
 3. **Never commit Secrets to version control**, even base64-encoded — they are trivially decoded.
 4. **Use `stringData` for ease of use** when creating/updating Secrets — Kubernetes automatically base64-encodes the values:
    ```yaml
@@ -378,5 +378,5 @@ Base64 is an encoding, not an encryption. Anyone with `get` permissions on Secre
 - **Sealed Secrets** (bitnami-labs/sealed-secrets) is ideal for GitOps workflows — it encrypts secrets on the client side so only the Sealed Secrets controller on the cluster can decrypt them. Encrypted secrets can be safely committed to git.
 - **SOPS (Secrets OPerationS)** by Mozilla integrates with Kubernetes and supports encrypted YAML files that can be applied directly to the cluster.
 - **Vault CSI Provider** allows Pods to mount secret values directly from Vault without creating Kubernetes Secret objects at all — the secret never touches etcd.
-- **In Kubernetes 1.23+**, the `AuditRequest` feature tracks secret access in audit logs, providing visibility into who accessed what secrets and when.
+- **Audit logging** (GA since Kubernetes 1.11) enables cluster administrators to track Secret access in audit logs, providing visibility into who accessed what secrets and when.
 - **Avoid storing Kubernetes service account tokens in Secrets** for application access — use Workload Identity (GKE) or IRSA (EKS) instead, which assign short-lived tokens scoped to specific AWS/GCP permissions.

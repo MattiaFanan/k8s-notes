@@ -15,7 +15,7 @@ Resource: pods
 Namespace: production
 ```
 
-The authorization module checks all enabled authorization modes and grants access if any mode allows the action.
+Each enabled authorization mode is checked in sequence. If any authorizer approves or denies the request, that decision is immediately returned and no other authorizer is consulted. If all modules have no opinion, the request is denied.
 
 ## RBAC (Role-Based Access Control)
 
@@ -107,12 +107,11 @@ roleRef:
 | `""` (core) | pods, services, configmaps, secrets, persistentvolumes, persistentvolumeclaims, namespaces, nodes, events, etc. |
 | `apps` | deployments, daemonsets, statefulsets, replicasets, etc. |
 | `batch` | jobs, cronjobs |
-| `extensions` | ingresses, networkpolicies, podsecuritypolicies |
 | `rbac.authorization.k8s.io` | roles, clusterroles, rolebindings, clusterrolebindings |
 | `admissionregistration.k8s.io` | validatingwebhookconfigurations, mutatingwebhookconfigurations |
 | `storage.k8s.io` | storageclasses, volumeattachments |
 | `networking.k8s.io` | ingresses, networkpolicies |
-| `policy` | podsecuritypolicies, poddisruptionbudgets |
+| `policy` | poddisruptionbudgets |
 | `autoscaling` | horizontalpodautoscalers |
 
 ### Checking RBAC Permissions
@@ -220,7 +219,7 @@ data:
 
 ## Authorization Mode Order
 
-Authorization modes are checked in order. The first mode that allows the request wins. If no mode allows the request, the request is denied.
+Authorization modes are checked in order. If any mode approves or denies the request, that decision is immediately returned and no other mode is consulted. If all modes return no opinion, the request is denied.
 
 ```bash
 # Configure multiple authorization modes
@@ -240,15 +239,20 @@ flowchart TD
     A[Authenticated Request] --> B[Check Authorization Modes]
     B --> C{Mode 1: Node?}
     C -->|Allowed| D[Grant Access]
-    C -->|Not Applicable| E{Mode 2: RBAC?}
-    E -->|Allowed| D
-    E -->|Not Applicable| F{Mode 3: Webhook?}
+    C -->|Denied| E1[Deny Request 403]
+    C -->|Not Applicable| F{Mode 2: RBAC?}
     F -->|Allowed| D
-    F -->|Not Applicable| G{Mode 4: ABAC?}
+    F -->|Denied| E1
+    F -->|Not Applicable| G{Mode 3: Webhook?}
     G -->|Allowed| D
-    G -->|Not Applicable| H{Mode 5: AlwaysAllow?}
+    G -->|Denied| E1
+    G -->|Not Applicable| H{Mode 4: ABAC?}
     H -->|Allowed| D
-    H -->|Not Applicable| I[Deny Request 403]
+    H -->|Denied| E1
+    H -->|Not Applicable| I{Mode 5: AlwaysAllow?}
+    I -->|Allowed| D
+    I -->|Denied| E1
+    I -->|Not Applicable| E1
 ```
 
 ## Best Practices

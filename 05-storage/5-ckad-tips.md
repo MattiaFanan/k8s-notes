@@ -32,7 +32,7 @@ volumeMounts:
   mountPath: /tmp
 
 # Quick PVC creation
-k create pvc my-pvc --storage-class=fast --size=1Gi --access-mode=ReadWriteOnce
+k apply -f pvc.yaml --dry-run=client -o yaml
 
 # Verify storage resources
 k get pv

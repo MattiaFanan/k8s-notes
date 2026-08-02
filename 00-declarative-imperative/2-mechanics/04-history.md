@@ -16,16 +16,19 @@ timeline
     section 2016 : kubectl expose : Services via CLI
         : kubectl expose (imperative)
         : ReplicaSet introduced
-    section 2017 : Server-Side Apply Proposal
-        : KEP 2875 proposed
+    section 2017 : Server-side apply proposal
+        : KEP 555 proposed
         : `kubectl apply` improvements
     section 2018 : K8s 1.14
-        : Server-side apply beta
+        : Server-side apply alpha
         : Kustomize built into kubectl
-    section 2019 : K8s 1.18
-        : Server-side apply GA
-        : Field ownership / multiple managers
+    section 2019 : K8s 1.16
+        : Server-side apply beta
+    section 2020 : K8s 1.18
+        : Server-side apply beta (field ownership / multiple managers)
         : CustomResourceDefinition maturity
+    section 2021 : K8s 1.22
+        : Server-side apply GA (stable)
     section 2020+ : GitOps Era
         : ArgoCD / FluxCD mainstream adoption
         : OCI support for Helm
@@ -118,7 +121,7 @@ spec:
 - Field ownership is tracked in the object's metadata
 - `kubectl apply` became a special case of a broader SSA API
 
-**KEP 2875** formalized this change and is considered one of the most important Kubernetes enhancements for collaborative environments.
+**KEP 555** formalized this change and is considered one of the most important Kubernetes enhancements for collaborative environments.
 
 ### The GitOps Era (2020 - Present)
 
@@ -222,7 +225,7 @@ kubectl version --client
 
 ## Community Knowledge
 
-- **Kubernetes Enhancement Proposals (KEPs)**: KEP 2875 (SSA) and KEP 3221 (kubectl apply pruning) represent major architectural shifts.
+- **Kubernetes Enhancement Proposals (KEPs)**: KEP 555 (SSA) and KEP 3221 (kubectl apply pruning) represent major architectural shifts.
 - **Kubernetes the Hard Way** (Kelsey Hightower) teaches imperative commands first to understand the API, then declarative for production.
 - **ArgoCD Creator** (Intiaz Saeed) has stated that GitOps adoption correlates strongly with declarative maturity: teams that master `kubectl apply` adopt GitOps faster.
 - **CNCF Annual Survey 2023**: 78% of respondents use GitOps in production, up from 55% in 2021.

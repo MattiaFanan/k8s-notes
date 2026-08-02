@@ -56,8 +56,9 @@ ETCDCTL_API=3 etcdctl \
   endpoint health
 # https://127.0.0.1:2379 is healthy
 
-# Check kube-apiserver health
+# Check kube-apiserver health (ComponentStatus is deprecated since v1.19; use readyz/healthz endpoints instead)
 kubectl get componentstatuses
+# Warning: v1 ComponentStatus is deprecated in v1.19+
 # NAME                 STATUS    MESSAGE   ERROR
 # scheduler            Healthy   ok
 # controller-manager   Healthy   ok
@@ -139,7 +140,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # 5. Install a CNI plugin (Calico example)
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.29/manifests/calico.yaml
 
 # Output shows the worker join command:
 # kubeadm join <control-plane-ip>:6443 --token <token> \

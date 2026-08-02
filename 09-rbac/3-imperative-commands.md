@@ -20,7 +20,7 @@ kubectl create clusterrolebinding read-secrets --clusterrole=secret-reader --ser
 ## Dry-run generation
 ```bash
 kubectl create role my-role --verb=get --resource=pods --dry-run=client -o yaml
-kubectl create rolebinding my-rb --role=my-role --serviceaccount=default:my-sa -n default $do
+kubectl create rolebinding my-rb --role=my-role --serviceaccount=default:my-sa -n default
 ```
 
 ## Edit & Audit

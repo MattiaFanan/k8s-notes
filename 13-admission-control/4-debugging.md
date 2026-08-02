@@ -17,7 +17,7 @@
    - *Fix*: Verify Secret exists and is attached to SA/Pod.
 
 4. **Token Expiry**
-   - ServiceAccount tokens expire (v1.24+ projected volume token bound to projected volume or creation timestamp).
+   - ServiceAccount tokens (v1.24+) are projected volume tokens with bounded lifetimes. They are automatically refreshed by the kubelet before expiration. Use `kubectl create token` for manual token generation.
 
 ## Diagnostic Commands
 ```bash

@@ -296,7 +296,7 @@ spec:
 
 ## Community Knowledge
 
-- **KEP 2875** (Server-Side Apply): Introduced the field ownership model. The KEP explicitly states that SSA is designed for "multiple actors managing the same object."
+- **KEP 555** (Server-Side Apply): Introduced the field ownership model. The KEP explicitly states that SSA is designed for "multiple actors managing the same object."
 - **Kubernetes Blog** (2020): "Server-side apply in Kubernetes 1.18" explains why client-side apply was insufficient for GitOps.
 - **ArgoCD** uses server-side apply by default (since v2.0), which is why it plays well with multiple field managers.
 - **FluxCD** supports both client-side and server-side apply. The `--ssa` flag enables SSA for Flux's apply operations.

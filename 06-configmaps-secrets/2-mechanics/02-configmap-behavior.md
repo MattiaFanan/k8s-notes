@@ -284,7 +284,7 @@ kubectl get configmap -A | grep app-config
 ## Community Knowledge
 
 - **Kubelet sync frequency:** By default, Kubelet checks for ConfigMap/Secret updates every 60 seconds (configurable via `--sync-frequency`). This means there is an inherent delay between updating a ConfigMap and seeing the change in a mounted file.
-- **Sealed Secrets** (kopia/booli) encrypts ConfigMap/Secret data at rest and can be committed to git safely. The controller decrypts them on the cluster side.
+- **Sealed Secrets** (bitnami-labs/sealed-secrets) encrypts ConfigMap/Secret data at rest and can be committed to git safely. The controller decrypts them on the cluster side.
 - **External Secrets Operator (ESO):** Pulls secrets from external providers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault) and creates Kubernetes Secret objects automatically. This avoids the need to manually `kubectl create secret`.
 - **ConfigMap and Secret caching:** Kubelet caches ConfigMaps and Secrets in memory. A `kubectl create` update may not be visible to Kubelet until the next sync cycle (within 60s).
 - **Do not mount Secrets and ConfigMaps to the same mount path** — the Secret key files would overwrite ConfigMap files with the same key name, which is a common source of silent bugs.

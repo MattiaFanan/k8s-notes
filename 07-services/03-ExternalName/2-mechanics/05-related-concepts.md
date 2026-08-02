@@ -22,7 +22,7 @@ ExternalName is a specialized Service type that operates fundamentally different
 | Exposes | Internal service on node port | External hostname via DNS |
 | kube-proxy | Yes | No |
 | Traffic flow | Pod ↔ ClusterIP ↔ kube-proxy ↔ Node ↔ Pod | Pod → external IP (direct) |
-| Ports | port, targetPort, nodePort | None (informational only) |
+| Ports | port, targetPort, nodePort | Informational only; not used for proxying |
 | External access | Via NodeIP:nodePort | Via DNS resolution |
 
 ### ExternalName vs LoadBalancer

@@ -68,9 +68,9 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: gp2
   persistentVolumeSource:
-    awsElasticBlockStore:
-      volumeID: vol-0abc123
-      fsType: ext4
+    hostPath:
+      path: /mnt/data
+      type: DirectoryOrCreate
 ```
 
 **Why use it:**

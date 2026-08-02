@@ -32,7 +32,7 @@ The `system:` prefix is reserved for built-in groups. The most common built-in g
 | `system:authenticated` | All authenticated users (including ServiceAccounts) |
 | `system:unauthenticated` | All unauthenticated requests |
 | `system:serviceaccounts` | All ServiceAccounts across all namespaces |
-| `system:masters` | Legacy superuser group (deprecated in v1.23+) |
+| `system:masters` | Legacy superuser group |
 
 ### ServiceAccount
 

@@ -80,7 +80,7 @@ spec:
 
 | Field | Required/Optional/Important | Editable with `kubectl edit` | Notes & Best Usage |
 |---|---|---|---|
-| `data` | Required | Yes | Key-value map for ConfigMaps; keys must be strings. For Secrets, values must be base64-encoded or use `stringData` for plain-text convenience. |
+| `data` | Optional | Yes | Key-value map for ConfigMaps; keys must be strings. For Secrets, values must be base64-encoded or use `stringData` for plain-text convenience. |
 | `metadata.name` | Required | Yes | Name of the resource within the namespace. Must be a valid DNS subdomain name. |
 | `type` | Optional (defaults to `Opaque` for Secrets) | Yes | Only applies to Secrets. Other types: `kubernetes.io/service-account-token`, `kubernetes.io/dockerconfigjson`, `kubernetes.io/basic-auth`. |
 | `stringData` | Optional | Yes | Accepts plain-text values for Secrets; automatically base64-encodes them at creation. Mutually exclusive with `data` for the same key. |

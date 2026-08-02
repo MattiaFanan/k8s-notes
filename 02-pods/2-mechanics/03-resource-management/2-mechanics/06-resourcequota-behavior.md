@@ -75,8 +75,8 @@ The `scopes` field lets you target a subset of Pods:
 
 | Scope | Applies To |
 |-------|-----------|
-| `Terminating` | Pods with `restartPolicy: Always` (Deployments, ReplicaSets) |
-| `NotTerminating` | Pods with `restartPolicy: Never` or `OnFailure` (Jobs, bare Pods) |
+| `Terminating` | Pods where `.spec.activeDeadlineSeconds >= 0` |
+| `NotTerminating` | Pods where `.spec.activeDeadlineSeconds` is `nil` |
 | `BestEffort` | Only BestEffort QoS Pods |
 | `NotBestEffort` | Burstable + Guaranteed Pods |
 

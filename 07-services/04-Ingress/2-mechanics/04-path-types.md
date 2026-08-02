@@ -16,23 +16,19 @@ Every Ingress rule's `http.paths[].pathType` field determines how the URL path i
 
 ### Prefix Matching
 
-`Prefix` is the most commonly used path type. It matches any URL path that begins with the specified `path` value. The match is performed from the start of the path and does not require a slash boundary.
+`Prefix` is the most commonly used path type. It matches any URL path that begins with the specified `path` value, split by `/` path elements. Matching is case sensitive and done on a path element by element basis. A path element refers to the list of labels in the path split by the `/` separator. If the last element of the path is a substring of the last element in request path, it is not a match (e.g. `/foo/bar` matches `/foo/bar/baz`, but does not match `/foo/barbaz`).
 
 ```mermaid
 flowchart TD
     A["Incoming Request Path"] --> B{"pathType: Prefix?"}
-    B -->| path = '/api' | C["Matches /api\nMatches /api/v1\nMatches /api/v1/users\nMatches /apianything"]
-    B -->| path = '/' | D["Matches everything\n/ any path"]
-    B -->| path = '/static' | E["Matches /static\nMatches /static/css/main.css\nMatches /staticfile (no slash)"]
-```
-
-**Important**: `Prefix` matching is NOT slash-boundary aware by default. A `Prefix` of `/api` will match `/apianything`, not just `/api/...` or `/api/v1`. This can cause unexpected routing if not carefully considered.
-
-```bash
-# Test prefix matching with curl
-curl -v http://<ingress-ip>/api
-curl -v http://<ingress-ip>/api/v1/users
-curl -v http://<ingress-ip>/apianything  # This ALSO matches /api prefix!
+    B -->| path = '/api' | C["Matches /api"]
+    B -->| path = '/api' | D["Matches /api/"]
+    B -->| path = '/api' | E["Matches /api/v1"]
+    B -->| path = '/api' | F["Does NOT match /apiv1 (no slash boundary)"]
+    B -->| path = '/' | G["Matches everything"]
+    B -->| path = '/static' | H["Matches /static"]
+    B -->| path = '/static' | I["Matches /static/css/main.css"]
+    B -->| path = '/static' | J["Does NOT match /staticfile"]
 ```
 
 ### Exact Matching
@@ -130,7 +126,7 @@ paths:
           number: 80
 ```
 
-In Kubernetes 1.18+, `pathType` defaults to `ImplementationSpecific` if omitted. This means behavior varies by controller. Always be explicit:
+In Kubernetes 1.18+ (networking.k8s.io/v1), omitting `pathType` will fail validation; `"Exact"`, `"Prefix"`, or `"ImplementationSpecific"` must be specified explicitly.
 
 ```yaml
 # GOOD: Explicit pathType

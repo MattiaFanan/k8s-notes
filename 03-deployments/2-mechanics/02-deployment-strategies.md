@@ -307,8 +307,7 @@ kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
 ### Common Pitfalls
 
 - **RollingUpdate sends traffic to terminating Pods** unless you enable `terminationGracePeriodSeconds` and ensure readiness probes fail before shutdown.
-- **Pod disruption budgets (PDB) interact with rollout strategies**: a PDB with `minAvailable: 3` forces maxUnavailable to 0 if you only have 3 replicas, causing a stuck rollout.
-- **Recreate does not respect PDB**: because all Pods are killed first, a PDB cannot prevent the downtime.
+- **PDBs do not constrain Deployment rolling updates**: the Deployment controller's `maxUnavailable` and `maxSurge` govern rollout behavior, not PDBs.
 - **PreStop hooks must be brief** if you want fast rollouts. A 30-second PreStop on every Pod means a 3-minute minimum rollout for 3 replicas.
 - **Blue/Green: forgetting to update the Service selector** after creating the green deployment — traffic still routes to blue.
 - **Canary: not monitoring before scaling up** — always verify canary health before increasing traffic weight.

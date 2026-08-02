@@ -90,12 +90,15 @@ volumeBindingMode: WaitForFirstConsumer
 
 CSI migration allows in-tree cloud provider plugins (e.g., `aws-ebs`, `gce-pd`) to be transparently redirected to their CSI driver equivalents. This enables the removal of in-tree plugins from Kubernetes.
 
-```yaml
-# Enable CSI migration for AWS EBS
---feature-gates=CSIMigration=true,CSIMigrationAWS=true
+```bash
+# CSI migration is enabled by default in Kubernetes 1.25+ and later.
+# The CSIMigration and CSIMigration<Provider> feature gates were removed in Kubernetes 1.27.
+# Migration is now controlled automatically — no feature-gate configuration is needed.
+# To verify migration status:
+kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo}' | grep -i csi
 ```
 
-> **Best practice**: Use CSI drivers for all storage needs. In-tree plugins are deprecated and will be removed in future Kubernetes versions.
+> **Best practice**: Use CSI drivers for all storage needs. In-tree plugins are deprecated and will be removed in future Kubernetes versions. CSI migration is enabled by default and the feature gates are no longer configurable.
 
 ## CCM (Cloud Controller Manager)
 
@@ -164,10 +167,10 @@ ps aux | grep kube-controller-manager | grep cloud-provider
 # CCM flags
 --cloud-provider=aws
 --cloud-config=/etc/kubernetes/cloud-config
---controllers=*,-persistentvolume-binder,-attachdetach
+# On kube-controller-manager, use --cloud-provider=external to disable cloud-specific controllers
 ```
 
-> **Pitfall**: When using CCM, the `--controllers` flag must exclude controllers that are now handled by CCM (e.g., `persistentvolume-binder`, `attachdetach`, `node`).
+> **Pitfall**: When using CCM, the `--controllers` flag must exclude cloud-specific controllers that are now handled by CCM (e.g., `service`, `route`, `cloud-node-lifecycle`). The `node` lifecycle controller is a core Kubernetes controller and is not handled by CCM.
 
 ## Mermaid: CSI and CCM Architecture
 

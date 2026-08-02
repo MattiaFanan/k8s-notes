@@ -48,7 +48,7 @@ CSI is the modern, vendor-neutral standard for exposing storage systems to Kuber
 |---|---|---|
 | **aws-ebs.csi.aws.com** | AWS | Block storage (gp2, gp3, io1); widely used; latency-sensitive stateful workloads |
 | **disk.csi.azure.com** | Azure | Managed Disks (Standard, Premium, Ultra); Azure-native workloads |
-| **pd.csi.storage.g8s.io** | GCP | Persistent Disk (PD); balanced price/performance on GCP |
+| **pd.csi.storage.gke.io** | GCP | Persistent Disk (PD); balanced price/performance on GCP |
 | **csi.vsphere.vmware.com** | vSphere | vSphere CSI; integrates with vCenter and storage profiles; on-prem VMware clusters |
 | **topolvm.io** | Any | CSI + Capacity-aware scheduling; dynamic local PVs using LVMs; suited for stateful apps needing fast local storage |
 | **longhorn.io** | Any | Distributed block storage; self-healing, live migration; good for edge, dev, or bare-metal environments |
@@ -58,7 +58,7 @@ CSI is the modern, vendor-neutral standard for exposing storage systems to Kuber
 | Plugin | Status | Replacement |
 |---|---|---|
 | `kubernetes.io/aws-ebs` | Deprecated | `ebs.csi.aws.com` |
-| `kubernetes.io/gce-pd` | Deprecated | `pd.csi.storage.g8s.io` |
+| `kubernetes.io/gce-pd` | Deprecated | `pd.csi.storage.gke.io` |
 | `kubernetes.io/azure-disk` | Deprecated | `disk.csi.azure.com` |
 | `kubernetes.io/cinder` | Deprecated | `cinder.csi.openstack.org` |
 

@@ -14,7 +14,6 @@ metadata:
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
-  iopsPerGB: "10"
   encrypted: "true"
 reclaimPolicy: Delete
 allowVolumeExpansion: true
@@ -44,8 +43,8 @@ The `provisioner` field determines which CSI driver handles volume creation. Com
 | `disk.csi.azure.com` | Azure | Azure Managed Disks |
 | `file.csi.azure.com` | Azure | Azure Files |
 | `nfs.csi.k8s.io` | Any | NFS shares |
-| `csi-hostpath.vmware.com` | vSphere | vSphere volumes |
-| `local-path.provisioner` | Any | Local storage on node |
+| `csi.vsphere.vmware.com` | vSphere | vSphere volumes |
+| `rancher.io/local-path` | Any | Local storage on node |
 
 ## Parameters
 
@@ -69,7 +68,6 @@ metadata:
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
-  iopsPerGB: "10"
   encrypted: "true"
   throughput: "125"
 reclaimPolicy: Delete
@@ -167,7 +165,7 @@ One StorageClass can be marked as the default so that PVCs without an explicit `
 kubectl patch storageclass fast-ssd -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
 ```
 
-**Note:** Only one default StorageClass can exist per cluster. If multiple are marked as default, Kubernetes will reject PVC creation.
+**Note:** Multiple default StorageClasses can coexist in a cluster. When more than one is marked as default, Kubernetes uses the most recently created default StorageClass for PVCs that do not specify a `storageClassName`.
 
 ## StorageClass YAML Structure Reference
 

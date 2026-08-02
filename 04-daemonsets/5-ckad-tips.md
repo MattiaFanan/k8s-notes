@@ -11,14 +11,14 @@
 2. **Label collisions**: Ensure DaemonSet `selector` matches `template.metadata.labels` exactly.
 3. **Namespace restriction**: DaemonSet respects namespace scoping just like other controllers.
 4. **DaemonSet Pods cannot use `restartPolicy: Never`**: DaemonSet-managed pods must use `Always`.
-5. **Updating DaemonSet strategy**: `RollingUpdate` is the only strategy for DaemonSets.
+5. **Updating DaemonSet strategy**: DaemonSets support both `RollingUpdate` (default) and `OnDelete` strategies.
 
 ## Time-Saver
 ```bash
 alias k=kubectl
 
 # Quick DaemonSet creation
-k create ds node-logger --image=fluentbit $do > ds.yaml
+k create ds node-logger --image=fluentbit --dry-run=client -o yaml > ds.yaml
 k apply -f ds.yaml
 k get pods -l app=node-logger -o wide
 

@@ -41,9 +41,9 @@ Each log line is prefixed with a timestamp:
 
 The format is: `TIMESTAMP STREAM FLAG MESSAGE`
 
-- `stdout` or `stderr`: The stream the log was written to.
-- `F` or `P`: Flag indicating the log type (F = first line of a message, P = partial line).
-- `MESSAGE`: The actual log content.
+  - `stdout` or `stderr`: The stream the log was written to.
+  - `F` or `P`: Flag indicating the log type (F = full line, meaning the log entry is complete; P = partial line, meaning the log entry is split across multiple lines).
+  - `MESSAGE`: The actual log content.
 
 ## Accessing Logs
 
@@ -92,9 +92,9 @@ spec:
   containers:
     - name: app
       image: myapp:1.0
-      stdout:
-        redirect:
-          path: /var/log/app/app.log
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/app
     - name: log-sidecar
       image: fluentd:latest
       volumeMounts:

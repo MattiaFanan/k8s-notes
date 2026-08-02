@@ -13,7 +13,6 @@ stateDiagram-v2
     Running --> Succeeded: All Containers Terminated (exit 0)
     Running --> Failed: All Containers Terminated (non-zero exit)
     Running --> Unknown: Node Communication Lost
-    Failed --> Pending: RestartPolicy triggers redeployment
     Succeeded --> [*]: Pod Deleted
     Failed --> [*]: Pod Deleted
     Unknown --> Pending: Node Contact Restored

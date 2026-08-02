@@ -99,7 +99,7 @@ spec:
     - name: host-vol
       hostPath:
         path: /data
-        type: Directory  # or DirectoryOrCreate, File, Socket, CharDevice, BlockDevice
+        type: Directory  # or DirectoryOrCreate, File, FileOrCreate, Socket, CharDevice, BlockDevice, Unset
 ```
 
 ### hostPath Types

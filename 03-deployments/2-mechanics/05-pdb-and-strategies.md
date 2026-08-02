@@ -1,15 +1,14 @@
 # PodDisruptionBudgets and Deployment Strategies
 
-PodDisruptionBudgets (PDBs) limit the number of pods of a replicated application that are down simultaneously from voluntary disruptions. They are essential for ensuring high availability during cluster maintenance and rolling updates.
+PodDisruptionBudgets (PDBs) limit the number of pods of a replicated application that are down simultaneously from voluntary disruptions. They are essential for ensuring high availability during cluster maintenance.
 
 ## What Are PodDisruptionBudgets?
 
 A PDB specifies the minimum number or percentage of pods that must remain available during voluntary disruptions. Voluntary disruptions include:
 
 - `kubectl drain` (node maintenance)
-- Rolling updates (Deployment, DaemonSet, StatefulSet)
 - Cluster upgrades
-- Node failures (if the node controller evicts pods)
+- Node maintenance events
 
 ## PDB YAML Structure
 
@@ -50,7 +49,7 @@ spec:
 
 ### PDB with RollingUpdate
 
-When a Deployment performs a rolling update, it creates new pods before killing old ones. A PDB can prevent the rollout from proceeding if it would violate the budget.
+When a Deployment performs a rolling update, it creates new pods before killing old ones. PDBs do not limit Deployment rolling updates; the Deployment controller manages pod replacements independently based on its own strategy settings (`maxUnavailable` and `maxSurge`).
 
 ```yaml
 apiVersion: apps/v1
@@ -93,7 +92,7 @@ If `minAvailable` is set to 3 and the Deployment has 3 replicas, then `maxUnavai
 
 ### PDB Interaction with Recreate Strategy
 
-The Recreate strategy kills all pods before creating new ones. A PDB with `minAvailable: 1` will block the Recreate strategy from proceeding, causing a deadlock.
+The Recreate strategy kills all pods before creating new ones. PDBs do not block the Recreate strategy because workload controllers use the Pod DELETE API directly rather than the Eviction API, which is what PDBs govern.
 
 ## PDB YAML Structure Reference
 

@@ -25,5 +25,5 @@ kubectl get secret db-credentials -o jsonpath='{.data.password}' | base64 --deco
 
 ## Dry-Run Generation Pattern
 ```bash
-kubectl create configmap app-config --from-literal=APP_MODE=production $do
+kubectl create configmap app-config --from-literal=APP_MODE=production --dry-run=client -o yaml
 ```
