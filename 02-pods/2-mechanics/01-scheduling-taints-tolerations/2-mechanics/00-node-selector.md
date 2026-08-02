@@ -156,7 +156,7 @@ kubectl get nodes -l node-role.kubernetes.io/worker
 
 2. **Confusing nodeSelector with pod labels**: `nodeSelector` matches **node labels**, not pod labels. This is a common source of confusion.
 
-3. **Using nodeName for production**: `nodeName` is brittle and does not support automatic rescheduling. Use `nodeSelector` or `nodeAffinity` for production workloads.
+3. **Using nodeName for production**: `nodeName` is brittle and does not support automatic rescheduling. Prefer `nodeSelector` or `nodeAffinity` instead.
 
 4. **Forgetting that nodeSelector is a hard constraint**: Unlike `preferredDuringSchedulingIgnoredDuringExecution` in node affinity, `nodeSelector` has no fallback. If no node matches, the pod is never scheduled.
 

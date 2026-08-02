@@ -10,7 +10,7 @@ alias k=kubectl
 export do="--dry-run=client -o yaml"
 
 # Fast pod generation
-k run busybox --image=busybox $do -- command -- env > pod.yaml
+k run busybox --image=busybox $do --command -- env > pod.yaml
 ```
 
 ## Vim Quick Settings (`~/.vimrc`)

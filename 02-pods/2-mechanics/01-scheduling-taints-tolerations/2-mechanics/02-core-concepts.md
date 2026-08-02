@@ -32,7 +32,7 @@ kubectl taint nodes node1 dedicated=special:PreferNoSchedule
 
 ### `NoExecute`
 
-The most restrictive effect. The scheduler will not place new Pods on the node unless they tolerate the taint. Additionally, **already-running Pods that do not tolerate the taint will be evicted**. The node controller manages this eviction and can apply a `tolerationSeconds` grace period.
+The most restrictive effect. Like `NoSchedule`, the scheduler will not place new Pods on the node unless they tolerate the taint. Additionally, **already-running Pods that do not tolerate the taint will be evicted**. The node controller manages this eviction and can apply a `tolerationSeconds` grace period.
 
 ```bash
 kubectl taint nodes node1 dedicated=special:NoExecute

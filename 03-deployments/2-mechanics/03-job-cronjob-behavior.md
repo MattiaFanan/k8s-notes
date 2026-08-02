@@ -64,7 +64,7 @@ kubectl describe job backup
 
 # Check which pods failed
 kubectl get pods -l job-name=backup
-kubectl logs job/backup --all-pit=true
+kubectl logs job/backup --all-pods=true
 ```
 
 ### CronJob Behavior

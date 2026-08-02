@@ -166,8 +166,6 @@ kubectl get nodes
 # server  Ready    control-plane,master   1m    v1.28.3+k3s1
 ```
 
-> For a full reference on kubeconfig structure, fields, and commands, see [`06-kubeconfig.md`](06-kubeconfig.md).
-
 ### Option 3: kind (Local Development)
 
 ```bash

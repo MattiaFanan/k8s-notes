@@ -1,0 +1,22 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "permission": {
+    "read": {
+      "../*": "deny",
+      "/*": "deny",
+      "*": "allow"
+    },
+    "edit": {
+      "../*": "deny",
+      "/*": "deny",
+      ".git/**": "deny",
+      "*": "allow"
+    },
+    "write": {
+      "../*": "deny",
+      "/*": "deny",
+      ".git/**": "deny",
+      "*": "allow"
+    }
+  }
+}
