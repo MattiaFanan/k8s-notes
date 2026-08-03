@@ -84,13 +84,13 @@ kubectl top node <node-name>
 
 ```mermaid
 flowchart LR
-    subgraph Node[Node: 4 cores (4000m allocatable)]
-        PodA[Pod A: req 500m lim 1000m]
-        PodB[Pod B: req 500m lim 1000m]
-        PodC[Pod C: req 2000m lim 2000m]
-        Free[Free: 500m]
+    subgraph Node ["Node: 4 cores (4000m allocatable)"]
+        PodA["Pod A: req 500m lim 1000m"]
+        PodB["Pod B: req 500m lim 1000m"]
+        PodC["Pod C: req 2000m lim 2000m"]
+        Free["Free: 1000m"]
     end
-    Note[Scheduler: sum of requests <= node allocatable<br/>2000m + 500m + 500m = 3000m <= 4000m]
+    Note["Scheduler: sum of requests <= node allocatable<br/>2000m + 500m + 500m = 3000m <= 4000m"]
     Note --> Node
 ```
 
