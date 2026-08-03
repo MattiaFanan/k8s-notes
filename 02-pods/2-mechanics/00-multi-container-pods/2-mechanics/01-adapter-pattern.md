@@ -3,7 +3,12 @@
 ## Adapter Pattern
 
 ### Concept
-@comment explain better that a container cannot read another container stdout, (stdout is read by kubectl logs...). option 1 (better for logs and files) they talk through a shared mounted volume, explain why emptydir, option 2 (api trans,ation and metrics) container on the same pod share the network namespace so they can talk on localhost, eg main output on 7000 while adapter listens 7000 translates and output on 9000, then the outside world can read from 9000.
+Containers in the same Pod cannot directly read another container's `stdout`. Although `kubectl logs` surfaces a container's stdout/stderr stream, that stream is not exposed as a file or readable pipe that a sibling container can open. Sidecars therefore integrate with the main application through one of two shared mechanisms:
+
+1. **Shared volume (logs and files):** both containers mount the same `emptyDir` volume. The main app writes log files or artifacts to the volume; the adapter reads (often `readOnly`) from the same path. An `emptyDir` is preferred over `hostPath` because it is pod-scoped and ephemeral, requiring no host filesystem coupling — it survives container restarts within the Pod and is cleaned up automatically when the Pod terminates.
+
+2. **Shared network namespace (API transactions and metrics):** all containers in a Pod share the loopback interface, so they communicate over `localhost`. For example, the main app exposes its raw output on port `7000`, the adapter listens on `7000`, transforms the data, and re-publishes on port `9000`, which the outside world scrapes.
+
 The **Adapter Pattern** uses a sidecar container to transform the main application's output, metrics, or monitoring interface into a format consumable by external systems. The adapter "wraps" the application to make it compatible with the surrounding ecosystem without modifying the application itself.
 
 This pattern embodies the **separation of concerns**: the application focuses on business logic, while the adapter handles external integration details.
@@ -48,8 +53,10 @@ spec:
     env:
     - name: FLUENTD_ARGS
       value: "-c /etc/fluentd/config/transform.conf"
+  volumes:
+  - name: log-volume
+    emptyDir: {}
 ```
-@comment probavly missing a volume here
 
 The `log-adapter` tail `/var/log/app/app.log`, applies regex transformations or field extractions, and forwards the result to the logging infrastructure.
 
