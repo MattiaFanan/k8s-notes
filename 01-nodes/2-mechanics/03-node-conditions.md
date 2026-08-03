@@ -165,4 +165,4 @@ flowchart TD
 - **Node Lifecycle Controller**: Part of the kube-controller-manager, it is responsible for updating node conditions and taints. Source code is in `pkg/controller/nodelifecycle`.
 - **Node Problem Detector**: An open-source project (SIG Node) that runs on nodes and reports hardware, kernel, and runtime problems as node conditions.
 - **Cluster Autoscaler**: Depends on `Ready=False` to decide which nodes are unsafe to scale down. False positives (clock skew, network blips) can cause unwanted scale-up.
-- **Graceful Node Shutdown (KEP 2008)**: Since K8s 1.20, the kubelet can detect system shutdown and gracefully terminate Pods, improving condition transitions during maintenance.
+- **Graceful Node Shutdown (KEP 2008)**: Since K8s 1.20, the kubelet can detect system shutdown and gracefully terminate Pods, improving condition transitions during maintenance. The feature was alpha at introduction and requires `--feature-gates=GracefulNodeShutdown=true` to be enabled.

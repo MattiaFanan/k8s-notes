@@ -42,7 +42,7 @@ kubectl api-versions | grep apps/v1
 kubectl apply --dry-run=server -f my-manifest.yaml 2>&1 | grep -i "deprecated\|deprecated"
 
 # Note: kubectl convert is a separate plugin (kubectl-convert) that must be installed separately.
-# It was part of kubectl itself prior to Kubernetes 1.24.
+# It was never part of the built-in kubectl binary.
 # Use `kubectl-convert` instead, or manually update apiVersion in manifests.
 kubectl convert -f my-manifest.yaml --output-version apps/v1 || echo "Install kubectl-convert plugin first"
 ```

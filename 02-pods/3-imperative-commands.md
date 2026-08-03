@@ -28,7 +28,8 @@ When editing a running Pod (`kubectl edit pod <pod-name>` or `kubectl apply`):
 - `spec.tolerations`
 
 ### Non-Editable Fields
-- Everything else (`spec.containers[*].name`, `spec.containers[*].command`, `resources`, `env`, etc.)
+- `spec.containers[*].name` (immutable structural identifier)
+- `spec.volumes[*].name` (immutable structural identifier)
 
 ### Force Replace Strategy (CKAD Speed Trick)
 To replace a Pod with updated non-editable fields:

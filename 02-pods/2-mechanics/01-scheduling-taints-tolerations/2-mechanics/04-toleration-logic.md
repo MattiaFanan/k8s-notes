@@ -105,7 +105,7 @@ tolerations:
 
 This is equivalent to saying "I tolerate every taint on this node." It is commonly used in two scenarios:
 
-1. **DaemonSet Pods**: DaemonSets often use empty-key tolerations so that their Pods can run on any node, including control-plane nodes with taints.
+1. **DaemonSet Pods**: DaemonSets often use empty-key tolerations so that their Pods can run on any node, including control-plane nodes with taints. DaemonSets do NOT automatically tolerate all taints — they require explicit toleration configuration.
 2. **Pods that must run everywhere**: Workloads that need to run on all nodes regardless of taints.
 
 ### DaemonSet Example

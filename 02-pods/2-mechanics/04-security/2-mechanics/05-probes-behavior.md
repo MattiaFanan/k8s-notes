@@ -10,7 +10,7 @@ The startup probe disables liveness and readiness probes until it succeeds. This
 
 - Once the startup probe succeeds, Kubernetes stops running it and enables the liveness and readiness probes.
 - If the startup probe fails, the container is restarted (as if the liveness probe failed).
-- If neither `periodSeconds` nor `failureThreshold` is set, the startup probe defaults to an infinite timeout (effectively disabled).
+- If neither `periodSeconds` nor `failureThreshold` is set, the startup probe uses defaults of `periodSeconds: 10` and `failureThreshold: 3`, giving a 30-second startup window.
 
 ```yaml
 spec:

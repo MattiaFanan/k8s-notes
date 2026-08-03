@@ -26,8 +26,8 @@ alias k=kubectl
 # Quick Ingress creation
 k create ingress web-ingress --class=nginx --rule="myapp.example.com/*=web-service:80"
 
-# Quick Ingress with TLS
-k create ingress web-ingress --class=nginx --rule="myapp.example.com/*=web-service:80" --tls=myapp.example.com,secret=myapp-tls-secret
+# Quick Ingress with TLS (TLS embedded in rule)
+k create ingress web-ingress --class=nginx --rule="myapp.example.com/*=web-service:80,tls=myapp-tls-secret"
 
 # Verify IngressClass
 k get ingressclass

@@ -17,8 +17,8 @@ Kubernetes expresses CPU resources in **CPU units**, where 1 CPU unit equals one
 | `2` | 2.0 | Two full CPU cores |
 
 **Key rules:**
-- **Fractional values require the `m` suffix**: Write `250m`, not `0.25`. The Kubernetes API accepts `0.1` in some versions but it is non-standard and may fail validation.
-- **No decimal point notation in requests/limits**: Always use `m` for sub-core values.
+- **Decimal values are valid**: The Kubernetes API accepts decimal notation like `0.1` for CPU requests/limits. However, `m` suffix notation (e.g., `100m`) is preferred for precision and clarity.
+- **No restriction on decimal notation**: Both `0.1` and `100m` are valid CPU quantity expressions. The `m` suffix is preferred for sub-core values for clarity.
 - **Maximum is the node's core count**: Requesting more CPUs than a node has will cause scheduling to fail.
 
 ### How CPU Is Enforced: The CFS

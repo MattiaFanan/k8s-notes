@@ -5,16 +5,27 @@ NetworkPolicies control pod-to-pod traffic at the network layer. They are additi
 ## Create NetworkPolicies
 
 ```bash
-# Generate NetworkPolicy YAML with dry-run
-kubectl create networkpolicy my-policy \
-  --pod-selector app=database \
-  --ingress \
-  --from-pod-selector app=backend \
-  --port 5432 \
-  --dry-run=client -o yaml > netpol.yaml
-
-# Apply explicit policy
-kubectl apply -f netpol.yaml
+# Generate NetworkPolicy YAML with dry-run (must use YAML manifest)
+cat <<'EOF' | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: my-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend
+    ports:
+    - protocol: TCP
+      port: 5432
+EOF
 ```
 
 ## Default-Deny Ingress

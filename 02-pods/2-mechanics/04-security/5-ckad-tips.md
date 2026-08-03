@@ -19,7 +19,7 @@
 3. **`privileged`** has no restrictions.
 4. PSS labels: `pod-security.kubernetes.io/enforce`, `pod-security.kubernetes.io/warn`, `pod-security.kubernetes.io/audit`.
 5. Unlabeled namespaces inherit from the closest labeled ancestor.
-6. PSA is enabled by default in K8s 1.25+.
+6. PSA is built-in and available by default in K8s 1.25+, but enforcement is opt-in via namespace labels. The default policy mode is privileged (no enforcement).
 
 ## Pitfalls
 

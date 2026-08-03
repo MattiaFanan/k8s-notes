@@ -66,7 +66,7 @@ ps aux | grep kubelet | grep config
 | `--kubeconfig` | `/etc/kubernetes/kubelet.conf` | Path to kubelet's client credentials (see [`06-kubeconfig.md`](../06-kubeconfig.md) for full kubeconfig reference) |
 | `--feature-gates` | (empty) | Comma-separated list of feature gates to enable/disable (e.g., `GracefulNodeShutdown=true`) |
 | `--runtime-config` | (empty) | Comma-separated list of API versions to enable/disable (e.g., `api/all=true`, `apps/v1beta1=true`, `api/v1=false`). Controls which API groups are enabled or disabled |
-| `--container-runtime-endpoint` | `unix:///run/containerd/containerd.sock` | CRI socket endpoint (can be configured via KubeletConfiguration; the `--container-runtime` flag was removed in v1.27, but `--container-runtime-endpoint` still exists as a CLI flag) |
+| `--container-runtime-endpoint` | `unix:///run/containerd/containerd.sock` | CRI socket endpoint (configure via KubeletConfiguration; the `--container-runtime` flag was removed in v1.27) |
 | `--image-service-endpoint` | `unix:///var/run/containerd/containerd.sock` | Image service socket |
 | `--register-node` | `true` | Auto-register node with cluster |
 | `--node-status-update-frequency` | `10s` | How often to post node status |
@@ -121,7 +121,7 @@ ipvsadm -Ln
 | :--- | :--- | :--- | :--- |
 | **iptables** | Random NAT rules in iptables chains | Simple, widely supported | Performance degrades with many services (O(n) lookup) |
 | **ipvs** | IP Virtual Server with scheduling algorithms | Better performance (O(1) lookup), load balancing algorithms | More complex, requires ipvsadm |
-| **nftables** | Modern replacement for iptables | GA in v1.35, recommended replacement for IPVS, better performance | Requires kernel 5.13+ |
+| **nftables** | Modern replacement for iptables | GA in v1.33, recommended replacement for IPVS, better performance | Requires kernel 5.13+ |
 
 **How kube-proxy works**:
 
@@ -257,7 +257,7 @@ kubectl run net-test --image=busybox --rm -it --restart=Never -- wget -O- <servi
 2. **Pin component versions** - keep kubelet, kube-proxy, and container runtime versions consistent across nodes.
 3. **Enable kubelet authentication and authorization** - the kubelet API (port 10250) should be restricted.
 4. **Monitor kubelet metrics** - key metrics include `kubelet_running_pods`, `kubelet_node_name`, `kubelet_volume_stats_*`.
-5. **Use IPVS for large clusters** - if you have more than 1000 Services, IPVS significantly outperforms iptables.
+5. **Use nftables for large clusters** — IPVS mode is deprecated in v1.35; nftables is the recommended replacement for clusters with many Services.
 
 ## Common Pitfalls
 

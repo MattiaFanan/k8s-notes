@@ -22,7 +22,7 @@ timeline
     section 2018 : K8s 1.14
         : Server-side apply alpha
         : Kustomize built into kubectl
-    section 2019 : K8s 1.16
+    section 2019 : K8s 1.18
         : Server-side apply beta
     section 2020 : K8s 1.18
         : Server-side apply beta (field ownership / multiple managers)
@@ -78,7 +78,7 @@ These commands were designed for convenience, not production management. They:
 - The `kubectl` client had to understand all API types to perform merging
 - Multiple users applying the same object caused conflicts
 
-### Server-Side Apply (SSA) Revolution (v1.16 - v1.18+)
+### Server-Side Apply (SSA) Revolution (v1.18+)
 
 Server-side apply moved the merge logic to the API server:
 

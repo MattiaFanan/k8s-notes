@@ -298,7 +298,7 @@ Some CNI implementations (especially on Linux with default iptables) allow same-
 ### Can't Tell if a NetworkPolicy is Actually Applied
 
 ```bash
-# Check that the NetworkPolicy API is available (GA since K8s 1.7)
+# Check that the NetworkPolicy API is available (GA since K8s 1.8)
 kubectl api-resources | grep networkpolicy
 
 # Check the NetworkPolicy status (if supported by the CNI)

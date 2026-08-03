@@ -409,7 +409,7 @@ kubectl get pods -n kube-system
 ## Community Knowledge
 
 - **Node Lifecycle Controller**: Part of the `kube-controller-manager`, not a separate process. It handles registration, heartbeats, and evictions.
-- **Lease API**: Introduced in Kubernetes 1.17 to reduce API server load from node status updates. The lease object is smaller and updated more frequently.
+- **Lease API**: Introduced as alpha in Kubernetes 1.14, graduated to beta in 1.17 to reduce API server load from node status updates. The lease object is smaller and updated more frequently.
 - **Node Problem Detector**: A community project that monitors kernel logs, systemd, and other sources to detect node-level issues (hardware, kernel panic, etc.) and report them as node conditions.
 - **Cluster Autoscaler**: Depends on node conditions. If a node is NotReady, the cluster autoscaler may choose to delete it rather than fix it.
 - **Graceful Node Shutdown**: KEP 1875 introduced this feature to handle cloud provider preemption (spot instance termination) and planned maintenance.

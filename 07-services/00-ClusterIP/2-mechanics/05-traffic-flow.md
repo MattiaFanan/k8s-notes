@@ -90,7 +90,7 @@ sudo iptables -t nat -L KUBE-SERVICES -n -v
 ```
 
 ### Best Practice
-For clusters with **> 1000 Services**, prefer **IPVS** or **nftables** mode. iptables mode creates a rule per endpoint per Service per port; at scale this causes slow kube-proxy syncs and noisy `iptables-restore` calls.
+For clusters with **> 1000 Services**, prefer **nftables** mode (IPVS is deprecated in v1.35). iptables mode creates a rule per endpoint per Service per port; at scale this causes slow kube-proxy syncs and noisy `iptables-restore` calls.
 
 **Community Knowledge:** In managed Kubernetes (EKS, GKE, AKS), iptables is often still the default. Check your kube-proxy configmap:
 ```bash

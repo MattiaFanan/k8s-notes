@@ -42,7 +42,7 @@ spec:
 
 - Controls whether a process can gain more privileges than its parent process (via `setuid`/`setgid` binaries).
 - Default value is `true` if not explicitly set. This is a common misconfiguration.
-- Setting `allowPrivilegeEscalation: false` adds `no-new-privileges` to the seccomp profile, preventing any `setuid`/`setgid` execution.
+- Setting `allowPrivilegeEscalation: false` sets the `no_new_privs` flag on the container process, preventing `setuid`/`setgid` binaries from granting additional privileges.
 
 ```yaml
 spec:

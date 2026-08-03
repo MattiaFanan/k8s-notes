@@ -26,7 +26,7 @@ flowchart LR
 | kubectl Command | HTTP Method | API Path Pattern |
 | :--- | :--- | :--- |
 | `kubectl create` | `POST` | `/apis/<group>/<version>/namespaces/<ns>/<resource>` |
-| `kubectl run` | `POST` | `/api/v1/namespaces/<ns>/pods` (or `/apis/apps/v1/.../deployments`) |
+| `kubectl run` | `POST` | `/api/v1/namespaces/<ns>/pods` (creates a Pod by default since 1.18) |
 | `kubectl expose` | `POST` | `/api/v1/namespaces/<ns>/services` |
 | `kubectl set image` | `PATCH` | `/apis/apps/v1/namespaces/<ns>/deployments/<name>` |
 | `kubectl scale` | `PATCH` | `/apis/apps/v1/namespaces/<ns>/deployments/<name>` |
@@ -59,17 +59,14 @@ curl -X POST https://kubernetes.default.svc/apis/apps/v1/namespaces/default/depl
 ### `kubectl run`
 
 ```bash
-# Creates a Pod directly (legacy behavior)
-kubectl run nginx --image=nginx:1.25 --port=80 --restart=Never
-
-# Creates a Deployment (modern behavior, default since 1.18)
-kubectl run nginx --image=nginx:1.25 --port=80 --restart=Always
+# Creates a Pod directly (default behavior since 1.18)
+kubectl run nginx --image=nginx:1.25 --port=80
 
 # Dry run to see what would be created
 kubectl run nginx --image=nginx:1.25 --dry-run=client -o yaml
 ```
 
-**Key behavior**: `kubectl run` is a convenience wrapper. It constructs a manifest in memory and POSTs it. The `--restart` flag determines whether a Pod or Deployment is created.
+**Key behavior**: `kubectl run` is a convenience wrapper that constructs a Pod manifest in memory and POSTs it. The `--restart` flag was removed in 1.18; `kubectl run` now always creates a Pod. To create a Deployment, use `kubectl create deployment` instead.
 
 ### `kubectl expose`
 
@@ -202,13 +199,10 @@ kubectl create deployment nginx --image=nginx:1.26 --replicas=5
 ### Pitfall 3: `kubectl run` deprecation confusion
 
 ```bash
-# kubectl run behavior changed between versions
-# v1.18+: default is to create a Deployment
-# v1.17 and earlier: default was a Pod (unless --restart=Always)
+# kubectl run always creates a Pod since 1.18
+# To create a Deployment, use kubectl create deployment instead
 
-# Always specify --restart explicitly
-kubectl run nginx --image=nginx --restart=Always
-# or use kubectl create deployment
+# Always use kubectl create deployment for Deployment resources
 kubectl create deployment nginx --image=nginx
 ```
 

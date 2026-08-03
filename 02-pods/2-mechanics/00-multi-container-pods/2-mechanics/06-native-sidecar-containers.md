@@ -1,6 +1,6 @@
 # Native Sidecar Containers (Kubernetes v1.28+)
 
-Kubernetes v1.28 introduced native sidecar containers as an alpha feature. The feature became stable in Kubernetes v1.33 and is enabled by default. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use `restartPolicy: Always` on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
+Kubernetes v1.28 introduced native sidecar containers as an alpha feature. The feature graduated to beta in v1.33 and is enabled by default. Unlike traditional sidecars that run as regular containers alongside the main container, native sidecars use `restartPolicy: Always` on init containers, allowing them to run for the lifetime of the Pod alongside the main application container.
 
 ## Traditional Sidecar vs Native Sidecar
 

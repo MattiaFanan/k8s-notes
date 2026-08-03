@@ -219,7 +219,9 @@ kubectl edit configmap -n kube-system kube-proxy
 # Set: mode: "nftables"
 ```
 
-#### IPVS Mode (Recommended for Large Clusters)
+#### IPVS Mode (Deprecated in v1.35)
+
+IPVS mode is deprecated in Kubernetes v1.35. The recommended kube-proxy mode for large clusters is now nftables.
 
 IPVS (IP Virtual Server) is a Linux kernel module that implements L4 load balancing with multiple scheduling algorithms. It is significantly more efficient than iptables at scale.
 

@@ -5,7 +5,7 @@
 - Prefer binary units: `100m`, `128Mi`, `1Gi`.
 
 ## Pitfalls
-1. **Decimal CPU**: Never write `0.1` CPU; use `100m`.
+1. **Decimal CPU**: Both `0.1` and `100m` are valid CPU quantity expressions. Prefer `100m` for precision and clarity.
 2. **No Quota by Default**: ResourceQuota does not exist unless explicitly created.
 3. **Requests Drive Scheduling**: Omitting requests can cause scheduling unpredictability.
 

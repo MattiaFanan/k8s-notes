@@ -75,7 +75,7 @@ The `scopes` field lets you target a subset of Pods:
 
 | Scope | Applies To |
 |-------|-----------|
-| `Terminating` | Pods where `.spec.activeDeadlineSeconds >= 0` |
+| `Terminating` | Pods where `.spec.activeDeadlineSeconds` is set (for Jobs with a deadline) |
 | `NotTerminating` | Pods where `.spec.activeDeadlineSeconds` is `nil` |
 | `BestEffort` | Only BestEffort QoS Pods |
 | `NotBestEffort` | Burstable + Guaranteed Pods |

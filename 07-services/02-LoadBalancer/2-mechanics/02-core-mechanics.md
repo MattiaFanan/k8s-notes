@@ -116,7 +116,7 @@ For Layer 7 (HTTP/HTTPS) routing with host/path rules, use **Ingress** instead.
 
 ### AWS
 
-- Creates an **Application Load Balancer (ALB)** for HTTP/HTTPS or a **Network Load Balancer (NLB)** for TCP/UDP.
+- Creates a **Network Load Balancer (NLB)** for TCP/UDP traffic (or an **Application Load Balancer (ALB)** when using the AWS Load Balancer Controller with Ingress).
 - Supports annotations for internal LB, scheme, subnets, and security groups.
 - The external IP is an DNS name (e.g., `k8s-web-abc123.elb.amazonaws.com`), not a static IP.
 

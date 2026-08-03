@@ -117,7 +117,7 @@ flowchart TD
 ### userspace Mode (legacy)
 
 - kube-proxy runs in userspace and proxies traffic itself.
-- Deprecated since Kubernetes 1.20 and removed in later versions.
+- Deprecated since Kubernetes 1.22 and removed in later versions.
 - Do not use in production.
 
 ## Session Affinity

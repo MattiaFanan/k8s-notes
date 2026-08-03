@@ -18,7 +18,6 @@ Minimal restrictions that prevent known privilege escalations. Does not restrict
 - `runAsNonRoot: true` (or `runAsUser` != 0)
 - `allowPrivilegeEscalation: false`
 - No privileged containers
-- Read-only root filesystem recommended
 
 ### Restricted
 
@@ -54,16 +53,6 @@ PSA is the admission controller that enforces PSS at the namespace or cluster le
 | Enforce | `pod-security.kubernetes.io/enforce` | Rejects pods that violate the policy |
 | Warn | `pod-security.kubernetes.io/warn` | Adds warning annotations to violating pods |
 | Audit | `pod-security.kubernetes.io/audit` | Logs violations to the audit log |
-
-### PSA Hierarchy
-
-PSA uses a hierarchy of policies. When a namespace has a label, it inherits from the closest ancestor that has a label.
-
-```
-cluster (no label)
-└── namespace-a (enforce=baseline)
-    └── namespace-b (no label) → inherits baseline from namespace-a
-```
 
 ### Checking PSA Status
 
@@ -121,4 +110,4 @@ kubectl apply -f privileged-pod.yaml -n myns
 - **Setting `runAsNonRoot` without `runAsUser`**: If the image runs as root (UID 0), `runAsNonRoot` alone will reject the pod. Add `runAsUser` with a non-zero UID.
 - **Not setting `allowPrivilegeEscalation: false`**: The default is `true` if not set, which is a security risk.
 - **Confusing PSS with RBAC**: PSS controls what pods can run; RBAC controls who can create/modify pods. They are independent mechanisms.
-- **Assuming PSA is always enabled**: PSA must be explicitly enabled in the kube-apiserver configuration. Check with `ps aux | grep kube-apiserver | grep pod-security`.
+- **Assuming PSA is always enabled**: PSA is built-in and available by default in K8s 1.25+, but enforcement is opt-in via namespace labels. The default policy mode is privileged (no enforcement). Check with `ps aux | grep kube-apiserver | grep pod-security`.

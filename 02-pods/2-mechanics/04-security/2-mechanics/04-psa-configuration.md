@@ -4,16 +4,11 @@ Pod Security Admission (PSA) is the admission controller that enforces Pod Secur
 
 ## Enabling PSA
 
-PSA is enabled by default in Kubernetes 1.25+. To configure PSA behavior, use the following kube-apiserver flags:
-
-```bash
---pod-security-admission-defaults=enforce=baseline
---pod-security-admission-namespaces=enforce=restricted
-```
+PSA is built-in and available by default in Kubernetes 1.25+. Enforcement is opt-in via namespace labels. The default mode is `privileged` (no enforcement). To configure PSA behavior, use the admission controller configuration file or namespace labels.
 
 ## Namespace-Level Configuration
 
-PSA is configured per namespace using labels. The three enforcement modes are `enforce`, `warn`, and `audit`.
+PSA is configured per namespace using labels. The three enforcement modes are `enforce`, `warn`, and `audit`. Each namespace's PSA policy is determined solely by its own labels — there is no automatic inheritance between namespaces.
 
 ### Enforce Mode
 
@@ -50,15 +45,15 @@ kubectl label namespace production \
   pod-security.kubernetes.io/audit=restricted
 ```
 
-## PSA and Namespace Inheritance
+## PSA and Namespace Configuration
 
-PSA uses a hierarchical inheritance model. A namespace without a PSS label inherits the policy from its closest ancestor that has a label.
+PSA is configured per namespace using labels. Each namespace's PSA policy is determined solely by its own labels — there is no automatic inheritance between namespaces.
 
 ```
 cluster
-└── namespace-a (enforce=baseline)
-    └── namespace-b (no label) → inherits baseline
-        └── namespace-c (enforce=restricted) → overrides to restricted
+└── namespace-a (enforce=restricted)
+
+# namespace-b has no label — uses cluster default (privileged, no enforcement)
 ```
 
 ## Checking PSA Configuration
@@ -145,4 +140,4 @@ kubectl apply -f privileged-pod.yaml -n myns
 - **Pod not rejected despite PSS label**: PSA may not be enabled on the API server. Check kube-apiserver flags.
 - **Warning annotations not appearing**: The namespace may have `warn` instead of `enforce`. Check the label value.
 - **Audit logs not showing violations**: The audit log configuration may not be set up. Check the API server audit policy.
-- **Namespace inherits wrong policy**: A parent namespace may have a label that overrides the intended policy. Remove or change the parent label.
+- **Namespace has wrong policy**: Check the namespace's `pod-security.kubernetes.io/enforce` label. Each namespace's policy is independent — there is no inheritance between namespaces.
