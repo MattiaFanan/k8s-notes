@@ -3,7 +3,7 @@
 ## Adapter Pattern
 
 ### Concept
-
+@comment explain better that a container cannot read another container stdout, (stdout is read by kubectl logs...). option 1 (better for logs and files) they talk through a shared mounted volume, explain why emptydir, option 2 (api trans,ation and metrics) container on the same pod share the network namespace so they can talk on localhost, eg main output on 7000 while adapter listens 7000 translates and output on 9000, then the outside world can read from 9000.
 The **Adapter Pattern** uses a sidecar container to transform the main application's output, metrics, or monitoring interface into a format consumable by external systems. The adapter "wraps" the application to make it compatible with the surrounding ecosystem without modifying the application itself.
 
 This pattern embodies the **separation of concerns**: the application focuses on business logic, while the adapter handles external integration details.
@@ -49,6 +49,7 @@ spec:
     - name: FLUENTD_ARGS
       value: "-c /etc/fluentd/config/transform.conf"
 ```
+@comment probavly missing a volume here
 
 The `log-adapter` tail `/var/log/app/app.log`, applies regex transformations or field extractions, and forwards the result to the logging infrastructure.
 
