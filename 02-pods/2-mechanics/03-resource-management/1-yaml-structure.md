@@ -72,9 +72,6 @@ spec:
 | `spec.limits[].default` (LimitRange) | Important | Yes | Default limit applied to containers that omit `resources.limits`. |
 | `spec.limits[].defaultRequest` (LimitRange) | Important | Yes | Default request applied to containers that omit `resources.requests`. |
 | `spec.hard` (ResourceQuota) | Required | Yes | Hard limits for the namespace. Must specify at least one scope. Can restrict `pods`, `cpu`, `memory`, `secrets`, `configmaps`, and more. |
-| QoS class | — | No | `Guaranteed` when requests == limits; `Burstable` when requests < limits; `BestEffort` when no requests/limits set. |
-| OOMKill exit code | — | No | Exit Code 137 occurs when a container exceeds its memory limit and is killed by the OOM killer. |
-| CPU throttling | — | No | Occurs when a container's CPU usage exceeds its `resources.limits.cpu` value. |
 
 ### Key Concepts
 
