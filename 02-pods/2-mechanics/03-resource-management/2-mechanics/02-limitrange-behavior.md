@@ -32,13 +32,13 @@ metadata:
 spec:
   limits:
     - type: Container
-      default:
+      default: # this section defines default limits
         cpu: "500m"
         memory: "256Mi"
-      defaultRequest:
+      defaultRequest: # this section defines default requests
         cpu: "250m"
         memory: "128Mi"
-      max:
+      max: # max and min define the limit range
         cpu: "2"
         memory: "2Gi"
       min:
