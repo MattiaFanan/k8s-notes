@@ -7,6 +7,7 @@ Taints and tolerations work together to control which pods can be scheduled onto
 ```bash
 # Imperative taint
 kubectl taint nodes node1 key=value:NoSchedule
+%comment add remov etaint commad and move here taint fields table 
 ```
 
 ## Pod with Toleration
