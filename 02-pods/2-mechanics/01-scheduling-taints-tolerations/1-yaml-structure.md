@@ -47,7 +47,6 @@ spec:
 | :--- | :--- | :--- | :--- |
 | `key` (taint) | Required | No — use `kubectl taint` | Must follow `key=value:effect` format. Remove with `key:effect-` (no value). |
 | `value` (taint) | Optional | No — use `kubectl taint` | Omit when using `Exists` operator. |
-| `operator` (taint) | Optional | No — use `kubectl taint` | Defaults to `Equal`. Use `Exists` to taint all nodes regardless of value. |
 | `effect` (taint) | Required | No — use `kubectl taint` | One of `NoSchedule`, `PreferNoSchedule`, `NoExecute`. |
 | `key` (toleration) | Conditional | Yes — edit pod spec | Required unless `operator` is `Exists`. |
 | `operator` (toleration) | Optional | Yes — edit pod spec | Defaults to `Equal`. Use `Exists` to tolerate any taint with the matching key/effect. |
