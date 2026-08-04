@@ -1,5 +1,5 @@
 # Pods - Taints & Tolerations - Imperative Commands
-
+%comment this page is almost useless, merge with structure
 ```bash
 # Add taint to node
 kubectl taint nodes node1 key=value:NoSchedule
