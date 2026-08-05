@@ -192,7 +192,7 @@ flowchart TD
 3. **Set appropriate `initialDelaySeconds`**: Too short causes false positives; too long delays detection of actual failures.
 4. **Use `httpGet` for web services**: It is the most common and reliable probe type.
 5. **Avoid heavy operations in probes**: Probes run on a timer; expensive checks can degrade application performance.
-6. **Use `timeoutSeconds` aggressively**: A probe that hangs indefinitely blocks the kubelet from making progress. Set a short timeout (1-3 seconds).
+6. **Use `timeoutSeconds` aggressively**: A probe that hangs indefinitely blocks the kubelet from making progress. Set a short timeout (1-3 seconds). %comment this parameter is never really explained nor in graphs
 7. **Monitor probe failure rates**: High failure rates on liveness probes indicate application instability. High failure rates on readiness probes indicate dependency issues.
 
 ## Troubleshooting
