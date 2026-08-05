@@ -302,3 +302,49 @@ kubectl get pod <pod-name> -o jsonpath='{.spec.affinity.podAntiAffinity}'
 # Check if all nodes already have a matching Pod (anti-affinity blocks all nodes)
 kubectl get pods -l app=<label> -o wide
 ```
+%comment add the following somewhere
+**Question:** 
+Why is `nodeSelectorTerms` a list in Node Affinity, while `labelSelector` is a single object in Pod Affinity?
+
+**Answer:** 
+The structural difference exists because of how Kubernetes handles logical **OR** conditions and how Pod Affinity relies on a `topologyKey`. In both features, you can create "OR" conditions using a list, but that list sits at a different level in the YAML hierarchy.
+
+Here is the breakdown of why the APIs differ:
+
+### 1. Node Affinity: The Selectors are the List
+In Node Affinity, the `nodeSelectorTerms` field is an array. Kubernetes evaluates multiple terms in this list using **OR** logic. If a node matches *any* single term in the list, the Pod can be scheduled there. Inside each term, the expressions are evaluated using **AND**.
+
+```yaml
+nodeAffinity:
+  requiredDuringSchedulingIgnoredDuringExecution:
+    nodeSelectorTerms:
+    - matchExpressions: # TERM 1: Schedule here...
+      - key: gpu
+        operator: Exists
+    - matchExpressions: # OR TERM 2: ...or schedule here
+      - key: disk
+        operator: In
+        values: [ssd]
+```
+
+### 2. Pod Affinity: The Terms are the List
+In Pod Affinity, a `labelSelector` is a single object. To create an **OR** condition, the parent field (`requiredDuringSchedulingIgnoredDuringExecution`) acts as the list containing multiple `PodAffinityTerm` objects. 
+
+This design is required because Pod Affinity also needs a **`topologyKey`** (which dictates if the rule applies to a node, a rack, or a zone). Kubernetes forces you to package the `labelSelector` and the `topologyKey` tightly together inside a single term. If you want an "OR" condition with different boundaries, you just add another term to the array.
+
+```yaml
+podAffinity:
+  requiredDuringSchedulingIgnoredDuringExecution:
+  - labelSelector: # TERM 1: Schedule near the web app on the same node...
+      matchExpressions: 
+      - key: app
+        operator: In
+        values: [web]
+    topologyKey: kubernetes.io/hostname
+  - labelSelector: # OR TERM 2: ...or schedule near the cache in the same zone.
+      matchExpressions:
+      - key: app
+        operator: In
+        values: [cache]
+    topologyKey: topology.kubernetes.io/zone
+```
