@@ -44,6 +44,7 @@ kubectl label namespace production \
   pod-security.kubernetes.io/warn=baseline \
   pod-security.kubernetes.io/audit=restricted
 ```
+%comment why would i log what i enforced and warn a livel more lenient that cannot be instantiated?
 
 ## PSA and Namespace Configuration
 
