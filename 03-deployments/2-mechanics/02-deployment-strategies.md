@@ -311,3 +311,5 @@ kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
 - **PreStop hooks must be brief** if you want fast rollouts. A 30-second PreStop on every Pod means a 3-minute minimum rollout for 3 replicas.
 - **Blue/Green: forgetting to update the Service selector** after creating the green deployment — traffic still routes to blue.
 - **Canary: not monitoring before scaling up** — always verify canary health before increasing traffic weight.
+
+%comment too many unexplained fields in this last part
