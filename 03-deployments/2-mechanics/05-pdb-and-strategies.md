@@ -145,7 +145,8 @@ kubectl drain node-1 --ignore-daemonsets --delete-emptydir-data --force --grace-
 ## Common Pitfalls
 
 1. **PDB blocking rollouts**: A PDB with `minAvailable` equal to `replicas` blocks any rolling update by preventing voluntary evictions during `kubectl drain`. However, the Deployment controller itself is not limited by PDBs — it uses direct Pod DELETE, not the Eviction API. The rollout proceeds normally; the issue only arises when draining nodes.
-4. **Wrong selector**: The PDB selector must match the pod labels exactly.
+%comment point 1cseems contraddictory, review this file and make sense of what uses whaat spi and what api pdb governs 
+2. **Wrong selector**: The PDB selector must match the pod labels exactly.
 
 ## Best Practices
 
