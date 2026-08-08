@@ -48,7 +48,7 @@ flowchart LR
     C -->|Yes| H["Job Failed"]
     F -->|No| E
 ```
-
+%comment it doesnt seem exonential this backoff
 ### Backoff Limit and Exponential Backoff
 
 The Job controller retries Pods with exponential backoff:
