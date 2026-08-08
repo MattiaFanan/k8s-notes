@@ -19,7 +19,7 @@ spec:
   hostPath:
     path: /mnt/data
 ```
-
+%comment hostpath pv without nodeaffinity is not really usefull
 ## PersistentVolumeClaim (PVC) Manifest
 
 ```yaml
