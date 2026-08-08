@@ -2,6 +2,9 @@
 
 Kubernetes provides persistent storage through PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs). A PV is a cluster-administered volume, while a PVC is a user's request for that storage. StorageClasses define the type and provisioning behavior of storage. The examples below show how to define PVs, PVCs, StorageClasses, and how to mount a PVC into a Pod.
 
+%comment make sure somewhere in this argoment folder, the fact that pv and pvc exist is to decouple pod volume usage and physical volume properties
+a pod says i want 10Gi and uses a pvc, but the admin can later change the type to cloud or local or a different cloud without the pod having to modify its yaml
+
 ## PersistentVolume (PV) Manifest
 
 ```yaml
@@ -19,7 +22,21 @@ spec:
   hostPath:
     path: /mnt/data
 ```
-%comment hostpath pv without nodeaffinity is not really usefull
+%comment hostpath pv without nodeaffinity is not really usefull, add somewhere this class 
+ local workflow
+ So in local hostpath the pv nodeaffinity imposes the pod to have that nodeaffinity, then when first pod requests the csi looks at it and find ou the node
+But id doesnt shortcut it only lookingnat affinity
+
+Exactly. You hit on the exact sequence of events.
+The scheduler doesn't just peek at the storage affinity and blindly guess. Instead, the scheduler drives the decision first, and the CSI driver listens to what the scheduler chose.
+The exact handshake looks like this:
+ * Pod is created requesting a PVC (which has WaitForFirstConsumer).
+ * The Scheduler steps in first: It looks at the pod's CPU, memory, and any constraints, and decides: "I am going to place this pod on Worker-Node-B."
+ * The Scheduling Decision is Passed Down: Once the scheduler picks Worker-Node-B, it writes that node choice as a "topology hint" (or annotation) onto the PVC.
+ * The CSI Driver wakes up: Now that the target node is officially locked in by the scheduler, the CSI provisioner triggers, reads the hint ("Ah, the pod is going to Worker-Node-B"), creates the folder on Worker-Node-B, and generates the PV with the matching node affinity.
+So it is a partnership: The scheduler decides where the pod goes, and the storage controller obeys that decision so they always land on the exact same machine.
+
+
 ## PersistentVolumeClaim (PVC) Manifest
 
 ```yaml
