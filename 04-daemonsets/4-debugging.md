@@ -11,7 +11,7 @@
 
 2. **Multiple DaemonSet Pods on Same Node**
    - *Root Cause*: Selector mismatch causing duplicate controllers targeting same Pod labels. Fix: Ensure unique labels per DaemonSet.
-
+%comment point 2 is not understandable, explain better with example
 3. **Rollout Stuck**
    ```bash
    kubectl rollout status daemonset node-logger
