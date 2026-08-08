@@ -293,5 +293,5 @@ spec:
 | Pod stuck in `Pending` with volume issue | No PV matches PVC requirements | Check `kubectl describe pvc`, verify storage class and access modes |
 | Data lost after pod restart | Used `emptyDir` or `hostPath` without understanding lifecycle | Switch to PVC-backed storage |
 | `Permission denied` on hostPath mount | SELinux or filesystem permissions block pod access | Set `securityContext` with `fsGroup` or use correct `hostPath.type` |
-| ConfigMap changes not reflected | Volume mount is not automatically updated at runtime | Restart pods to pick up new ConfigMap data; use `subPath` mounts cautiously |
+| ConfigMap changes not reflected | Volume mount is not automatically updated at runtime %comment explain that if secrets and configmaps are mounted as volume, they are eventually updated in 1 or 2 min, as so as long as the app inside the pod reparses them the changes are applied. but subpath are immutabl3 so if used it breaks the automatic update| Restart pods to pick up new ConfigMap data; use `subPath` mounts cautiously |
 | PVC stuck in `Pending` | Storage class not found or provisioner not deployed | Verify storage class exists: `kubectl get storageclass` |
