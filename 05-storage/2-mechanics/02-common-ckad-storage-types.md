@@ -22,7 +22,7 @@ flowchart TD
     J -->|Yes| K[Use hostPath with read-only]
     J -->|No| L[Reconsider architecture — hostPath is not portable]
 ```
-
+%comment this marmaid is strange, like yes in the node?
 ## emptyDir
 
 `emptyDir` is created when a pod is assigned to a node. It exists as long as the pod runs on that node. When the pod is removed, `emptyDir` is deleted permanently.
