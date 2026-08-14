@@ -228,7 +228,7 @@ flowchart TD
     G -->|File volume| I[✅ Updates ~every 60s<br/>(Kubelet sync)]
     G -->|subPath| J[❌ No automatic update]
 ```
-
+%comment broken marmaid
 ## Best Practices
 
 1. **Use volume mounts for configuration that changes at runtime** — this allows the application to pick up updates without a pod restart.
