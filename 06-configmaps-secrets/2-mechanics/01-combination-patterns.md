@@ -207,7 +207,7 @@ flowchart TD
     EnvIssue --> BestPractice["Use ConfigMap/Secret for<br/>initial bootstrap values only"]
     MountInfo --> BestPractice2["Best for dynamic<br/>configuration changes"]
 ```
-
+% comment broken marmaid
 ## Security Considerations for Combination Patterns
 
 1. **Never base64-encoded and commit Secrets to version control** — the encoded values are trivially decoded (`echo UEBzc3cwcmQh | base64 -d`). Use Sealed Secrets, External Secrets Operator, or vault injection instead.
