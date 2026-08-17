@@ -309,7 +309,7 @@ Summary
    kubectl get endpoints <service-name>
    # If empty, the selector does not match any ready Pods
    ```
-7. **Use `sessionAffinity: ClientIP`** only when needed (e.g., stateful protocols that require sticky connections). It adds overhead and does not survive Pod restarts.
+7. **Use `sessionAffinity: ClientIP`** only when needed (e.g., stateful protocols that require sticky connections). It adds overhead and does not survive Pod restarts. %comment this is never explained before, add it to yaml structure
 8. **Do not use ClusterIP Services for external traffic** — use NodePort, LoadBalancer, or Ingress instead. ClusterIP is only reachable from within the cluster.
 
 ## Common CKAD Exam Mistakes
