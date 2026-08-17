@@ -251,15 +251,66 @@ flowchart LR
 
 1. **Always name your Service ports** when there are multiple ports — required for DNS SRV records and CKAD exam clarity.
 2. **Use FQDN for cross-namespace calls** (`service.namespace.svc.cluster.local`) — short names only work within the same namespace.
-3. **Use `clusterIP: None` intentionally** — headless Services are for StatefulSets or custom service discovery, not for regular load balancing.
-4. **Use ExternalName for external services** — avoid creating manual Endpoints when a simple CNAME will do.
-5. **Verify Endpoints after creating a Service:**
+%comment with final dot i think, explain the 5dots linux serch
+Why should i use FQSN when servicename.namespace is always enough
+While servicename.namespace (or even just a short name within the same namespace) is usually enough for day-to-day functionality, using the full Fully Qualified Service Name (FQSN/FQDN) like servicename.namespace.svc.cluster.local offers critical advantages in performance, security, and strict environment management:
+1. Performance and DNS Optimization (ndots)
+Inside a Kubernetes pod, the /etc/resolv.conf file is configured with a search path and an ndots setting (typically ndots:5).
+ * When you use a short name or servicename.namespace, the Linux DNS resolver doesn't immediately know it's an absolute address.
+ * It sequentially appends every search domain in the pod's list (e.g., trying servicename.namespace.svc.cluster.local, then servicename.namespace.svc., then cluster domains) until it gets a hit.
+ * This results in multiple hidden DNS lookups (traffic overhead) for every single request. Using a true FQSN with a trailing dot (servicename.namespace.svc.cluster.local.) tells the resolver it's an absolute path, cutting straight to 1 single DNS query. At scale, this drastically reduces CoreDNS latency and load.
+2. Preventing Multi-Cluster and Ambiguity Bugs
+If you ever implement multi-cluster architectures (like Kubernetes federation, Cluster API, or hybrid setups with customized CoreDNS forwarders), short names can resolve unpredictably depending on which cluster context or fallback resolver handles the request. An FQSN explicitly locks the target to a specific cluster and namespace layout.
+3. Strict Security and Preventing Namespace Hijacking
+In large organizations sharing a cluster, relying on short names or loose naming conventions can occasionally lead to unexpected collision risks if search paths are misconfigured. An explicit FQSN ensures that code explicitly declares where a dependency lives, making security audits and network policies much easier to reason about.
+4. Code Portability and Config Maps
+When writing configuration files or environment variables for applications that might need to talk to services across different environments (or even external mock services mapped via ExternalName), enforcing a strict FQDN standard means your configuration parser treats internal and external dependencies uniformly.
+
+Why would it search first svcname.ns.svc. if svcname.ns is unique and svc.cluster.local. is a constant suffix?
+When you type a short name or a name like servicename.namespace, it contains only 1 dot.
+Under standard Linux DNS resolver (glibc) configuration in Kubernetes, the ndots:5 setting dictates how lookups are handled:
+ * The Relative Name Check: Because your query has fewer dots than the ndots threshold (1 is less than 5), the Linux resolver treats the name as relative, not absolute.
+ * Appending the Search Path: Instead of querying servicename.namespace directly, the resolver takes your text and sequentially appends every domain in the pod's search list:
+   * Attempt 1: servicename.namespace.current-namespace.svc.cluster.local (Results in NXDOMAIN)
+   * Attempt 2: servicename.namespace.svc.cluster.local (Results in a match)
+   * Attempt 3: servicename.namespace.cluster.local (If needed)
+Even though servicename.namespace feels unique and intuitive to you, the underlying operating system resolver does not inherently know that ns is a Kubernetes namespace—it just sees a string with one dot and blindly follows the search path rules.
+Using an absolute FQSN with a trailing dot (servicename.namespace.svc.cluster.local.) bypasses the search path entirely, forcing the resolver to make 1 direct query.
+
+Difference between 
+​Attempt 2: servicename.namespace.svc.cluster.local (Results in a match)
+​Attempt 3: servicename.namespace.cluster.local (If needed)
+
+The difference between Attempt 2 and Attempt 3 comes down to the exact structure of the pod's DNS search path (search list) and how the Linux resolver steps through it.
+Here is what the standard search path looks like inside a Kubernetes Pod's /etc/resolv.conf:
+search <current-namespace>.svc.cluster.local svc.cluster.local cluster.local
+
+When you query servicename.namespace (which has 1 dot and triggers ndots:5), the resolver appends each item from that search list one by one:
+1. Attempt 2: servicename.namespace.svc.cluster.local
+ * What it represents: This is formed by taking your query (servicename.namespace) and appending the second item in the search list (svc.cluster.local).
+ * Why it matters: This matches the standard format of a Service inside a different namespace. If you are in namespace alpha and you look up my-service.beta, Attempt 2 tests my-service.beta.svc.cluster.local, which correctly resolves to the service in namespace beta.
+2. Attempt 3: servicename.namespace.cluster.local
+ * What it represents: This is formed by appending the third item in the search list (cluster.local).
+ * Why it matters: This is a fallback search domain for the cluster base. For most standard Kubernetes deployments, this attempt will fail (NXDOMAIN) because cluster.local alone isn't a valid namespace-level routing pattern for a service, but the Linux resolver runs through it anyway because it is in the search block.
+Summary
+ * Attempt 2 checks if you meant a service inside another namespace (.svc.cluster.local).
+ * Attempt 3 checks against the root cluster domain (.cluster.local).
+
+
+
+
+
+
+
+4. **Use `clusterIP: None` intentionally** — headless Services are for StatefulSets or custom service discovery, not for regular load balancing.
+5. **Use ExternalName for external services** — avoid creating manual Endpoints when a simple CNAME will do.
+6. **Verify Endpoints after creating a Service:**
    ```bash
    kubectl get endpoints <service-name>
    # If empty, the selector does not match any ready Pods
    ```
-6. **Use `sessionAffinity: ClientIP`** only when needed (e.g., stateful protocols that require sticky connections). It adds overhead and does not survive Pod restarts.
-7. **Do not use ClusterIP Services for external traffic** — use NodePort, LoadBalancer, or Ingress instead. ClusterIP is only reachable from within the cluster.
+7. **Use `sessionAffinity: ClientIP`** only when needed (e.g., stateful protocols that require sticky connections). It adds overhead and does not survive Pod restarts.
+8. **Do not use ClusterIP Services for external traffic** — use NodePort, LoadBalancer, or Ingress instead. ClusterIP is only reachable from within the cluster.
 
 ## Common CKAD Exam Mistakes
 
