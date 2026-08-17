@@ -39,4 +39,4 @@ spec:
 | `spec.ports[].port` | Required | Yes | Editable via `kubectl edit`; changes take effect immediately. |
 | `spec.ports[].targetPort` | Required | Yes | Editable via `kubectl edit`; referenced Pod containerPort must exist. |
 | `spec.ports[].name` | Important | Yes | Required when multiple ports are exposed. Used by DNS SRV records and health probes. |
-| `clusterIP` | N/A | No | Immutable after creation. Assigned automatically unless explicitly set at creation time. |
+| `clusterIP` | N/A | No | Immutable after creation. Assigned automatically unless explicitly set at creation time. %comment say that this is actually a virtual IP automatically assigned if not manually set to None |
