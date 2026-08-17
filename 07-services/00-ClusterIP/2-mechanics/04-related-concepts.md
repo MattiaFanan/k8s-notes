@@ -218,7 +218,7 @@ flowchart TD
 ## Ingress vs. Service Types
 
 Ingress is not a Service type but often works alongside ClusterIP Services to provide external HTTP(S) access. The Ingress controller typically creates a LoadBalancer Service externally, and then routes HTTP(S) traffic to ClusterIP Services internally.
-
+%comment broken maramaid 
 ```mermaid
 flowchart LR
     Internet[Internet Client] -->|HTTPS| IngressCtrl[Ingress Controller<br/>(LoadBalancer/NodePort)]
