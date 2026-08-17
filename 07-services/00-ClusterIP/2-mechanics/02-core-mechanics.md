@@ -45,7 +45,7 @@ spec:
 ### 2. Endpoint Tracking
 
 The Kubernetes control plane continuously monitors which Pods match a Service's selector and creates Endpoints (or the modern EndpointSlice) objects that list the IP addresses and ports of all ready matching Pods.
-
+%comment broken marmaid 
 ```mermaid
 flowchart TD
     S[Service Created with Selector] --> W[Workload Controller]
