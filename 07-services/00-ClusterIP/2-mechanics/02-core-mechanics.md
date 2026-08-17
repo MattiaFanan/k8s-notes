@@ -155,7 +155,7 @@ kubectl run dns-test --image=busybox:1.36 --rm -it --restart=Never -- \
 kube-proxy runs on every node and installs networking rules that intercept traffic destined for ClusterIPs and redirect it to actual backend Pods. It operates in one of three modes.
 
 #### kube-proxy Modes
-
+%comment broken marmaid 
 ```mermaid
 flowchart TD
     Traffic[Traffic Destined for ClusterIP] --> KP[kube-proxy Intercepts]
