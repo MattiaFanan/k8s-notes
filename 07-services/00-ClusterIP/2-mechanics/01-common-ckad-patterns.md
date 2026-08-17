@@ -77,7 +77,7 @@ kubectl run dns-test --image=busybox:1.36 --rm -it --restart=Never -- \
 # Test with curl from another Pod
 kubectl exec -it frontend -- curl -s http://user-service.api.svc.cluster.local/health
 ```
-
+%comment explain that endpoints and services are always associated by the same name
 ### Important Namespaces for Services
 
 - `default`: The default namespace where untagged resources go
