@@ -233,7 +233,7 @@ flowchart LR
 The key distinction: Ingress operates at L7 (HTTP/HTTPS) and does path/host-based routing, while Service types operate at L4 (TCP/UDP) and do simple round-robin or session affinity.
 
 ## Service Discovery Comparison
-
+%comment broken marmaid
 ```mermaid
 flowchart TD
     A[How do clients discover backends?] --> B{Method}
