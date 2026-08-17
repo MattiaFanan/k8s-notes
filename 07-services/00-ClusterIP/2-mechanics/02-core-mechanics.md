@@ -125,7 +125,7 @@ This plugin handles DNS resolution for:
 - `<service-name>` → ClusterIP (in the current namespace)
 
 #### DNS Record Types
-
+%comment this table is not very understandable
 | Query | Record Type | Answer |
 |-------|-------------|--------|
 | `web-svc.default.svc.cluster.local` | A | ClusterIP (e.g., 10.96.123.45) |
