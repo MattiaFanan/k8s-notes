@@ -24,7 +24,7 @@ spec:
 
 | Field | Required | Notes |
 | :--- | :---: | :--- |
-| `spec.type` | No | Defaults to `ClusterIP`. Internal cluster access only. |
+| `spec.type` | No | Defaults to `ClusterIP`. Internal cluster access only. %comment say that the possible values are ClusterIP, NodePort, LoadBalancer, ExternalName. |
 | `spec.selector` | Yes | Must match Pod `labels` exactly. %comment service labels subset of pod labels |
 | `spec.ports[].port` | Yes | Service port exposed inside cluster. |
 | `spec.ports[].targetPort` | Yes | Container port on the Pod. |
