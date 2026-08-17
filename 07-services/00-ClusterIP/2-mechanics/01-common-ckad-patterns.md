@@ -124,7 +124,7 @@ ports:
   - port: 80
     targetPort: 8080
   - port: 50051
-    targetPort: 50051
+    targetPort: 50051  %comment i think names are mandatory when multiple ports are used
 
 # ✅ Named ports — clear and DNS-friendly
 ports:
