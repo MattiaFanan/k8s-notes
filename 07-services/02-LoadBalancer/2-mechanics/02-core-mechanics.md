@@ -193,6 +193,8 @@ The `externalTrafficPolicy` field controls how traffic from external clients is 
 | `Local` | Traffic is routed only to nodes that have at least one healthy backend Pod. | Yes — the original client source IP is preserved. |
 
 ### When to Use Local
+%comment say that lb is node wise while cloudIP is pod wise, and that kubeproxy always tries to redirect to current node pods ("nodeport behavior" - with cluster it can redirect away changing source ip, with local it cant source ip preserved). so since with local, tcp healthchecks are dropped (cant redirect away in local so they are dropped) on nodes withput the pod matching selector lables, they result as not available and no lb request is sent to them.
+but in local if a node has 3 matching pods and another has only 1, and the lb is node wise, then the two n9des have the same traffic with the single pod having the same as the other three together.
 
 `externalTrafficPolicy: Local` is recommended when:
 - You need the original client IP in your application (e.g., for logging, rate limiting, or firewall rules).
