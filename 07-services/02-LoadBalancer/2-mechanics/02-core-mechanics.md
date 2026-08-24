@@ -1,4 +1,26 @@
 # Services - LoadBalancer - Core Mechanics
+%comment make esplicit that the lb is essentially a way to balance the traffic among the nodes, it 8s better than nodeport cause you can use usual port like 8080 (nodeport goes 30000+) it is cloud managed so if a node goes down you dont loose the ip, it does tcp connection healthcheck on nodes and avoid dead ones.
+usually at creation you get an ip that is somewhat stable till the cloud recycles it, but you can request a static one from cloude console or with lb k8s annotations.
+
+say that it is essentially a service so can only root towards a set of pods with labels matching the selector, meaning in theory one lb per deployment, but since it is espensive the usual way is to attach it to an ingress controller deployment.
+so the wholechain of events become
+[External LoadBalancer]
+  │
+  ├─ (Random Entry Node)
+  │   └─ nodeport > kube-proxy intercepts (creating a nodeport sets the kubeproxy to interceptall packets tothatport as if they where for the relative ClusterIP) and DNAT with EndpointSlices lookup to POD IP (unique per cluster each node gets a slice like 10.1.1.0/24) 
+  |      └─> cni set routing table (records of (destination pod ip, next hop node ip if eth, interface eth0/cni0(pod ip, veth[tunnel to containers virtuel network] table)) decides where to send the packets 
+  │
+  ├─ (Node with Ingress Controller Pod)
+  │   └─ cni set routing table > cni0 > veth > Ingress Controller Pod
+  │       └─ checks routing rules > redirects to App Service ClusterIP 
+  |         └─ kube-proxy intercepts ClusterIP, DNAT with EndpointSlices lookup 
+  |           └─ cni set routing table > eth0/cni0 (cross-node tunnel or local veth)
+  │
+  └─ (Node with App Pod)
+      └─ cni set routing table > cni0 > veth > App Pod
+%endcomment
+
+
 
 The LoadBalancer Service type extends NodePort by asking the cloud provider to provision an external load balancer that forwards traffic to the nodePort on each node. This is the standard way to expose Kubernetes workloads in cloud environments.
 
