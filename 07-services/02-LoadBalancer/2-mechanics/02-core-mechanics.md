@@ -6,7 +6,7 @@ say that it is essentially a service so can only root towards a set of pods with
 so the wholechain of events become
 [External LoadBalancer]
   │
-  ├─ (Random Entry Node)
+  ├─ (Random healty Entry Node in the cluster - one that can TCP connect)
   │   └─ nodeport > kube-proxy intercepts (creating a nodeport sets the kubeproxy to interceptall packets tothatport as if they where for the relative ClusterIP) and DNAT with EndpointSlices lookup to POD IP (unique per cluster each node gets a slice like 10.1.1.0/24) 
   |      └─> cni set routing table (records of (destination pod ip, next hop node ip if eth, interface eth0/cni0(pod ip, veth[tunnel to containers virtuel network] table)) decides where to send the packets 
   │
