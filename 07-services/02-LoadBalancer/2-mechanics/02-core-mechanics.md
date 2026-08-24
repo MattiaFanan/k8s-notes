@@ -1,5 +1,5 @@
 # Services - LoadBalancer - Core Mechanics
-%comment make esplicit that the lb is essentially a way to balance the traffic among the nodes, it is better than nodeport cause you can use usual port like 8080 (nodeport goes 30000+) it is cloud managed so if a node goes down you dont loose the ip customer and DNS use, it does tcp connection healthcheck on nodes and avoid dead ones.
+%comment make esplicit that the lb is essentially a way to balance the traffic among the nodes, it is better than nodeport cause you can use usual port like 8080 (nodeport goes 30000+) it is cloud managed so if a node goes down you dont loose the ip customer and DNS use, it does tcp connection healthcheck with eternalTrafficPolicy local avoiding the nodeport no-response in case of no matching pod.
 usually at creation you get an ip that is somewhat stable till the cloud recycles it, but you can request a static one from cloud console or with lb k8s annotations.
 
 say that it is essentially a service so can only route towards a set of pods with labels matching the selector, meaning in theory one lb per deployment, but since it is espensive the usual way is to attach it to an ingress controller deployment.
