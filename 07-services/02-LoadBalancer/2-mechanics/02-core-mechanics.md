@@ -7,13 +7,14 @@ so the wholechain of events become
 [External LoadBalancer]
   │
   ├─ (Random healty Entry Node in the cluster - one that can TCP connect)
-  │   └─ nodeport > kube-proxy intercepts (creating a nodeport sets the kubeproxy to interceptall packets tothatport as if they where for the relative ClusterIP) and DNAT with EndpointSlices lookup to POD IP (unique per cluster each node gets a slice like 10.1.1.0/24) 
+  │   └─ nodeport > (lb creates nodeport, creating a nodeport sets the kubeproxy to intercept all packets tothatport as if they where for the relative ClusterIP) kube-proxy intercepts x.x.x.x:nodeport and DNAT ClusterIP:port
+  |     └─  kubeproxy intercepts ClusterIP:port and DNATs with EndpointSlices lookup to POD_IP:targetport (pod ip is unique per cluster each node gets a slice like 10.1.1.0/24) preferring local node pods if available.
   |      └─> cni set routing table (records of (destination pod ip, next hop node ip if eth, interface eth0/cni0(pod ip, veth[tunnel to containers virtuel network] table)) decides where to send the packets 
   │
   ├─ (Node with Ingress Controller Pod)
   │   └─ cni set routing table > cni0 > veth > Ingress Controller Pod
-  │       └─ checks routing rules > redirects to App Service ClusterIP 
-  |         └─ kube-proxy intercepts ClusterIP, DNAT with EndpointSlices lookup 
+  │       └─ checks routing rules > redirects to App Service ClusterIP:port
+  |         └─ kube-proxy intercepts ClusterIP:port, DNAT with EndpointSlices lookup to POD_IP:targetport
   |           └─ cni set routing table > eth0/cni0 (cross-node tunnel or local veth)
   │
   └─ (Node with App Pod)
