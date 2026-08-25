@@ -59,7 +59,7 @@ flowchart TD
     WebSvc -->|ClusterIP| WebPod[Web Pod]
     StaticSvc -->|ClusterIP| StaticPod[Static Pod]
 ```
-
+%comment misleading, seems like ingress controller LB is the external LB and not a deployment of an nginx (or similar) working as lb that is exposed through externallb/nodeport/clusteriip.
 ### When to use each
 
 - **Use LoadBalancer** for non-HTTP services (databases, message queues, gRPC services) or when you need a dedicated external IP.
