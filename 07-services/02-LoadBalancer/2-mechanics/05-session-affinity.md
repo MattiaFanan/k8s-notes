@@ -72,7 +72,7 @@ spec:
 ### Kubernetes Level (kube-proxy)
 
 When `sessionAffinity: ClientIP` is set, kube-proxy installs iptables or IPVS rules that hash the client IP to select a backend Pod:
-
+%comment broken mermaid
 ```mermaid
 flowchart TD
     Client[Client IP: 203.0.113.1] -->|arrives at NodePort| KubeProxy[kube-proxy]
