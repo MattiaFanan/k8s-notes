@@ -34,6 +34,7 @@ kubectl get svc web-lb -o jsonpath='{.spec.clusterIP}'
 ```
 
 Key insight: **You can access a LoadBalancer Service internally via its ClusterIP, just like any other Service.** The LoadBalancer is only for external traffic.
+%comment misleading, it seems loadbalancer is a deployment served throug a service. while in reality the served/accessded thing are pods matching the service selector
 
 ## Relationship with Ingress
 
