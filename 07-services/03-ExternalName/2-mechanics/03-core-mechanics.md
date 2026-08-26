@@ -153,6 +153,8 @@ When a query for an ExternalName Service is received, CoreDNS returns the CNAME 
 ## Immediate DNS Propagation
 
 Because ExternalName relies on DNS rather than kube-proxy rules, changes to the `externalName` field take effect immediately at the DNS level. There is no need to restart kube-proxy or wait for iptables/IPVS rule updates.
+%comment say that kubeproxy is a daemonset and need to be restarted if kube-proxy configmap is modified (configmaps update the pods by themselves but some changes need a restart, like switching from iptables to IPVS, so it is good norm to restart in any case), or if it goes out of synch and there is node connectivity problems
+with kubectl rollout restart daemonset kube-proxy -n kube-system
 
 ```bash
 # Change the ExternalName target
