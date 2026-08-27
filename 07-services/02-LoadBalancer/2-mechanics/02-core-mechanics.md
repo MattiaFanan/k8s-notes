@@ -13,8 +13,7 @@ so the wholechain of events become
   │
   ├─ (Node with Ingress Controller Pod)
   │   └─ cni set routing table > cni0 > veth > Ingress Controller Pod
-  │       └─ checks routing rules > redirects to App Service ClusterIP:port
-  |         └─ kube-proxy intercepts ClusterIP:port, DNAT with EndpointSlices lookup to POD_IP:targetport
+  │       └─ checks routing rules > read service endpointslices > redirects to randompodIP:targetport
   |           └─ cni set routing table > eth0/cni0 (cross-node tunnel or local veth)
   │
   └─ (Node with App Pod)
