@@ -194,9 +194,8 @@ kubectl apply --dry-run=client -f ingress.yaml
 
 1. **Prefer `Prefix` over `ImplementationSpecific`** — Prefix behavior is standardized and predictable across all Ingress Controller implementations.
 2. **Use `Exact` for health check endpoints** — If you have a `/healthz` endpoint, use `Exact` to prevent it from accidentally matching a broader prefix rule meant for a different service.
-3. **Use `Prefix` with a trailing slash for directory-like paths** — `/api/` as a Prefix will match `/api/users`, `/api/orders`, etc., but not `/apianything` (unlike `/api` without trailing slash).
-4. **Test with and without trailing slashes** — The difference between `/api` and `/api/` in Prefix mode can be controller-specific. Test both cases.
-5. **Use longest-prefix-first ordering in NGINX Ingress** — NGINX sorts Prefix paths by length internally, so you don't need to worry about rule order. But other controllers may not.
+3. **Test with and without trailing slashes** — The difference between `/api` and `/api/` in Prefix mode can be controller-specific. Test both cases.
+4. **Use longest-prefix-first ordering in NGINX Ingress** — NGINX sorts Prefix paths by length internally, so you don't need to worry about rule order. But other controllers may not.
 
 ## Exam Tips for CKAD
 
