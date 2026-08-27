@@ -128,7 +128,7 @@ flowchart TD
 ```
 
 ### Architecture 3: Ingress with Multiple TLS Certificates
-
+%comment broken mermaid
 ```mermaid
 flowgraph TD
     Internet -->|"HTTPS :443"| IC["Ingress Controller"]
