@@ -152,7 +152,11 @@ flowgraph TD
 - **Using a LoadBalancer Service as an Ingress backend**: This creates a double-NAT situation (client → external LB → ClusterIP → pod). It works but is wasteful and adds latency.
 - **Assuming Ingress handles gRPC or WebSocket natively**: Most Ingress Controllers support WebSocket proxying, but gRPC requires specific configuration (e.g., `nginx.ingress.kubernetes.io/backend-protocol: "GRPC"`).
 - **Forgetting that Ingress is namespace-aware for Service references**: The Ingress references Services by name, and the Service must be in the same namespace as the Ingress resource (unless the controller supports cross-namespace backends via annotations).
-
+%comment Standard Kubernetes Ingress controllers (such as ingress-nginx, Traefik, HAProxy, and Envoy-based gateways) watch the Service and its associated EndpointSlices (or legacy Endpoints), extract the individual Pod IPs and ports, and configure their internal reverse proxies (like NGINX upstream blocks) to load-balance traffic directly to those Pod IPs.  
+​They do not route data-plane traffic through the Service's ClusterIP for standard in-cluster backends.
+​Direct Pod Routing: The controller acts as the load balancer. It pulls the live list of healthy Pod IPs from the EndpointSlice and distributes HTTP/S requests across them natively.  
+​Why Service Type Matters: Even if you reference a Service of type ClusterIP, NodePort, or LoadBalancer in your Ingress manifest, standard controllers only look at the Service name to find its selector, locate the backing EndpointSlice, and route straight to the Pods.
+​The Result of Zero Endpoints: If a Service has no matching pods, the EndpointSlice is empty. The Ingress controller sees zero valid targets for that upstream block, which is precisely why it immediately throws a 503 Service Unavailable error.
 ## Exam Reference
 
 On the CKAD exam:
