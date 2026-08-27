@@ -74,7 +74,7 @@ flowchart LR
 
 A standard Ingress setup involves three core components:
 
-1. **Ingress Controller Deployment**: Runs the reverse proxy (NGINX, Traefik, etc.) as a Deployment with at least 2 replicas for HA.
+1. **Ingress Controller Deployment**: Runs the reverse proxy (NGINX, Traefik, etc.) as a Deployment with at least 2 replicas for HA. %comment tf is an HA dont spit acronyms
 2. **Ingress Controller Service**: A `LoadBalancer` (cloud) or `NodePort` (bare metal) Service that exposes the controller pods externally.
 3. **Ingress Resources**: One or more Ingress resources that define the routing rules.
 
