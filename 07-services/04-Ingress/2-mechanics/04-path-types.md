@@ -199,7 +199,7 @@ kubectl apply --dry-run=client -f ingress.yaml
 
 ## Exam Tips for CKAD
 
-- When asked to route `/` to one service and `/api` to another, use `Prefix` for both (as `/api` is longer and is evalauted first leaving tge rest to `/`).
+- When asked to route `/` to one service and `/api` to another, use `Prefix` for both (as `/api` is longer and is evalauted first, leaving the rest to `/`).
 - When asked to route only the exact path `/status`, use `Exact`.
 - If the question mentions regex or complex path patterns, you'll need `ImplementationSpecific` plus controller-specific annotations.
 - Always include `pathType` in your Ingress manifests on the CKAD exam. Omitting it may cause the grading system to flag it as incomplete.
