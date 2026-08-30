@@ -123,6 +123,7 @@ policyTypes:
 ```
 
 **Important**: If you define a `policyTypes` with only `Ingress` but your ingress section has no rules, the policy effectively does nothing for ingress (all ingress is allowed since there are no deny rules). Conversely, if you only list `Egress` but need ingress control, your ingress will remain fully open.
+%comment not very clear
 
 ### kubectl Examples
 
