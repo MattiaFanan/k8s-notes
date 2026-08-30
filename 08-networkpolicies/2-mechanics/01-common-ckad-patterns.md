@@ -131,14 +131,14 @@ spec:
         - namespaceSelector:
             matchLabels:
               name: ingress-nginx
-      podSelector:
-        matchLabels:
-          app: ingress-nginx
+          podSelector:
+            matchLabels:
+              app: ingress-nginx
 ```
 
 > **Note**: The combination of `namespaceSelector` + `podSelector` in the same `from` entry is a logical AND — both must match for traffic to be allowed. Multiple entries in the `from` list are OR conditions.
 
-### kubectl Commands
+### kubectl Commands.
 
 ```bash
 # Verify the namespace has the expected labels
