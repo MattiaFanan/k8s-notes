@@ -2,6 +2,10 @@
 
 This document covers the fundamental internal mechanics of Kubernetes Ingress: how L7 routing works, the role of the Ingress Controller, IngressClass selection, and backend service references.
 
+%comment somewhere in 04 ingress there should be a section on IngressClass, then say that ingress are configurations that the ingress controller polls from the api and autoapply on himeslf, while an ingressClass works as a label to make the controller poll only its ofn configs, while being a concern separation to avoid modifying all ingresses just to change the type of ingress controller. specify the default ingressclass k8s label.
+one esterbal lb can only point to one internal ingress controller through its service, but another ingress controlle deployment, even if of different type like traefik for service discover, can also be acessible as normal internal service or externally with another lb
+
+
 ## How Ingress Routing Works at the Protocol Level
 
 Ingress operates exclusively at **Layer 7 (Application Layer)** of the OSI model. Unlike a `NodePort` or `LoadBalancer` Service, which can proxy arbitrary TCP/UDP traffic, Ingress only understands HTTP and HTTPS. This is both a limitation (no non-HTTP protocols) and a strength (L7 awareness enables content-based routing).
