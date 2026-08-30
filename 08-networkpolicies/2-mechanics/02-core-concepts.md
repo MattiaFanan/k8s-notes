@@ -46,7 +46,6 @@ spec:
 
 # Also matches ALL pods in the namespace (selector omitted, defaults to {})
 spec:
-  podSelector: {}
 
 ```bash
 # See which pods in a namespace match a given selector
