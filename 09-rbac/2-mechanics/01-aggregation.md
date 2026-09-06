@@ -9,7 +9,7 @@ Role aggregation allows a `ClusterRole` to automatically collect and merge rules
 ### Core Concept
 
 A `ClusterRole` with `aggregationRule` acts as a **computed union** of rules from other ClusterRoles that match the specified label selector. The aggregating ClusterRole itself has no static `rules` — its effective rules are the union of all matching source ClusterRoles' rules.
-
+%comment broken mermaid
 ```mermaid
 flowchart TD
     A["ClusterRole: admin-role\naggregationRule"] -->| labelSelector: role=admin | B["ClusterRole: read-only<br/>rules: get, list, watch"]
