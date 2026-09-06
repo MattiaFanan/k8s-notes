@@ -215,6 +215,11 @@ If two source ClusterRoles define conflicting rules for the same resource, the v
 3. **Test aggregated permissions** — Use `kubectl auth can-i --as=<user-or-group>` to verify that aggregated permissions are what you expect, not just the sum of individual rules.
 4. **Document the aggregation chain** — Since aggregated permissions are implicit, document which ClusterRoles contribute to each aggregating ClusterRole.
 5. **Avoid circular aggregation** — A ClusterRole that aggregates itself (directly or indirectly) can cause undefined behavior. Ensure the aggregation graph is acyclic.
+%comment No, it does not cause undefined behavior, control plane instability, or infinite loops in the Kubernetes API server.
+​Deterministic Evaluation: The RBAC aggregation controller evaluates rules in a single, flat pass. When it queries for matching ClusterRoles, finding itself in the result set simply results in the controller attempting to merge the role's rules into itself.
+​Idempotent State: Because merging identical rules into a role is an idempotent operation, the control plane reaches a stable state immediately without triggering runaway resource consumption or erratic permission grants.
+​API Server Safety: Kubernetes controllers are designed to handle self-referencing or circular label selectors safely without crashing the control plane or corrupting the authorization cache.
+​While it is a redundant configuration that achieves nothing functional, the system handles it gracefully as a harmless no-op.
 6. **Prefer aggregation over manual duplication** — When the same set of permissions needs to apply to multiple roles, aggregation reduces maintenance overhead and eliminates the risk of drift.
 
 ## Community Knowledge
