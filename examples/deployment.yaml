@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+    tier: backend
+  annotations:
+    description: "Fully fledged Deployment demonstrating all apps/v1 Deployment fields"
+    kubernetes.io/change-cause: "bump image to my-app:1.2.0"
+
+spec:
+  # ── Scale ────────────────────────────────────────────────────────
+  replicas: 3
+
+  # ── Selector — must match template.metadata.labels; immutable ────
+  selector:
+    matchLabels:
+      app: my-app
+    # matchExpressions can also be used alongside matchLabels:
+    # matchExpressions:
+    #   - key: tier
+    #     operator: In
+    #     values: [backend]
+
+  # ── Rollout behavior ──────────────────────────────────────────────
+  minReadySeconds: 5                          # pod must be ready this long before counted available
+  revisionHistoryLimit: 10                    # old ReplicaSets kept for rollback
+  paused: false                               # true freezes rollout (used mid-canary edits)
+  progressDeadlineSeconds: 600                # rollout considered stalled if no progress in this window
+
+  strategy:
+    type: RollingUpdate                       # RollingUpdate | Recreate
+    rollingUpdate:
+      maxSurge: 1                             # extra pods allowed above `replicas` during rollout (number or %)
+      maxUnavailable: 0                       # pods allowed unavailable during rollout (number or %)
+    # type: Recreate kills all old pods before creating new ones (no rollingUpdate block, causes downtime):
+    # strategy:
+    #   type: Recreate
+
+  # ── Pod template ───────────────────────────────────────────────────
+  # Full per-pod field reference (scheduling, affinity, volumes, security
+  # context, probes, etc.) lives in pod.yaml — this covers only a
+  # realistic, representative subset.
+  template:
+    metadata:
+      labels:
+        app: my-app                           # must match spec.selector.matchLabels
+        environment: production
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+
+    spec:
+      serviceAccountName: my-service-account
+      terminationGracePeriodSeconds: 30
+      restartPolicy: Always                   # Deployment pods must always be Always
+
+      imagePullSecrets:
+        - name: registry-credentials
+
+      volumes:
+        - name: app-config
+          configMap:
+            name: my-configmap
+        - name: scratch
+          emptyDir: {}
+
+      initContainers:
+        - name: init-db
+          image: busybox:1.36
+          command: ["sh", "-c", "until nc -z db-service 5432; do sleep 2; done"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+
+      containers:
+        - name: main
+          image: my-app:1.2.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/app"]
+          args: ["--config", "/etc/config/config.yaml", "--port", "8080"]
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+
+          env:
+            - name: ENV
+              value: production
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: db_password
+
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+
+          volumeMounts:
+            - name: app-config
+              mountPath: /etc/config
+              readOnly: true
+            - name: scratch
+              mountPath: /tmp
+
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+        - name: sidecar-logger
+          image: fluent-bit:2.2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: scratch
+              mountPath: /var/log/app
+              readOnly: true

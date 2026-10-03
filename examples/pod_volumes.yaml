@@ -1,0 +1,326 @@
+# volumes.yaml — complete reference for every Kubernetes volume type
+# These are the entries that go under spec.volumes in a Pod (or pod template).
+# For how volumes are consumed (volumeMounts, volumeDevices) see pod.yaml.
+#
+# Each entry is shown as a standalone list item; in practice you combine
+# whichever sources you need under a single spec.volumes list.
+
+# ── Ephemeral / in-cluster ────────────────────────────────────────────────────
+
+# emptyDir — scratch space, lives and dies with the pod
+- name: scratch
+  emptyDir:
+    medium: Memory                            # "" (disk) | Memory
+    sizeLimit: 128Mi
+
+# hostPath — node filesystem path (avoid in production; breaks portability)
+- name: host-data
+  hostPath:
+    path: /var/log/myapp
+    type: DirectoryOrCreate                   # "" | File | Directory | FileOrCreate | DirectoryOrCreate | Socket | CharDevice | BlockDevice
+
+# configMap
+- name: app-config
+  configMap:
+    name: my-configmap
+    defaultMode: 0644
+    optional: false
+    items:
+      - key: config.yaml
+        path: config.yaml
+        mode: 0600
+
+# secret
+- name: app-secret
+  secret:
+    secretName: my-secret
+    defaultMode: 0400
+    optional: false
+    items:
+      - key: tls.crt
+        path: tls.crt
+
+# persistentVolumeClaim
+- name: data-pvc
+  persistentVolumeClaim:
+    claimName: my-pvc
+    readOnly: false
+
+# projected — combines multiple sources into one mountPath
+- name: projected-vol
+  projected:
+    defaultMode: 0644
+    sources:
+      - serviceAccountToken:
+          audience: api
+          expirationSeconds: 3600
+          path: token
+      - configMap:
+          name: my-configmap
+          items:
+            - key: ca.crt
+              path: ca.crt
+      - secret:
+          name: my-secret
+          items:
+            - key: username
+              path: username
+      - downwardAPI:
+          items:
+            - path: labels
+              fieldRef:
+                fieldPath: metadata.labels
+                apiVersion: v1
+
+# downwardAPI — exposes pod/container metadata as files
+- name: podinfo
+  downwardAPI:
+    defaultMode: 0644
+    items:
+      - path: labels
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels
+      - path: annotations
+        fieldRef:
+          fieldPath: metadata.annotations
+      - path: cpu_limit
+        resourceFieldRef:
+          containerName: main
+          resource: limits.cpu
+          divisor: "1m"
+      - path: mem_request
+        resourceFieldRef:
+          containerName: main
+          resource: requests.memory
+          divisor: 1Mi
+
+# ephemeral — inline PVC created and deleted with the pod
+- name: ephemeral-vol
+  ephemeral:
+    volumeClaimTemplate:
+      metadata:
+        labels:
+          type: my-frontend-volume
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 1Gi
+
+# image — OCI image as a volume (K8s 1.31+ alpha)
+- name: oci-image-vol
+  image:
+    reference: registry.example.com/my-image:latest
+    pullPolicy: IfNotPresent               # IfNotPresent | Always | Never
+
+# ── Network-attached storage ──────────────────────────────────────────────────
+
+# nfs
+- name: nfs-vol
+  nfs:
+    server: nfs-server.example.com
+    path: /exported/path
+    readOnly: false
+
+# csi — generic CSI driver (preferred for cloud/vendor volumes in modern K8s)
+- name: csi-vol
+  csi:
+    driver: csi.example.com
+    readOnly: false
+    fsType: ext4
+    volumeAttributes:
+      storage.kubernetes.io/csiProvisionerIdentity: csi.example.com
+    nodePublishSecretRef:
+      name: csi-secret
+
+# iscsi
+- name: iscsi-vol
+  iscsi:
+    targetPortal: 10.0.2.15:3260
+    iqn: iqn.2001-04.com.example:storage:kube-vol-1
+    lun: 0
+    fsType: ext4
+    readOnly: false
+    iscsiInterface: default
+    chapAuthDiscovery: false
+    chapAuthSession: false
+    secretRef:
+      name: chap-secret
+    initiatorName: iqn.1994-05.com.redhat:node1
+    portals:
+      - 10.0.2.16:3260
+
+# fc (Fibre Channel)
+- name: fc-vol
+  fc:
+    targetWWNs: ["50014380186af83c", "50014380186af83d"]
+    lun: 2
+    fsType: ext4
+    readOnly: false
+    wwids: []
+
+# ── Ceph ─────────────────────────────────────────────────────────────────────
+
+# cephfs
+- name: cephfs-vol
+  cephfs:
+    monitors:
+      - 10.16.154.78:6789
+      - 10.16.154.82:6789
+    path: /volumes/kubernetes
+    user: admin
+    secretFile: /etc/ceph/admin.secret
+    secretRef:
+      name: ceph-secret
+    readOnly: false
+
+# rbd (RADOS Block Device)
+- name: rbd-vol
+  rbd:
+    monitors:
+      - 10.16.154.78:6789
+    image: foo
+    fsType: ext4
+    pool: kube
+    user: admin
+    keyring: /etc/ceph/keyring
+    secretRef:
+      name: ceph-secret
+    readOnly: false
+
+# ── Cloud-provider (legacy in-tree; prefer CSI equivalents) ──────────────────
+
+# awsElasticBlockStore (deprecated — use ebs.csi.aws.com CSI driver)
+- name: ebs-vol
+  awsElasticBlockStore:
+    volumeID: aws://us-east-1a/vol-0d51b1f6d0b97acb0
+    fsType: ext4
+    partition: 0
+    readOnly: false
+
+# gcePersistentDisk (deprecated — use pd.csi.storage.gke.io CSI driver)
+- name: gce-pd-vol
+  gcePersistentDisk:
+    pdName: my-data-disk
+    fsType: ext4
+    partition: 0
+    readOnly: false
+
+# azureFile (deprecated — use file.csi.azure.com CSI driver)
+- name: azure-file-vol
+  azureFile:
+    secretName: azure-secret
+    shareName: my-share
+    readOnly: false
+    secretNamespace: kube-system
+
+# azureDisk (deprecated — use disk.csi.azure.com CSI driver)
+- name: azure-disk-vol
+  azureDisk:
+    diskName: myAKSDisk
+    diskURI: /subscriptions/.../resourceGroups/.../providers/Microsoft.Compute/disks/myAKSDisk
+    kind: Managed                             # Shared | Dedicated | Managed
+    cachingMode: ReadWrite                    # None | ReadOnly | ReadWrite
+    fsType: ext4
+    readOnly: false
+
+# vsphereVolume (deprecated — use csi.vsphere.volume-driver CSI driver)
+- name: vsphere-vol
+  vsphereVolume:
+    volumePath: "[DatastoreName] volumes/myDisk"
+    fsType: ext4
+    storagePolicyName: ""
+    storagePolicyID: ""
+
+# cinder (OpenStack — deprecated; use cinder.csi.openstack.org CSI driver)
+- name: cinder-vol
+  cinder:
+    volumeID: bd82f7e2-wece-4c01-bf14-b49a2070e
+    fsType: ext4
+    readOnly: false
+    secretRef:
+      name: cinder-secret
+
+# ── Other / legacy ────────────────────────────────────────────────────────────
+
+# flexVolume (deprecated — replaced by CSI)
+- name: flex-vol
+  flexVolume:
+    driver: example/nfs
+    fsType: nfs
+    secretRef:
+      name: flex-secret
+    readOnly: false
+    options:
+      server: nfs-server.example.com
+      share: /data
+
+# glusterfs (deprecated)
+- name: glusterfs-vol
+  glusterfs:
+    endpoints: glusterfs-cluster
+    path: kube_vol
+    readOnly: false
+
+# quobyte (deprecated)
+- name: quobyte-vol
+  quobyte:
+    registry: registry:7861
+    volume: testVolume
+    readOnly: false
+    user: serviceaccount
+    group: serviceaccount
+    tenant: Backend
+
+# portworxVolume (deprecated — use Portworx CSI driver)
+- name: portworx-vol
+  portworxVolume:
+    volumeID: pxvol
+    fsType: ext4
+    readOnly: false
+
+# storageOS (deprecated)
+- name: storageos-vol
+  storageos:
+    volumeName: my-db-vol
+    volumeNamespace: default
+    fsType: ext4
+    readOnly: false
+    secretRef:
+      name: storageos-secret
+
+# scaleIO (deprecated)
+- name: scaleio-vol
+  scaleIO:
+    gateway: https://localhost:443/api
+    system: scaleio
+    protectionDomain: pd01
+    storagePool: sp01
+    storageMode: ThinProvisioned              # ThinProvisioned | ThickProvisioned
+    volumeName: vol-0
+    secretRef:
+      name: sio-secret
+    fsType: xfs
+    readOnly: false
+    sslEnabled: false
+
+# photonPersistentDisk (deprecated)
+- name: photon-vol
+  photonPersistentDisk:
+    pdID: 4c45f4d1-f6c4-40b3-a7ef-7f5e3c08ee0c
+    fsType: ext4
+
+# flocker (deprecated / removed in K8s 1.25)
+- name: flocker-vol
+  flocker:
+    datasetName: my-flocker-vol
+    datasetUUID: ""
+
+# gitRepo (deprecated / removed in K8s 1.12 — use initContainer + emptyDir instead)
+- name: git-vol
+  gitRepo:
+    repository: https://github.com/example/repo.git
+    revision: abc1234
+    directory: .

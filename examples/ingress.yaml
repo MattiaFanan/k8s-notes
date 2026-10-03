@@ -1,0 +1,150 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fully-fledged-ingress
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+  annotations:
+    description: "Fully fledged ingress demonstrating all Ingress v1 API fields"
+    # ── nginx ingress-controller annotations (NOT part of core API) ──
+    # These only take effect if an nginx-ingress-controller is watching this
+    # Ingress; other controllers (ALB, Traefik, GCE, ...) use their own
+    # annotation sets and ignore these.
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.0.0/16"
+    cert-manager.io/cluster-issuer: letsencrypt-prod    # another controller-adjacent convention (cert-manager)
+  finalizers:
+    - example.io/my-finalizer
+
+spec:
+  # ── Ingress class ────────────────────────────────────────────────
+  # Selects which ingress controller implements this resource.
+  # Must match the "name" of an IngressClass object (e.g. nginx, alb, traefik).
+  # If omitted, the controller marked as default (via the
+  # ingressclass.kubernetes.io/is-default-class annotation) is used.
+  ingressClassName: nginx
+
+  # ── Default backend ──────────────────────────────────────────────
+  # Catch-all target for any request that matches no rule below.
+  # Only one of "service" or "resource" may be set — mutually exclusive.
+  defaultBackend:
+    service:
+      name: default-backend-svc
+      port:
+        name: http                            # by name...
+        # number: 80                          # ...or by number (pick one)
+    # resource:                               # alternative: route to a non-Service backend
+    #   apiGroup: k8s.example.com
+    #   kind: StorageBucket
+    #   name: static-assets
+
+  # ── TLS ───────────────────────────────────────────────────────────
+  # One entry per certificate; each can cover multiple hosts via SNI.
+  tls:
+    - hosts:
+        - my-app.example.com
+        - www.my-app.example.com
+      secretName: my-app-tls                  # kubernetes.io/tls Secret (tls.crt + tls.key)
+    - hosts:
+        - api.example.com
+      secretName: api-tls
+    - hosts: []                               # no hosts = matches the default/wildcard cert
+      secretName: default-tls
+
+  # ── Rules ─────────────────────────────────────────────────────────
+  rules:
+    # host-based rule with multiple paths
+    - host: my-app.example.com                 # omit for a catch-all rule (matches any host)
+      http:
+        paths:
+          - path: /
+            pathType: Prefix                   # Exact | Prefix | ImplementationSpecific
+            backend:
+              service:
+                name: my-app-svc
+                port:
+                  name: http                    # by name...
+                  # number: 8080                # ...or by number (pick one)
+
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: my-app-static-svc
+                port:
+                  number: 8080
+
+          - path: /healthz
+            pathType: Exact                     # matches only the literal path, no prefix/suffix
+            backend:
+              service:
+                name: my-app-svc
+                port:
+                  number: 8080
+
+          - path: /legacy
+            pathType: ImplementationSpecific    # matching semantics left to the ingress controller
+            backend:
+              service:
+                name: legacy-svc
+                port:
+                  number: 80
+
+    # separate host routed to a different service
+    - host: api.example.com
+      http:
+        paths:
+          - path: /v1
+            pathType: Prefix
+            backend:
+              service:
+                name: api-v1-svc
+                port:
+                  number: 8080
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: api-v2-svc
+                port:
+                  number: 8080
+
+    # wildcard subdomain host
+    - host: "*.tenants.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: multi-tenant-svc
+                port:
+                  number: 80
+
+    # route to a non-Service backend resource (e.g. a cloud storage bucket)
+    - host: assets.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              resource:
+                apiGroup: k8s.example.com
+                kind: StorageBucket
+                name: static-assets
+
+    # no host — catch-all rule, matches requests for any host not covered above
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catch-all-svc
+                port:
+                  number: 80

@@ -1,0 +1,156 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fully-fledged-netpol
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+  annotations:
+    description: "Fully fledged NetworkPolicy demonstrating all NetworkPolicy v1 API fields"
+
+spec:
+  # ── Pod selector ─────────────────────────────────────────────────
+  # Selects the pods THIS policy applies to (within metadata.namespace).
+  # {} (empty selector) = every pod in the namespace.
+  podSelector:
+    matchLabels:
+      app: my-app
+      tier: backend
+    matchExpressions:
+      - key: environment
+        operator: In                        # In | NotIn | Exists | DoesNotExist
+        values: [production, staging]
+      - key: tier
+        operator: Exists
+
+  # ── Policy types ─────────────────────────────────────────────────
+  # Which directions this policy governs. Defaults to [Ingress] if omitted,
+  # or [Ingress, Egress] if egress rules are present. Set explicitly so an
+  # empty rule list below is interpreted as "deny", not "field unset".
+  policyTypes:
+    - Ingress                               # Ingress | Egress
+    - Egress
+
+  # ── Ingress rules ────────────────────────────────────────────────
+  # Traffic is allowed if it matches ANY rule in the list (OR'd).
+  # Within a rule, it must match a `from` peer AND a `ports` entry (AND'd).
+  # An empty/omitted `from` or `ports` means "match all" for that field.
+  #
+  # NOTE: if `ingress: []` (empty list) while policyTypes includes Ingress,
+  # NO ingress traffic is allowed — this is the "default-deny-all ingress"
+  # pattern. Combine with an empty podSelector to deny all ingress cluster-wide:
+  #   spec:
+  #     podSelector: {}
+  #     policyTypes: [Ingress]
+  #     ingress: []
+  ingress:
+    - from:
+        # podSelector alone — peers in the SAME namespace as this policy
+        - podSelector:
+            matchLabels:
+              app: frontend
+
+        # namespaceSelector alone — all pods in namespaces matching the selector
+        # (this is the "allow-all-from-namespace" pattern: no podSelector means
+        # every pod in every matched namespace is allowed)
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: staging
+
+        # podSelector + namespaceSelector together in ONE peer entry = AND
+        # (pods matching podSelector, but only within namespaces matching namespaceSelector)
+        - namespaceSelector:
+            matchLabels:
+              team: platform
+          podSelector:
+            matchLabels:
+              app: monitoring
+
+        # ipBlock — CIDR-based peer; mutually exclusive with pod/namespaceSelector
+        # in the same peer entry (ipBlock cannot be combined with selectors)
+        - ipBlock:
+            cidr: 10.0.0.0/16
+            except:
+              - 10.0.5.0/24
+              - 10.0.6.0/24
+
+      ports:
+        - protocol: TCP                     # TCP | UDP | SCTP
+          port: 8080                        # numeric or named (container) port
+        - protocol: TCP
+          port: 9000
+          endPort: 9100                     # inclusive range 9000-9100 (requires protocol)
+        - protocol: UDP
+          port: 53
+
+    # A second, independent ingress rule (OR'd with the one above) —
+    # omitting `from` entirely means "allow from anywhere" for these ports
+    - ports:
+        - protocol: TCP
+          port: 443
+
+    # A rule with `from` but no `ports` — allow all ports from this peer
+    - from:
+        - podSelector:
+            matchLabels:
+              app: healthcheck-probe
+
+  # ── Egress rules ─────────────────────────────────────────────────
+  # Same shape as ingress, but `from` becomes `to` and it governs outbound traffic.
+  #
+  # NOTE: if `egress: []` (empty list) while policyTypes includes Egress,
+  # NO egress traffic is allowed — "default-deny-all egress". Pods still get
+  # DNS resolution only if you explicitly allow UDP/53 egress (common gotcha).
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: database
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: data-tier
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow DNS egress to kube-system (common companion rule to a deny-all-egress policy)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # ipBlock egress — e.g. allow calls out to a specific external CIDR, deny the rest
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.169.254/32           # block cloud metadata endpoint
+      ports:
+        - protocol: TCP
+          port: 443
+
+# ── Common patterns (not separate fields, just canonical spec shapes) ──
+#
+# 1. Default-deny-all ingress (per namespace):
+#      spec: {podSelector: {}, policyTypes: [Ingress], ingress: []}
+#
+# 2. Default-deny-all egress (per namespace):
+#      spec: {podSelector: {}, policyTypes: [Egress], egress: []}
+#
+# 3. Default-deny-all both directions:
+#      spec: {podSelector: {}, policyTypes: [Ingress, Egress], ingress: [], egress: []}
+#
+# 4. Allow-all-from-namespace (no podSelector inside the peer = every pod there):
+#      ingress: [{from: [{namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: trusted-ns}}}]}]
+#
+# 5. Allow-all ingress/egress (explicitly open, still namespaced to podSelector):
+#      spec: {podSelector: {}, policyTypes: [Ingress], ingress: [{}]}   # {} peer = allow from anywhere

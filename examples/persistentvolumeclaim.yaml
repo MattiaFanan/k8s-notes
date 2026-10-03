@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fully-fledged-pvc
+  namespace: default
+  labels:
+    app: my-app
+  annotations:
+    description: "Fully fledged PersistentVolumeClaim demonstrating all PVC v1 API fields"
+  finalizers:
+    - kubernetes.io/pvc-protection            # auto-added; blocks deletion while in use by a pod
+
+spec:
+  # ── Access modes ─────────────────────────────────────────────────
+  accessModes:
+    - ReadWriteOnce                           # RWO | ROX | RWX | RWOP
+    # - ReadOnlyMany
+    # - ReadWriteMany
+    # - ReadWriteOncePod
+
+  # ── Volume mode ──────────────────────────────────────────────────
+  volumeMode: Filesystem                      # Filesystem | Block
+
+  # ── Resource requests/limits ──────────────────────────────────────
+  resources:
+    requests:
+      storage: 10Gi
+    limits:                                   # rarely set; caps in-place resize (K8s 1.24+)
+      storage: 20Gi
+
+  # ── Label selector ────────────────────────────────────────────────
+  # Restricts binding to PVs matching this selector (used with
+  # pre-provisioned/static PVs; omit when relying on dynamic provisioning).
+  selector:
+    matchLabels:
+      type: nfs
+    matchExpressions:
+      - key: environment
+        operator: In                          # In | NotIn | Exists | DoesNotExist
+        values: [production]
+
+  # ── Storage class ────────────────────────────────────────────────
+  storageClassName: standard                  # "" = no dynamic provisioning; omit for cluster default
+
+  # ── Explicit volume binding ──────────────────────────────────────
+  volumeName: fully-fledged-pv                # pre-bind to a specific PV by name
+
+  # ── Data source (cloning / restoring) ─────────────────────────────
+  # Populate the new volume from an existing PVC (clone) or a
+  # VolumeSnapshot. dataSource and dataSourceRef are mutually
+  # consistent (dataSourceRef is the generalized, namespace-aware
+  # successor); set at most one meaningfully.
+  dataSource:
+    name: source-pvc
+    kind: PersistentVolumeClaim               # PersistentVolumeClaim | VolumeSnapshot
+    apiGroup: ""                              # "" for PVC; snapshot.storage.k8s.io for VolumeSnapshot
+
+  dataSourceRef:
+    name: source-snapshot
+    kind: VolumeSnapshot                      # PersistentVolumeClaim | VolumeSnapshot | custom CRD
+    apiGroup: snapshot.storage.k8s.io          # "" for core types (e.g. PersistentVolumeClaim)
+    namespace: default                        # cross-namespace data source (K8s 1.26+ stable)
+
+# ── Consumption in a Pod ────────────────────────────────────────────
+# A PVC is mounted into a container via the pod's
+# spec.volumes[].persistentVolumeClaim entry — see pod.yaml's
+# "Volumes" section ("persistentVolumeClaim" source), e.g.:
+#
+#   volumes:
+#     - name: data-pvc
+#       persistentVolumeClaim:
+#         claimName: fully-fledged-pvc
+#         readOnly: false

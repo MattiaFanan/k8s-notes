@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fully-fledged-job
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+  annotations:
+    description: "Fully fledged job demonstrating all Job v1 API fields"
+  finalizers:
+    - example.io/my-finalizer
+  ownerReferences:
+    - apiVersion: batch/v1
+      kind: CronJob
+      name: my-cronjob
+      uid: "d9607e19-f88f-11e6-a518-42010a800195"
+      controller: true
+      blockOwnerDeletion: true
+  generateName: my-job-
+
+spec:
+  # ── Parallelism / completion model ─────────────────────────────────
+  parallelism: 3                              # max pods running concurrently
+  completions: 10                             # successful pod completions needed (NonIndexed) / highest index + 1 (Indexed)
+  completionMode: Indexed                     # NonIndexed | Indexed — Indexed gives each pod a JOB_COMPLETION_INDEX
+
+  # ── Failure handling ─────────────────────────────────────────────────
+  backoffLimit: 6                             # retries before marking the Job failed (NonIndexed)
+  backoffLimitPerIndex: 3                     # per-index retry cap (Indexed mode only, beta)
+  maxFailedIndexes: 5                         # Job fails once this many indexes exceed backoffLimitPerIndex (requires backoffLimitPerIndex)
+
+  activeDeadlineSeconds: 3600                 # wall-clock limit for the whole Job; exceeding it terminates all pods
+  ttlSecondsAfterFinished: 86400              # auto-delete the Job (and its pods) this long after it finishes
+
+  suspend: false                              # true pauses the Job — deletes active pods, keeps status, resumable
+
+  # ── Pod failure policy ────────────────────────────────────────────────
+  # Lets specific container failures short-circuit backoffLimit handling
+  # instead of always counting toward retries.
+  podFailurePolicy:
+    rules:
+      - action: FailJob                       # FailJob | Ignore | Count | FailIndex (FailIndex needs Indexed + backoffLimitPerIndex)
+        onExitCodes:
+          containerName: main                 # optional; omit to match any container
+          operator: In                        # In | NotIn
+          values: [42]
+      - action: Ignore                        # e.g. spot-instance preemption: don't count against backoffLimit
+        onExitCodes:
+          operator: In
+          values: [137]
+      - action: Count
+        onPodConditions:
+          - type: DisruptionTarget            # match on pod condition instead of exit code
+      - action: FailIndex
+        onExitCodes:
+          containerName: main
+          operator: In
+          values: [1]
+
+  # ── Selector ──────────────────────────────────────────────────────────
+  # Normally omitted — the controller generates and manages this itself.
+  # Only set selector + manualSelector together when adopting pods that
+  # already carry a matching controller-uid label (rare, advanced use).
+  manualSelector: false
+  # selector:
+  #   matchLabels:
+  #     controller-uid: "d9607e19-f88f-11e6-a518-42010a800195"
+
+  # ── Pod template ─────────────────────────────────────────────────────
+  # This is a full PodTemplateSpec — every field under spec.template.spec
+  # is the same Pod v1 API documented in pod.yaml. Only the fields with
+  # Job-specific meaning or constraints are called out below; for the
+  # rest (volumes, probes, security contexts, affinity, etc.) see pod.yaml.
+  template:
+    metadata:
+      labels:
+        app: my-app
+        environment: production
+    spec:
+      restartPolicy: OnFailure                # OnFailure | Never — Always is invalid for Job pods
+
+      containers:
+        - name: main
+          image: my-batch-job:1.0.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/process"]
+          args: ["--batch-size", "100"]
+          env:
+            - name: JOB_COMPLETION_INDEX       # only populated when completionMode: Indexed
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+
+      # See pod.yaml for: volumes, initContainers, affinity, tolerations,
+      # securityContext, nodeSelector, serviceAccountName, probes,
+      # imagePullSecrets, and every other PodSpec field — all valid here.

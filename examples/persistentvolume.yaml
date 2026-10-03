@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fully-fledged-pv
+  labels:
+    type: nfs
+    environment: production
+  annotations:
+    description: "Fully fledged PersistentVolume demonstrating all PV v1 API fields"
+  finalizers:
+    - kubernetes.io/pv-protection             # auto-added; blocks deletion while bound
+
+spec:
+  # ── Capacity ─────────────────────────────────────────────────────
+  capacity:
+    storage: 100Gi
+
+  # ── Volume mode ──────────────────────────────────────────────────
+  volumeMode: Filesystem                      # Filesystem | Block
+
+  # ── Access modes ─────────────────────────────────────────────────
+  accessModes:
+    - ReadWriteOnce                           # RWO | ROX | RWX | RWOP
+    # - ReadOnlyMany
+    # - ReadWriteMany
+    # - ReadWriteOncePod                       # K8s 1.22+; exclusive single-pod RWO
+
+  # ── Reclaim policy ───────────────────────────────────────────────
+  persistentVolumeReclaimPolicy: Retain       # Retain | Delete | Recycle (Recycle deprecated)
+
+  # ── Storage class ────────────────────────────────────────────────
+  storageClassName: standard                  # "" binds to no class; omit for dynamic default
+
+  # ── Mount options ────────────────────────────────────────────────
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+
+  # ── Node affinity ────────────────────────────────────────────────
+  # Constrains which nodes can access this volume (used by local volumes
+  # and topology-aware provisioners).
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: [worker-node-1, worker-node-2]
+
+  # ── Claim binding ────────────────────────────────────────────────
+  # Set automatically once a PVC claims this PV; can be pre-populated
+  # to pre-bind a specific claim.
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: my-pvc
+    namespace: default
+    uid: "d9607e19-f88f-11e6-a518-42010a800195"
+    resourceVersion: "12345"
+
+  # ── Volume source ────────────────────────────────────────────────
+  # A PV supports the same ~25 volume source types as Pod.spec.volumes
+  # (see pod.yaml's "Volumes" section for the full catalog: configMap,
+  # secret, csi, awsElasticBlockStore, azureDisk, rbd, iscsi, cephfs,
+  # glusterfs, fc, storageos, scaleIO, etc.). Exactly one source is set.
+  # Two of the most common are shown below — pick one.
+
+  # hostPath — node-local directory (single-node/dev use only)
+  hostPath:
+    path: /mnt/data
+    type: DirectoryOrCreate                   # "", File, Directory, FileOrCreate, DirectoryOrCreate, Socket, CharDevice, BlockDevice
+
+  # nfs — network-backed, accessible from any node (mutually exclusive
+  # with hostPath above; shown together here only for reference)
+  # nfs:
+  #   server: nfs-server.example.com
+  #   path: /exported/path
+  #   readOnly: false
+
+  # csi — generic CSI-provisioned volume (typical for dynamic provisioning)
+  # csi:
+  #   driver: csi.example.com
+  #   volumeHandle: vol-0d51b1f6d0b97acb0        # provisioner's unique volume ID
+  #   fsType: ext4
+  #   readOnly: false
+  #   volumeAttributes:
+  #     storage.kubernetes.io/csiProvisionerIdentity: csi.example.com
+  #   controllerPublishSecretRef:
+  #     name: csi-secret
+  #   nodeStageSecretRef:
+  #     name: csi-secret
+  #   nodePublishSecretRef:
+  #     name: csi-secret

@@ -1,0 +1,504 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fully-fledged-pod
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+    tier: backend
+  annotations:
+    description: "Fully fledged pod demonstrating all Pod v1 API fields"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+  finalizers:
+    - example.io/my-finalizer
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: my-replicaset
+      uid: "d9607e19-f88f-11e6-a518-42010a800195"
+      controller: true
+      blockOwnerDeletion: true
+  generateName: my-pod-
+
+spec:
+  # ── Scheduling ───────────────────────────────────────────────────
+  nodeName: worker-node-1                     # pin to specific node (skips scheduling)
+  nodeSelector:
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/worker: "true"
+    disktype: ssd
+
+  schedulerName: default-scheduler
+
+  priorityClassName: high-priority
+  preemptionPolicy: PreemptLowerPriority
+
+  schedulingGates:
+    - name: example.io/my-gate              # blocks scheduling until gate removed
+
+  # ── Identity / service account ───────────────────────────────────
+  serviceAccountName: my-service-account
+  automountServiceAccountToken: true
+
+  # ── Networking ───────────────────────────────────────────────────
+  hostNetwork: false
+  hostPID: false
+  hostIPC: false
+  hostUsers: false                            # user-namespace isolation (Linux 5.19+)
+  shareProcessNamespace: false
+
+  hostname: my-pod-hostname
+  subdomain: my-subdomain                     # creates <hostname>.<subdomain>.<ns>.svc.cluster.local
+  setHostnameAsFQDN: false
+
+  dnsPolicy: ClusterFirst                     # ClusterFirst | ClusterFirstWithHostNet | None | Default
+  dnsConfig:
+    nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+    searches:
+      - my-namespace.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    options:
+      - name: ndots
+        value: "5"
+      - name: single-request-reopen
+
+  hostAliases:
+    - ip: "127.0.0.1"
+      hostnames:
+        - "foo.local"
+        - "bar.local"
+    - ip: "192.168.1.100"
+      hostnames:
+        - "legacy-host"
+
+  # ── OS ───────────────────────────────────────────────────────────
+  os:
+    name: linux                               # linux | windows
+
+  # ── Runtime ──────────────────────────────────────────────────────
+  runtimeClassName: gvisor
+
+  # ── Lifecycle ────────────────────────────────────────────────────
+  restartPolicy: Always                       # Always | OnFailure | Never
+  activeDeadlineSeconds: 3600
+  terminationGracePeriodSeconds: 30
+
+  # ── Readiness gates ──────────────────────────────────────────────
+  readinessGates:
+    - conditionType: "www.example.com/feature-1"
+
+  # ── Service injection ────────────────────────────────────────────
+  enableServiceLinks: true
+
+  # ── Topology spread ──────────────────────────────────────────────
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule       # DoNotSchedule | ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: my-app
+      matchLabelKeys:
+        - pod-template-hash
+      minDomains: 1
+      nodeAffinityPolicy: Honor              # Honor | Ignore
+      nodeTaintsPolicy: Honor                # Honor | Ignore
+
+  # ── Tolerations ──────────────────────────────────────────────────
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: "dedicated"
+      operator: Equal
+      value: "gpu"
+      effect: NoSchedule
+    - key: ""
+      operator: Exists                        # tolerate all taints (wildcard)
+
+  # ── Affinity ─────────────────────────────────────────────────────
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values: [amd64, arm64]
+            matchFields:
+              - key: metadata.name
+                operator: NotIn
+                values: [bad-node-1]
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 80
+          preference:
+            matchExpressions:
+              - key: disktype
+                operator: In
+                values: [ssd]
+
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: cache
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: default
+          namespaces: [default, staging]
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 50
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: tier
+                  operator: In
+                  values: [backend]
+            topologyKey: topology.kubernetes.io/zone
+
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: my-app
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: my-app
+            topologyKey: topology.kubernetes.io/zone
+
+  # ── Pod-level security context ────────────────────────────────────
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    runAsNonRoot: true
+    fsGroup: 2000
+    fsGroupChangePolicy: OnRootMismatch       # Always | OnRootMismatch
+    supplementalGroups: [4000, 5000]
+    sysctls:
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
+      - name: kernel.shm_rmid_forced
+        value: "0"
+    seLinuxOptions:
+      level: "s0:c123,c456"
+      role: system_r
+      type: svirt_lxc_net_t
+      user: system_u
+    seccompProfile:
+      type: RuntimeDefault                    # Unconfined | RuntimeDefault | Localhost
+      # localhostProfile: profiles/audit.json  # when type=Localhost
+    appArmorProfile:
+      type: RuntimeDefault                    # Unconfined | RuntimeDefault | Localhost
+      # localhostProfile: k8s-apparmor-example-deny-write  # when type=Localhost
+    windowsOptions:                           # Windows-only; ignored on Linux
+      gmsaCredentialSpecName: webapp-gmsa
+      gmsaCredentialSpec: ""
+      runAsUserName: ContainerUser
+      hostProcess: false
+
+  # ── Resource claims (DRA) ─────────────────────────────────────────
+  resourceClaims:
+    - name: gpu-claim
+      resourceClaimName: my-gpu-resource-claim
+    # or use resourceClaimTemplateName to create on demand:
+    # - name: gpu-claim-template
+    #   resourceClaimTemplateName: my-gpu-template
+
+  # ── Volumes ───────────────────────────────────────────────────────
+  # Full catalog of all volume types → see volumes.yaml
+  volumes:
+    # emptyDir — ephemeral scratch space (disk or memory)
+    - name: scratch
+      emptyDir:
+        medium: Memory                        # "" (disk) | Memory
+        sizeLimit: 128Mi
+
+    # configMap
+    - name: app-config
+      configMap:
+        name: my-configmap
+        defaultMode: 0644
+        optional: false
+        items:
+          - key: config.yaml
+            path: config.yaml
+            mode: 0600
+
+    # secret
+    - name: app-secret
+      secret:
+        secretName: my-secret
+        defaultMode: 0400
+        optional: false
+        items:
+          - key: tls.crt
+            path: tls.crt
+
+  # ── Init containers ───────────────────────────────────────────────
+  initContainers:
+    - name: init-db
+      image: busybox:1.36
+      imagePullPolicy: IfNotPresent
+      command: ["sh", "-c", "until nc -z db-service 5432; do sleep 2; done"]
+      env:
+        - name: DB_HOST
+          value: "db-service"
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
+      volumeMounts:
+        - name: scratch
+          mountPath: /tmp
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      securityContext:
+        runAsUser: 999
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      restartPolicy: Always                   # sidecar-style init container
+
+  # ── Main containers ───────────────────────────────────────────────
+  containers:
+    - name: main
+      image: my-app:1.0.0
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/app"]
+      args: ["--config", "/etc/config/config.yaml", "--port", "8080"]
+      workingDir: /app
+
+      ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+          hostPort: 0                         # 0 = no host port binding
+          hostIP: ""
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        - name: grpc
+          containerPort: 9000
+          protocol: TCP
+
+      env:
+        - name: ENV
+          value: production
+        - name: LOG_LEVEL
+          value: info
+        # Downward API via env
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: main
+              resource: limits.cpu
+              divisor: "1m"
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              resource: requests.memory
+              divisor: 1Mi
+        # From ConfigMap key
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: my-configmap
+              key: database_url
+              optional: false
+        # From Secret key
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: db_password
+              optional: false
+
+      envFrom:
+        - prefix: CFG_
+          configMapRef:
+            name: my-configmap
+            optional: false
+        - prefix: SEC_
+          secretRef:
+            name: my-secret
+            optional: false
+
+      resources:
+        requests:
+          cpu: 250m
+          memory: 256Mi
+          ephemeral-storage: 500Mi
+          hugepages-2Mi: 0
+        limits:
+          cpu: "1"
+          memory: 512Mi
+          ephemeral-storage: 1Gi
+        claims:
+          - name: gpu-claim               # references spec.resourceClaims[].name
+
+      resizePolicy:
+        - resourceName: cpu
+          restartPolicy: NotRequired       # NotRequired | RestartContainer
+        - resourceName: memory
+          restartPolicy: RestartContainer
+
+      volumeMounts:
+        - name: app-config
+          mountPath: /etc/config
+          readOnly: true
+          subPath: ""
+          mountPropagation: None           # None | HostToContainer | Bidirectional
+        - name: data-pvc
+          mountPath: /var/data
+          readOnly: false
+        - name: scratch
+          mountPath: /tmp
+        - name: podinfo
+          mountPath: /etc/podinfo
+          readOnly: true
+        - name: projected-vol
+          mountPath: /var/run/secrets/tokens
+          readOnly: true
+          subPathExpr: $(MY_POD_NAME)      # supports env var expansion
+
+      volumeDevices:
+        - name: data-pvc
+          devicePath: /dev/xvda            # raw block device (requires Block accessMode)
+
+      # ── Probes ────────────────────────────────────────────────────
+      startupProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+          scheme: HTTP
+          httpHeaders:
+            - name: X-Custom-Header
+              value: Awesome
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 3
+        successThreshold: 1
+        failureThreshold: 30
+        terminationGracePeriodSeconds: 10
+
+      livenessProbe:
+        exec:
+          command: ["/bin/grpc_health_probe", "-addr=:9000"]
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+        terminationGracePeriodSeconds: 5
+
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+          host: ""
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 2
+        successThreshold: 1
+        failureThreshold: 3
+
+      # ── Lifecycle hooks ───────────────────────────────────────────
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "echo 'started' > /tmp/started"]
+        preStop:
+          httpGet:
+            path: /shutdown
+            port: 8080
+            scheme: HTTP
+          # exec and tcpSocket are alternatives; only one can be set per hook
+
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError  # File | FallbackToLogsOnError
+
+      # ── Container security context ────────────────────────────────
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        privileged: false
+        procMount: Default                   # Default | Unmasked
+        capabilities:
+          add: [NET_BIND_SERVICE]
+          drop: [ALL]
+        seLinuxOptions:
+          level: "s0:c123,c456"
+        seccompProfile:
+          type: RuntimeDefault
+        appArmorProfile:
+          type: RuntimeDefault
+        windowsOptions:
+          runAsUserName: ContainerUser
+
+      stdin: false
+      stdinOnce: false
+      tty: false
+
+  # ── Ephemeral containers (debug sidecars, attach-only) ────────────
+  ephemeralContainers:
+    - name: debugger
+      image: busybox:1.36
+      imagePullPolicy: IfNotPresent
+      command: ["sh"]
+      stdin: true
+      tty: true
+      targetContainerName: main            # shares process namespace with this container
+      env:
+        - name: DEBUG
+          value: "true"
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+      securityContext:
+        runAsUser: 0
+        capabilities:
+          add: [SYS_PTRACE]
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+
+  # ── Image pull secrets ────────────────────────────────────────────
+  imagePullSecrets:
+    - name: registry-credentials
+    - name: ghcr-credentials
+

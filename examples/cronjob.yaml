@@ -1,0 +1,110 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fully-fledged-cronjob
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+    tier: batch
+  annotations:
+    description: "Fully fledged CronJob demonstrating all batch/v1 CronJob fields"
+  finalizers:
+    - example.io/my-finalizer
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: my-replicaset
+      uid: "d9607e19-f88f-11e6-a518-42010a800195"
+      controller: true
+      blockOwnerDeletion: true
+  generateName: my-cronjob-
+
+spec:
+  # ── Schedule ─────────────────────────────────────────────────────
+  # standard 5-field cron: minute(0-59) hour(0-23) day-of-month(1-31) month(1-12) day-of-week(0-6, Sun=0)
+  # also accepts: @yearly | @monthly | @weekly | @daily | @hourly
+  schedule: "TZ=America/New_York 0 2 * * *"   # optional "TZ=<IANA zone>" prefix pins the cron fields to that zone
+
+  # spec.timeZone is the modern (1.27+) way to pin the zone instead of the TZ= prefix;
+  # do not set both — timeZone wins if schedule also carries a CRON_TZ=/TZ= prefix
+  timeZone: "America/New_York"                # IANA time zone name; unset = kube-controller-manager's local time (usually UTC)
+
+  startingDeadlineSeconds: 200                 # how late a missed run may start before being counted as failed/skipped
+
+  concurrencyPolicy: Forbid                    # Allow | Forbid | Replace
+  # Allow   — runs can overlap
+  # Forbid  — skip new run if previous still active
+  # Replace — cancel the still-running run and start the new one
+
+  suspend: false                               # true pauses future scheduling; in-flight jobs keep running
+
+  successfulJobsHistoryLimit: 3                # how many completed Job objects to retain (0 = none)
+  failedJobsHistoryLimit: 1                    # how many failed Job objects to retain (0 = none)
+
+  # ── Job template ─────────────────────────────────────────────────
+  # jobTemplate.spec mirrors batch/v1 Job's JobSpec exactly — see job.yaml for the
+  # full field-by-field reference. Only the fields commonly tuned per-CronJob are
+  # shown here; template.spec (the Pod template) is documented in full in pod.yaml.
+  jobTemplate:
+    metadata:
+      labels:
+        app: my-app
+        tier: batch
+      annotations:
+        description: "Job created by fully-fledged-cronjob"
+    spec:
+      parallelism: 1                           # number of pods to run concurrently
+      completions: 1                           # number of successful pod completions required
+      completionMode: NonIndexed                # NonIndexed | Indexed
+
+      backoffLimit: 4                          # retries before marking the Job failed
+      backoffLimitPerIndex: 2                  # per-index retry cap (Indexed mode only)
+      maxFailedIndexes: 1                      # max failed indexes tolerated before failing the Job (Indexed mode only)
+
+      activeDeadlineSeconds: 3600               # wall-clock limit for the whole Job; exceeding it terminates all pods
+      ttlSecondsAfterFinished: 86400            # auto-delete the finished Job (and its pods) after this many seconds
+
+      podReplacementPolicy: Failed              # TerminatingOrFailed | Failed — when to count a pod as needing replacement
+      podFailurePolicy:                        # fine-grained control over which pod failures count against backoffLimit
+        rules:
+          - action: FailJob                    # FailJob | Ignore | Count | FailIndex
+            onExitCodes:
+              containerName: main
+              operator: In                      # In | NotIn
+              values: [42]
+          - action: Ignore
+            onPodConditions:
+              - type: DisruptionTarget
+
+      suspend: false                            # pause pod creation for this specific Job run
+
+      manualSelector: false                     # true if selector/matchLabels are hand-set instead of auto-generated
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: "auto-generated-if-unset"
+
+      # ── Pod template — see pod.yaml for every field under here ──────
+      template:
+        metadata:
+          labels:
+            app: my-app
+            tier: batch
+        spec:
+          restartPolicy: OnFailure               # Always is invalid for Job pods; OnFailure | Never
+          containers:
+            - name: main
+              image: my-batch-job:1.0.0
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/run-job"]
+              args: ["--config", "/etc/config/config.yaml"]
+              env:
+                - name: ENV
+                  value: production
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 512Mi

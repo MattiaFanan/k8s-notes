@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fully-fledged-service
+  namespace: default
+  labels:
+    app: my-app
+    environment: production
+    tier: backend
+  annotations:
+    description: "Fully fledged Service demonstrating all Service v1 API fields"
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb   # cloud-provider-specific annotations live here
+
+spec:
+  # ── Selector ─────────────────────────────────────────────────────
+  selector:                                   # matches Pods to receive traffic (omit for headless/manual-endpoints Services)
+    app: my-app
+    tier: backend
+
+  # ── Type ─────────────────────────────────────────────────────────
+  type: LoadBalancer                          # ClusterIP (default, internal-only) | NodePort (+ opens port on every node) | LoadBalancer (+ provisions cloud LB) | ExternalName (DNS CNAME alias, ignores selector/ports)
+
+  # ── Ports ────────────────────────────────────────────────────────
+  ports:
+    - name: http                              # required when more than one port is defined
+      protocol: TCP                           # TCP | UDP | SCTP
+      port: 80                                # port exposed on the Service's ClusterIP/LB
+      targetPort: 8080                        # port on the Pod; may be a name (e.g. "http") or number
+      nodePort: 30080                         # 30000-32767; only used when type=NodePort|LoadBalancer; omit to auto-allocate
+      appProtocol: http                       # hint for consumers (e.g. http, https, grpc, kubernetes.io/h2c)
+    - name: metrics
+      protocol: TCP
+      port: 9090
+      targetPort: metrics                     # named container port
+      nodePort: 30090
+    - name: dns
+      protocol: UDP
+      port: 53
+      targetPort: 53
+
+  # ── Cluster IP allocation ─────────────────────────────────────────
+  clusterIP: 10.96.0.11                       # explicit VIP; "None" for headless Service (no VIP, DNS returns Pod IPs); omit to auto-allocate
+  clusterIPs:                                 # dual-stack: one IP per family, must match ipFamilies order
+    - 10.96.0.11
+    - fd00::1234
+  ipFamilies:
+    - IPv4                                    # IPv4 | IPv6
+    - IPv6
+  ipFamilyPolicy: PreferDualStack             # SingleStack | PreferDualStack | RequireDualStack
+
+  # ── External access ────────────────────────────────────────────────
+  externalIPs:                                # extra VIPs routed to this Service by external means (not cloud LB)
+    - 203.0.113.10
+
+  # externalName: my-external-service.example.com   # only valid when type=ExternalName; Service becomes a DNS CNAME, selector/ports/clusterIP ignored
+
+  externalTrafficPolicy: Local                # Cluster (default, may SNAT + spread across nodes) | Local (preserves source IP, only routes to local endpoints)
+  internalTrafficPolicy: Cluster              # Cluster (default) | Local (routes only to node-local endpoints for in-cluster traffic)
+
+  # ── Session affinity ───────────────────────────────────────────────
+  sessionAffinity: ClientIP                   # None (default) | ClientIP (sticky sessions by source IP)
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800                   # max session sticky time, 1-86400 (default 10800 = 3h)
+
+  # ── Load balancer tuning (type=LoadBalancer only) ──────────────────
+  loadBalancerIP: 203.0.113.20                # deprecated; request a specific LB IP (cloud-provider support varies)
+  loadBalancerSourceRanges:                   # restrict inbound traffic to the LB by CIDR
+    - "203.0.113.0/24"
+    - "198.51.100.0/24"
+  loadBalancerClass: service.k8s.aws/nlb      # selects a non-default LB controller/implementation; unset uses cloud provider's default
+  allocateLoadBalancerNodePorts: true          # false skips auto-allocating NodePorts when type=LoadBalancer (LB-only traffic path)
+
+  healthCheckNodePort: 32000                  # fixed port for the externalTrafficPolicy=Local health check; omit to auto-allocate
+
+  # ── Misc ────────────────────────────────────────────────────────────
+  publishNotReadyAddresses: false             # true = include not-yet-ready Pods in DNS/Endpoints (used by headless Services for StatefulSets)
+
+  trafficDistribution: PreferClose            # PreferClose routes to topologically closer endpoints (zone-aware) when available; unset = no preference
+
+---
+# ── Minimal ClusterIP Service (most common case) ─────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-clusterip
+spec:
+  selector:
+    app: my-app
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP                             # default; only reachable from inside the cluster
+
+---
+# ── Headless Service (clusterIP: None) ────────────────────────────────
+# No VIP is allocated; DNS returns individual Pod IPs directly.
+# Common for StatefulSets that need stable per-Pod DNS names.
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-headless
+spec:
+  selector:
+    app: my-app
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 8080
+  publishNotReadyAddresses: true              # StatefulSet Pods often need to be discoverable before Ready
+
+---
+# ── ExternalName Service ──────────────────────────────────────────────
+# Pure DNS alias: no selector, no ports, no proxying — kube-dns just
+# returns a CNAME pointing at externalName.
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-external-db
+spec:
+  type: ExternalName
+  externalName: prod-db.us-east-1.rds.amazonaws.com
