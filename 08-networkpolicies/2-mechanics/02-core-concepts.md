@@ -122,8 +122,12 @@ policyTypes:
 # egress rules present → egress is controlled
 ```
 
-**Important**: If you define a `policyTypes` with only `Ingress` but your ingress section has no rules, the policy effectively does nothing for ingress (all ingress is allowed since there are no deny rules). Conversely, if you only list `Egress` but need ingress control, your ingress will remain fully open.
-%comment not very clear
+**Important**: NetworkPolicies are **allowlists**, not deny lists. When a pod is selected by any NetworkPolicy that includes `Ingress` in its `policyTypes`, the pod becomes **isolated for ingress** — meaning only traffic explicitly allowed by an ingress rule (plus traffic from the pod's own node) is permitted; everything else is denied.
+
+- If `policyTypes: [Ingress]` is set but the `ingress` section is **empty** (`ingress: []`), the pod is isolated and **all ingress is denied** (except from the node). This is the standard **default-deny** pattern.
+- If you only list `Egress` in `policyTypes` (no `Ingress`), the pod is **not isolated for ingress**, so all ingress traffic remains fully open — you get no ingress control.
+- If you only list `Ingress` in `policyTypes` (no `Egress`), egress traffic is not affected and remains fully open.
+- Always explicitly set both `Ingress` and `Egress` in `policyTypes` when you want to control both directions; relying on inference can lead to unexpected gaps.
 
 ### kubectl Examples
 
