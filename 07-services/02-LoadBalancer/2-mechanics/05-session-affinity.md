@@ -72,13 +72,12 @@ spec:
 ### Kubernetes Level (kube-proxy)
 
 When `sessionAffinity: ClientIP` is set, kube-proxy installs iptables or IPVS rules that hash the client IP to select a backend Pod:
-%comment broken mermaid
 ```mermaid
 flowchart TD
-    Client[Client IP: 203.0.113.1] -->|arrives at NodePort| KubeProxy[kube-proxy]
-    KubeProxy -->|hash(ClientIP) % NumPods| PodA[Pod A]
-    Client2[Client IP: 198.51.100.1] -->|arrives at NodePort| KubeProxy
-    KubeProxy -->|hash(ClientIP) % NumPods| PodB[Pod B]
+    Client[Client IP: 203.0.113.1] -->|"hash(ClientIP) mod NumPods"| KubeProxy[kube-proxy]
+    KubeProxy -->|"hash mod NumPods"| PodA[Pod A]
+    Client2[Client IP: 198.51.100.1] -->|"hash(ClientIP) mod NumPods"| KubeProxy
+    KubeProxy -->|"hash mod NumPods"| PodB[Pod B]
 ```
 
 The hash is consistent, so the same client IP always maps to the same Pod (as long as the number of Pods does not change).

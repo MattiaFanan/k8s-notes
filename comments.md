@@ -6,7 +6,7 @@
 | 2 | 05-storage/2-mechanics/02-common-ckad-storage-types.md | 296 | explain that if secrets and configmaps are mounted as volume, they are eventually updated in 1 or 2 min, as so as long as the app inside the pod reparses them the changes are applied. but subpath are immutabl3 so if used it breaks the automatic update | solved |
 | 3 | 05-storage/1-yaml-structure.md | 5 | make sure somewhere in this argoment folder, the fact that pv and pvc exist is to decouple pod volume usage and physical volume properties | solved |
 | 4 | 05-storage/1-yaml-structure.md | 25 | hostpath pv without nodeaffinity is not really usefull, add somewhere this class | solved |
-| 5 | 07-services/02-LoadBalancer/2-mechanics/05-session-affinity.md | 75 | broken mermaid | unsolved |
+| 5 | 07-services/02-LoadBalancer/2-mechanics/05-session-affinity.md | 75 | broken mermaid | solved |
 | 6 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 80 | explain that endpoints and services are always associated by the same name | unsolved |
 | 7 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 127 | i think names are mandatory when multiple ports are used | unsolved |
 | 8 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 254 | with final dot i think, explain the 5dots linux serch | unsolved |
