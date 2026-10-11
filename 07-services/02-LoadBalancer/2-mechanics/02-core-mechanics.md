@@ -214,8 +214,18 @@ The `externalTrafficPolicy` field controls how traffic from external clients is 
 | `Local` | Traffic is routed only to nodes that have at least one healthy backend Pod. | Yes — the original client source IP is preserved. |
 
 ### When to Use Local
-%comment say that lb is node wise while cloudIP is pod wise, and that kubeproxy always tries to redirect to current node pods ("nodeport behavior" - with cluster it can redirect away changing source ip, with local it cant and eventually drops - no response back not event 5** code - the packet if no matching pods on the current node so source ip preserved). with local, tcp healthchecks are executed by lb against kubeproxy health api, and kubeproxy responds 503 if no matching pods in the node, so they result as not available and no lb request is sent to them.
-but in local if a node has 3 matching pods and another has only 1, and the lb is node wise, then the two n9des have the same traffic with the single pod having the same as the other three together.
+
+Before deciding, it helps to understand the difference between how the **external LoadBalancer** and the **ClusterIP** distribute traffic:
+
+- The **external LB is node-wise**: the cloud load balancer selects a *node* (not a Pod) as the target. All traffic for a given request flows to that node's `nodePort`, and only then does kube-proxy pick a Pod. This means nodes are the unit of load balancing — a node with 3 matching Pods and a node with 1 matching Pod each receive the same amount of traffic from the LB, so the single Pod on the second node gets as much traffic as the three Pods combined.
+- The **ClusterIP is pod-wise**: kube-proxy load-balances directly across all ready Pod IPs, regardless of which node they live on. This is the default, even for LoadBalancer Services once traffic is inside the cluster.
+
+kube-proxy always tries to redirect traffic to Pods on the **current node** first (this is the same "nodeport behavior" used for NodePort Services):
+
+- With `externalTrafficPolicy: Cluster` (the default), if the current node has no matching Pods, kube-proxy **can** redirect the packet to a Pod on *another* node. This extra hop replaces the source IP with the current node's IP, so the original client IP is lost.
+- With `externalTrafficPolicy: Local`, kube-proxy **cannot** redirect away from the current node. If no matching Pods exist on the node, the packet is simply **dropped** — there is no response, not even a TCP RST or an HTTP 5xx error. The source IP is preserved because the packet never leaves the node.
+
+To prevent the cloud LB from ever sending traffic to a node that would just drop it, `Local` mode uses **TCP health checks against kube-proxy's health API** (the per-Service `healthCheckNodePort`, served at `/healthz`). kube-proxy returns **200 OK** when at least one matching Pod exists on the node, or **503 Service Unavailable** when none do. Nodes returning 503 are excluded from the LB rotation entirely, so no LB request is ever sent to them. This is what makes `Local` safe for source-IP preservation: traffic only reaches nodes that actually have local backends.
 
 `externalTrafficPolicy: Local` is recommended when:
 - You need the original client IP in your application (e.g., for logging, rate limiting, or firewall rules).
