@@ -18,7 +18,7 @@
 | 14 | 07-services/02-LoadBalancer/2-mechanics/04-related-concepts.md | 62 | misleading, seems like ingress controller LB is the external LB and not a deployment of an nginx (or similar) working as lb that is exposed through externallb/nodeport/clusteriip. | solved |
 | 15 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/00-node-selector.md | 134 | seems to me that the tolleration is to allow schedule on manager | solved |
 | 16 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 48 | broken marmaid | solved |
-| 17 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 128 | this table is not very understandable | unsolved |
+| 17 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 128 | this table is not very understandable | solved |
 | 18 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 158 | broken marmaid | unsolved |
 | 19 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 221 | broken maramaid | unsolved |
 | 20 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 236 | broken mermaid | unsolved |

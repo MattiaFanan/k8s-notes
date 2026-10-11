@@ -125,14 +125,17 @@ This plugin handles DNS resolution for:
 - `<service-name>` → ClusterIP (in the current namespace)
 
 #### DNS Record Types
-%comment this table is not very understandable
-| Query | Record Type | Answer |
-|-------|-------------|--------|
-| `web-svc.default.svc.cluster.local` | A | ClusterIP (e.g., 10.96.123.45) |
-| `web-svc.default.svc.cluster.local` | SRV | Port and pod endpoints |
-| `web-svc.default` | A | ClusterIP (via search domain) |
-| `my-service.external.svc.cluster.local` | A | ClusterIP of `my-service` in `external` namespace |
-| Headless Service (clusterIP: None) | A | Individual Pod IPs (one per Pod) |
+
+CoreDNS answers different query forms with different record types. The table below shows what each query returns and when you would use it.
+
+| Query Example | Record Type | What It Returns | When It's Used |
+|---------------|-------------|-----------------|----------------|
+| `web-svc.default.svc.cluster.local` | A | The Service's ClusterIP (e.g., `10.96.123.45`) | Standard DNS lookup for a Service — the most common form |
+| `web-svc.default.svc.cluster.local` | SRV | The port number plus the IP:port of every ready backend Pod | Service discovery when a client needs to know the real endpoints (not just the virtual IP) |
+| `web-svc.default` | A | ClusterIP (same as the fully-qualified form) | Short form using the namespace; the DNS search list appends `.svc.cluster.local` automatically |
+| `web-svc` | A | ClusterIP of `web-svc` in the *current* namespace only | Shortest form — only resolves if the querying Pod is in the same namespace as the Service |
+| `my-service.external.svc.cluster.local` | A | ClusterIP of `my-service` in the `external` namespace | Cross-namespace access using the fully-qualified form |
+| `headless-svc.default.svc.cluster.local` (Service with `clusterIP: None`) | A | One A record per matching Pod, each pointing to that Pod's IP | Headless Services bypass the virtual IP entirely and return Pod IPs directly |
 
 #### Testing DNS from Inside the Cluster
 
