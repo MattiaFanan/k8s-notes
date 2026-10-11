@@ -50,15 +50,23 @@ Ingress and LoadBalancer serve different purposes and are often used together:
 
 ```mermaid
 flowchart TD
-    Internet((Internet)) -->|"Single external IP"| IngressCtrl[Ingress Controller LB]
-    IngressCtrl -->|"Host: api.example.com"| ApiSvc[API Service]
-    IngressCtrl -->|"Host: web.example.com"| WebSvc[Web Service]
-    IngressCtrl -->|"/static/*"| StaticSvc[Static Service]
+    Internet((Internet)) -->|"HTTP/HTTPS"| CloudLB[Cloud Load Balancer]
+    subgraph "Ingress Controller (Deployment of nginx or similar)"
+        IC[Ingress Controller Pod(s)]
+    end
+    subgraph "How the Ingress Controller is exposed"
+        ICSvc[Ingress Controller Service]
+        ICSvc -.->|"type: LoadBalancer / NodePort / ClusterIP"| IC
+    end
+    CloudLB -->|"forwards to"| ICSvc
+    IC -->|"Host: api.example.com"| ApiSvc[API Service]
+    IC -->|"Host: web.example.com"| WebSvc[Web Service]
+    IC -->|"/static/*"| StaticSvc[Static Service]
     ApiSvc -->|ClusterIP| ApiPod[API Pod]
     WebSvc -->|ClusterIP| WebPod[Web Pod]
     StaticSvc -->|ClusterIP| StaticPod[Static Pod]
 ```
-%comment misleading, seems like ingress controller LB is the external LB and not a deployment of an nginx (or similar) working as lb that is exposed through externallb/nodeport/clusteriip.
+The Ingress Controller is **not** the external load balancer. It is a Deployment (or DaemonSet) of nginx (or similar) running inside the cluster. It is exposed through a Service (typically LoadBalancer, but can also be NodePort), and the cloud load balancer forwards traffic to that Service. The Ingress Controller then routes HTTP/HTTPS traffic by host/path to the backend Services.
 ### When to use each
 
 - **Use LoadBalancer** for non-HTTP services (databases, message queues, gRPC services) or when you need a dedicated external IP.
