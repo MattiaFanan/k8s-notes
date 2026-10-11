@@ -38,7 +38,7 @@
 | 34 | 03-deployments/2-mechanics/02-deployment-strategies.md | 315 | too many unexplained fields in this last part | solved |
 | 35 | 03-deployments/2-mechanics/03-job-cronjob-behavior.md | 51 | how can attempt 2 have less failures than attempt 1 | solved |
 | 36 | 09-rbac/2-mechanics/01-aggregation.md | 12 | broken mermaid | solved |
-| 37 | 09-rbac/2-mechanics/01-aggregation.md | 218 | No, it does not cause undefined behavior, control plane instability, or infinite loops in the Kubernetes API server. | unsolved |
+| 37 | 09-rbac/2-mechanics/01-aggregation.md | 216 | No, it does not cause undefined behavior, control plane instability, or infinite loops in the Kubernetes API server. | solved |
 | 38 | 02-pods/2-mechanics/04-security/2-mechanics/04-psa-configuration.md | 47 | why would i log what i enforced and warn a livel more lenient that cannot be instantiated? | unsolved |
 | 39 | 02-pods/2-mechanics/04-security/2-mechanics/05-probes-behavior.md | 195 | this parameter is never really explained nor in graphs | unsolved |
 | 40 | 04-daemonsets/4-debugging.md | 14 | point 2 is not understandable, explain better with example | unsolved |
