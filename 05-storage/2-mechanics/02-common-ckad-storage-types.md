@@ -158,7 +158,9 @@ spec:
 **Behavior notes:**
 - Each key in `data` becomes a file (optionally under a `items` prefix)
 - ConfigMap volumes are mounted `readOnly` by default if specified (the `readOnly: true` in `volumeMounts` prevents writes)
-- Changes to the ConfigMap eventually propagate to mounted files (eventually consistent, typically within a minute)
+- Changes to the ConfigMap eventually propagate to mounted files (eventually consistent, typically within 1–2 minutes)
+- The application must re-read the file to pick up changes (e.g., via file watcher, SIGHUP, or periodic reload)
+- **`subPath` mounts break auto-updates** — `subPath` binds to a specific inode at mount time, so updates to the source ConfigMap/Secret are not reflected
 
 ## Secret Volumes
 
@@ -193,6 +195,11 @@ spec:
 ```
 
 **Important:** The Secret data is base64-encoded in the API, but this is **not encryption**. Secrets are stored in `etcd` as plaintext unless etcd encryption at rest is enabled. For production, use an external secrets manager (e.g., HashiCorp Vault, AWS Secrets Manager via CSI driver) or enable Kubernetes encryption providers.
+
+**Update behavior (same as ConfigMap):**
+- Secret volume updates propagate in ~1–2 minutes (eventual consistency)
+- Application must re-read files to see changes
+- **`subPath` mounts prevent updates** — they bind to a fixed inode at mount time
 
 ## PersistentVolumeClaim (PVC)
 
@@ -289,5 +296,5 @@ spec:
 | Pod stuck in `Pending` with volume issue | No PV matches PVC requirements | Check `kubectl describe pvc`, verify storage class and access modes |
 | Data lost after pod restart | Used `emptyDir` or `hostPath` without understanding lifecycle | Switch to PVC-backed storage |
 | `Permission denied` on hostPath mount | SELinux or filesystem permissions block pod access | Set `securityContext` with `fsGroup` or use correct `hostPath.type` |
-| ConfigMap changes not reflected | Volume mount is not automatically updated at runtime %comment explain that if secrets and configmaps are mounted as volume, they are eventually updated in 1 or 2 min, as so as long as the app inside the pod reparses them the changes are applied. but subpath are immutabl3 so if used it breaks the automatic update| Restart pods to pick up new ConfigMap data; use `subPath` mounts cautiously |
+| ConfigMap changes not reflected | Volume mount updates are eventually consistent (1–2 min); `subPath` mounts never update | App must re-read files; avoid `subPath` for ConfigMap/Secret volumes; restart pods if needed |
 | PVC stuck in `Pending` | Storage class not found or provisioner not deployed | Verify storage class exists: `kubectl get storageclass` |
