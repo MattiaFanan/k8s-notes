@@ -218,10 +218,9 @@ flowchart TD
 ## Ingress vs. Service Types
 
 Ingress is not a Service type but often works alongside ClusterIP Services to provide external HTTP(S) access. The Ingress controller typically creates a LoadBalancer Service externally, and then routes HTTP(S) traffic to ClusterIP Services internally.
-%comment broken maramaid 
 ```mermaid
 flowchart LR
-    Internet[Internet Client] -->|HTTPS| IngressCtrl[Ingress Controller<br/>(LoadBalancer/NodePort)]
+    Internet[Internet Client] -->|HTTPS| IngressCtrl["Ingress Controller<br/>(LoadBalancer/NodePort)"]
     IngressCtrl -->|Routes by path/host| ClusterIP1[ClusterIP: user-service]
     IngressCtrl -->|Routes by path/host| ClusterIP2[ClusterIP: api-service]
     ClusterIP1 -->|Load balance| Pod1A[User Pod A]
@@ -233,18 +232,17 @@ flowchart LR
 The key distinction: Ingress operates at L7 (HTTP/HTTPS) and does path/host-based routing, while Service types operate at L4 (TCP/UDP) and do simple round-robin or session affinity.
 
 ## Service Discovery Comparison
-%comment broken marmaid
 ```mermaid
 flowchart TD
-    A[How do clients discover backends?] --> B{Method}
+    A["How do clients discover backends?"] --> B{Method}
 
-    B --> C1[ClusterIP + kube-proxy<br/>Transparent proxying]
-    B --> C2[DNS (CoreDNS)<br/>Resolves service names to IPs]
-    B --> C3[EndpointSlice API<br/>Direct inspection of backends]
+    B --> C1["ClusterIP + kube-proxy<br/>Transparent proxying"]
+    B --> C2["DNS (CoreDNS)<br/>Resolves service names to IPs"]
+    B --> C3["EndpointSlice API<br/>Direct inspection of backends"]
 
-    C1 --> P1[Client connects to ClusterIP<br/>kube-proxy handles routing]
-    C2 --> P2[Client resolves name via DNS<br/>then connects to ClusterIP or Pod IPs]
-    C3 --> P3[Application queries EndpointSlice<br/>for backend list (e.g., client-side LB)"]
+    C1 --> P1["Client connects to ClusterIP<br/>kube-proxy handles routing"]
+    C2 --> P2["Client resolves name via DNS<br/>then connects to ClusterIP or Pod IPs"]
+    C3 --> P3["Application queries EndpointSlice<br/>for backend list (e.g., client-side LB)"]
 ```
 
 ## Environment Variables and Service Discovery

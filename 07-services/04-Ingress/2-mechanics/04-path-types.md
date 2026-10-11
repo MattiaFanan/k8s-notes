@@ -34,14 +34,13 @@ flowchart TD
 ### Exact Matching
 
 `Exact` matches the URL path precisely. The entire path must be identical, including any trailing slashes. This is useful for endpoints that should not be shadowed by broader Prefix rules.
-%comment text not completely shown in mermaid
 ```mermaid
 flowchart TD
     A["Incoming Request Path"] --> B{"pathType: Exact?"}
-    B -->| path = '/api/status' | C["Matches exactly /api/status"]
-    B -->| path = '/api/status' | D["Does NOT match /api/status/"]
-    B -->| path = '/api/status' | E["Does NOT match /api/status/health"]
-    B -->| path = '/api/status' | F["Does NOT match /api"]
+    B -->| path = '/api/status' | C["Matches exactly<br/>/api/status"]
+    B -->| path = '/api/status' | D["Does NOT match<br/>/api/status/"]
+    B -->| path = '/api/status' | E["Does NOT match<br/>/api/status/health"]
+    B -->| path = '/api/status' | F["Does NOT match<br/>/api"]
 ```
 
 ```bash

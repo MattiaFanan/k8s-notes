@@ -19,10 +19,10 @@
 | 15 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/2-mechanics/00-node-selector.md | 134 | seems to me that the tolleration is to allow schedule on manager | solved |
 | 16 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 48 | broken marmaid | solved |
 | 17 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 128 | this table is not very understandable | solved |
-| 18 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 158 | broken marmaid | unsolved |
-| 19 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 221 | broken maramaid | unsolved |
-| 20 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 236 | broken mermaid | unsolved |
-| 21 | 06-configmaps-secrets/2-mechanics/02-configmap-behavior.md | 231 | broken mermaid | unsolved |
+| 18 | 07-services/00-ClusterIP/2-mechanics/02-core-mechanics.md | 158 | broken marmaid | solved |
+| 19 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 221 | broken maramaid | solved |
+| 20 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 236 | broken mermaid | solved |
+| 21 | 06-configmaps-secrets/2-mechanics/02-configmap-behavior.md | 231 | broken mermaid | solved |
 | 22 | 07-services/00-ClusterIP/1-yaml-structure.md | 27 | say that the possible values are ClusterIP, NodePort, LoadBalancer, ExternalName. | solved |
 | 23 | 07-services/00-ClusterIP/1-yaml-structure.md | 28 | service labels subset of pod labels | solved |
 | 24 | 07-services/00-ClusterIP/1-yaml-structure.md | 42 | say that this is actually a virtual IP automatically assigned if not manually set to None | solved |
@@ -30,14 +30,14 @@
 | 26 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/1-yaml-structure.md | 10 | add remov etaint commad and move here taint fields table | unsolved |
 | 27 | 07-services/04-Ingress/2-mechanics/03-human-friendly-notes.md | 77 | tf is an HA dont spit acronyms | unsolved |
 | 28 | 08-networkpolicies/2-mechanics/02-core-concepts.md | 126 | not very clear | unsolved |
-| 29 | 07-services/04-Ingress/2-mechanics/05-related-concepts.md | 131 | broken mermaid | unsolved |
+| 29 | 07-services/04-Ingress/2-mechanics/05-related-concepts.md | 131 | broken mermaid | solved |
 | 30 | 07-services/04-Ingress/2-mechanics/05-related-concepts.md | 155 | Standard Kubernetes Ingress controllers (such as ingress-nginx, Traefik, HAProxy, and Envoy-based gateways) watch the Service and its associated EndpointSlices (or legacy Endpoints), extract the individual Pod IPs and ports, and configure their internal reverse proxies (like NGINX upstream blocks) to load-balance traffic directly to those Pod IPs. | unsolved |
-| 31 | 07-services/04-Ingress/2-mechanics/04-path-types.md | 37 | text not completely shown in mermaid | unsolved |
+| 31 | 07-services/04-Ingress/2-mechanics/04-path-types.md | 37 | text not completely shown in mermaid | solved |
 | 32 | 07-services/04-Ingress/2-mechanics/02-core-mechanics.md | 5 | somewhere in 04 ingress there should be a section on IngressClass, then say that ingress are configurations that the ingress controller polls from the api and autoapply on himeslf, while an ingressClass works as a label to make the controller poll only its ofn configs, while being a concern separation to avoid modifying all ingresses just to change the type of ingress controller. specify the default ingressclass k8s label. | unsolved |
 | 33 | 03-deployments/2-mechanics/05-pdb-and-strategies.md | 148 | point 1cseems contraddictory, review this file and make sense of what uses whaat spi and what api pdb governs | unsolved |
 | 34 | 03-deployments/2-mechanics/02-deployment-strategies.md | 315 | too many unexplained fields in this last part | unsolved |
 | 35 | 03-deployments/2-mechanics/03-job-cronjob-behavior.md | 51 | how can attempt 2 have less failures than attempt 1 | unsolved |
-| 36 | 09-rbac/2-mechanics/01-aggregation.md | 12 | broken mermaid | unsolved |
+| 36 | 09-rbac/2-mechanics/01-aggregation.md | 12 | broken mermaid | solved |
 | 37 | 09-rbac/2-mechanics/01-aggregation.md | 218 | No, it does not cause undefined behavior, control plane instability, or infinite loops in the Kubernetes API server. | unsolved |
 | 38 | 02-pods/2-mechanics/04-security/2-mechanics/04-psa-configuration.md | 47 | why would i log what i enforced and warn a livel more lenient that cannot be instantiated? | unsolved |
 | 39 | 02-pods/2-mechanics/04-security/2-mechanics/05-probes-behavior.md | 195 | this parameter is never really explained nor in graphs | unsolved |

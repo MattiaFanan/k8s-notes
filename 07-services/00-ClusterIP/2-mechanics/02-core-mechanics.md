@@ -158,7 +158,7 @@ kubectl run dns-test --image=busybox:1.36 --rm -it --restart=Never -- \
 kube-proxy runs on every node and installs networking rules that intercept traffic destined for ClusterIPs and redirect it to actual backend Pods. It operates in one of three modes.
 
 #### kube-proxy Modes
-%comment broken marmaid 
+
 ```mermaid
 flowchart TD
     Traffic[Traffic Destined for ClusterIP] --> KP[kube-proxy Intercepts]
@@ -167,15 +167,15 @@ flowchart TD
     KP -->|nftables mode| NFT[nftables sets]
     KP -->|IPVS mode| IPVS[IPVS load balancer]
 
-    subgraph iptables "iptables Mode"
+    subgraph iptablesMode ["iptables Mode"]
         IPTABLES --> RANDOM["Random selection<br/>O(n) rules per endpoint"]
     end
 
-    subgraph nftables "nftables Mode (alpha 1.29 / GA 1.33)"
+    subgraph nftablesMode ["nftables Mode (alpha 1.29 / GA 1.33)"]
         NFT --> SETS["nftables set-based matching<br/>Faster than iptables at scale"]
     end
 
-    subgraph ipvs "IPVS Mode"
+    subgraph ipvsMode ["IPVS Mode"]
         IPVS --> SCHED["Scheduler: rr, lc, wlc,<br/>dh, sh, sed, nq"]
         SCHED --> REALSERVER["Forward to real servers<br/>(Pod IPs)"]
     end

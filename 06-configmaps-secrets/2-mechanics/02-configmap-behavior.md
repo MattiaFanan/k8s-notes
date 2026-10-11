@@ -214,21 +214,24 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Create ConfigMap] --> B{How consumed?}
-    B -->|env| C[env vars set at container start]
-    B -->|envFrom| D[All keys become env vars]
-    B -->|volume| E[Files written to filesystem]
-    B -->|args| F[$(VAR) subs at container start]
+    B -->|env| C["env vars set at container start"]
+    B -->|envFrom| D["All keys become env vars"]
+    B -->|volume| E["Files written to filesystem"]
+    B -->|args| F["$(VAR) subs at container start"]
 
     C --> G{ConfigMap updated?}
     D --> G
-    E --> G{F mounted via volume<br/>(not subPath)?}
     F --> G
 
-    G -->|env vars| H[❌ No update until Pod restart]
-    G -->|File volume| I[✅ Updates ~every 60s<br/>(Kubelet sync)]
-    G -->|subPath| J[❌ No automatic update]
+    E --> H{"F mounted via volume<br/>not subPath?"}
+
+    G -->|env vars| I["❌ No update until Pod restart"]
+    G -->|File volume| J["✅ Updates ~every 60s<br/>(Kubelet sync)"]
+    G -->|subPath| K["❌ No automatic update"]
+
+    H -->|Yes| J
+    H -->|No, subPath| K
 ```
-%comment broken marmaid
 ## Best Practices
 
 1. **Use volume mounts for configuration that changes at runtime** — this allows the application to pick up updates without a pod restart.

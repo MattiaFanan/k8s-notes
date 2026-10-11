@@ -128,9 +128,8 @@ flowchart TD
 ```
 
 ### Architecture 3: Ingress with Multiple TLS Certificates
-%comment broken mermaid
 ```mermaid
-flowgraph TD
+flowchart TD
     Internet -->|"HTTPS :443"| IC["Ingress Controller"]
     IC -->| Host: app1.example.com | TLS1["TLS Termination<br/>using secret-a"] --> SVC1["Service A"]
     IC -->| Host: app2.example.com | TLS2["TLS Termination<br/>using secret-b"] --> SVC2["Service B"]

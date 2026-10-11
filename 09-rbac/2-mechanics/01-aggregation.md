@@ -9,10 +9,9 @@ Role aggregation allows a `ClusterRole` to automatically collect and merge rules
 ### Core Concept
 
 A `ClusterRole` with `aggregationRule` acts as a **computed union** of rules from other ClusterRoles that match the specified label selector. The aggregating ClusterRole itself has no static `rules` — its effective rules are the union of all matching source ClusterRoles' rules.
-%comment broken mermaid
 ```mermaid
 flowchart TD
-    A["ClusterRole: admin-role\naggregationRule"] -->| labelSelector: role=admin | B["ClusterRole: read-only<br/>rules: get, list, watch"]
+    A["ClusterRole: admin-role<br/>aggregationRule"] -->| labelSelector: role=admin | B["ClusterRole: read-only<br/>rules: get, list, watch"]
     A -->| labelSelector: role=admin | C["ClusterRole: edit-role<br/>rules: create, update, delete"]
     A -->| labelSelector: role=admin | D["ClusterRole: audit-role<br/>rules: get, list on logs"]
     B --> E["Effective Aggregated Rules"]
@@ -43,15 +42,15 @@ aggregationRule:
 ```
 
 ```mermaid
-flowchart TL
+flowchart TD
     A["ClusterRole: my-aggregated-role"] --> B{"aggregationRule"}
     B --> C["clusterRoleSelectors"]
     C --> D["matchLabels query"]
-    D --> E{"Find all ClusterRoles\nwhere labels match?"}
+    D --> E{"Find all ClusterRoles<br/>where labels match?"}
     E -->| Yes | F["Collect their `rules`"]
     E -->| No | G["No rules from this source"]
-    F --> H["Merge all rules into\none effective rule set"]
-    H --> I["Result: Union of ALL matching\nsource ClusterRole rules"]
+    F --> H["Merge all rules into<br/>one effective rule set"]
+    H --> I["Result: Union of ALL matching<br/>source ClusterRole rules"]
 ```
 
 ### Key Rules of Aggregation
