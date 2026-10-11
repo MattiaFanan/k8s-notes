@@ -35,7 +35,7 @@
 | 31 | 07-services/04-Ingress/2-mechanics/04-path-types.md | 37 | text not completely shown in mermaid | solved |
 | 32 | 07-services/04-Ingress/2-mechanics/02-core-mechanics.md | 5 | somewhere in 04 ingress there should be a section on IngressClass, then say that ingress are configurations that the ingress controller polls from the api and autoapply on himeslf, while an ingressClass works as a label to make the controller poll only its ofn configs, while being a concern separation to avoid modifying all ingresses just to change the type of ingress controller. specify the default ingressclass k8s label. | solved |
 | 33 | 03-deployments/2-mechanics/05-pdb-and-strategies.md | 148 | point 1cseems contraddictory, review this file and make sense of what uses whaat spi and what api pdb governs | solved |
-| 34 | 03-deployments/2-mechanics/02-deployment-strategies.md | 315 | too many unexplained fields in this last part | unsolved |
+| 34 | 03-deployments/2-mechanics/02-deployment-strategies.md | 315 | too many unexplained fields in this last part | solved |
 | 35 | 03-deployments/2-mechanics/03-job-cronjob-behavior.md | 51 | how can attempt 2 have less failures than attempt 1 | unsolved |
 | 36 | 09-rbac/2-mechanics/01-aggregation.md | 12 | broken mermaid | solved |
 | 37 | 09-rbac/2-mechanics/01-aggregation.md | 218 | No, it does not cause undefined behavior, control plane instability, or infinite loops in the Kubernetes API server. | unsolved |

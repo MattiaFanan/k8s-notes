@@ -306,10 +306,9 @@ kubectl patch svc web -n myns -p '{"spec":{"selector":{"version":"blue"}}}'
 
 ### Common Pitfalls
 
-- **RollingUpdate sends traffic to terminating Pods** unless you enable `terminationGracePeriodSeconds` and ensure readiness probes fail before shutdown.
-- **PDBs do not constrain Deployment rolling updates**: the Deployment controller's `maxUnavailable` and `maxSurge` govern rollout behavior, not PDBs.
-- **PreStop hooks must be brief** if you want fast rollouts. A 30-second PreStop on every Pod means a 3-minute minimum rollout for 3 replicas.
+- **RollingUpdate sends traffic to terminating Pods** unless you set `terminationGracePeriodSeconds` (the graceful shutdown window given to a Pod before it is force-killed; default 30s) and ensure readiness probes fail before shutdown, so the Pod is removed from Service endpoints while still draining in-flight requests.
+- **PDBs do not constrain Deployment rolling updates**: a PodDisruptionBudget (PDB) limits *voluntary* disruptions via the Eviction API (e.g. `kubectl drain`, cluster autoscaler scale-down). Deployments roll out via the normal Pod DELETE API, bypassing PDBs entirely. The Deployment controller's `maxUnavailable` and `maxSurge` govern rollout behavior, not PDBs.
+- **PreStop hooks must be brief** if you want fast rollouts. A PreStop hook is a container lifecycle hook that runs immediately before the container receives SIGTERM, and the kubelet waits for it to finish before sending the signal. The `terminationGracePeriodSeconds` covers the combined time of the PreStop hook *plus* the container's normal shutdown, so a 30-second PreStop on every Pod means a 3-minute minimum rollout for 3 replicas (one Pod at a time, each waiting for its PreStop to complete).
 - **Blue/Green: forgetting to update the Service selector** after creating the green deployment — traffic still routes to blue.
 - **Canary: not monitoring before scaling up** — always verify canary health before increasing traffic weight.
 
-%comment too many unexplained fields in this last part
