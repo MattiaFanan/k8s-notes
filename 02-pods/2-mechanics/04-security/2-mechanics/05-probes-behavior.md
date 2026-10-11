@@ -156,6 +156,7 @@ livenessProbe:
 - **`initialDelaySeconds` + `periodSeconds`**: The first probe fires at `initialDelaySeconds` after container start, then every `periodSeconds` thereafter.
 - **`failureThreshold`**: For liveness, this is the number of consecutive failures before the container is killed. For readiness, this is the number of consecutive failures before the pod is removed from endpoints.
 - **`successThreshold`**: Only relevant for readiness probes. A pod is added back to endpoints only after `successThreshold` consecutive successes. For liveness and startup probes, this is always 1.
+- **`timeoutSeconds`**: The maximum time (in seconds) the kubelet waits for a probe response before marking it as failed. Defaults to 1s, minimum 1s. Must be shorter than `periodSeconds` to avoid overlapping probes. If a probe times out, it counts as a failure toward `failureThreshold`. For `httpGet` probes, this is the HTTP request timeout. For `tcpSocket`, it's the connection timeout. For `exec`, it's the command execution timeout. For `grpc`, it's the gRPC call timeout.
 
 ## Mermaid: Probe Lifecycle Flow
 
@@ -192,7 +193,7 @@ flowchart TD
 3. **Set appropriate `initialDelaySeconds`**: Too short causes false positives; too long delays detection of actual failures.
 4. **Use `httpGet` for web services**: It is the most common and reliable probe type.
 5. **Avoid heavy operations in probes**: Probes run on a timer; expensive checks can degrade application performance.
-6. **Use `timeoutSeconds` aggressively**: A probe that hangs indefinitely blocks the kubelet from making progress. Set a short timeout (1-3 seconds). %comment this parameter is never really explained nor in graphs
+6. **Use `timeoutSeconds` aggressively**: A probe that hangs indefinitely blocks the kubelet from making progress. Set a short timeout (1-3 seconds).
 7. **Monitor probe failure rates**: High failure rates on liveness probes indicate application instability. High failure rates on readiness probes indicate dependency issues.
 
 ## Troubleshooting
