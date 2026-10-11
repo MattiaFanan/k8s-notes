@@ -10,7 +10,7 @@
 | 6 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 80 | explain that endpoints and services are always associated by the same name | solved |
 | 7 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 127 | i think names are mandatory when multiple ports are used | solved |
 | 8 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 254 | with final dot i think, explain the 5dots linux serch | solved |
-| 9 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 312 | this is never explained before, add it to yaml structure | unsolved |
+| 9 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 312 | this is never explained before, add it to yaml structure | solved |
 | 10 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 319 | i think svcname.ns is not FQDN but only domain qualified | unsolved |
 | 11 | 07-services/02-LoadBalancer/2-mechanics/02-core-mechanics.md | 2 | make esplicit that the lb is essentially a way to balance the traffic among the nodes, it is better than nodeport cause you can use usual port like 8080 (nodeport goes 30000+) it is cloud managed so if a node goes down you dont loose the ip customer and DNS use, it does tcp connection healthcheck with eternalTrafficPolicy local avoiding the nodeport no-response in case of no matching pod. | unsolved |
 | 12 | 07-services/02-LoadBalancer/2-mechanics/02-core-mechanics.md | 196 | say that lb is node wise while cloudIP is pod wise, and that kubeproxy always tries to redirect to current node pods ("nodeport behavior" - with cluster it can redirect away changing source ip, with local it cant and eventually drops - no response back not event 5** code - the packet if no matching pods on the current node so source ip preserved). with local, tcp healthchecks are executed by lb against kubeproxy health api, and kubeproxy responds 503 if no matching pods in the node, so they result as not available and no lb request is sent to them. | unsolved |
@@ -23,9 +23,9 @@
 | 19 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 221 | broken maramaid | unsolved |
 | 20 | 07-services/00-ClusterIP/2-mechanics/04-related-concepts.md | 236 | broken mermaid | unsolved |
 | 21 | 06-configmaps-secrets/2-mechanics/02-configmap-behavior.md | 231 | broken mermaid | unsolved |
-| 22 | 07-services/00-ClusterIP/1-yaml-structure.md | 27 | say that the possible values are ClusterIP, NodePort, LoadBalancer, ExternalName. | unsolved |
-| 23 | 07-services/00-ClusterIP/1-yaml-structure.md | 28 | service labels subset of pod labels | unsolved |
-| 24 | 07-services/00-ClusterIP/1-yaml-structure.md | 42 | say that this is actually a virtual IP automatically assigned if not manually set to None | unsolved |
+| 22 | 07-services/00-ClusterIP/1-yaml-structure.md | 27 | say that the possible values are ClusterIP, NodePort, LoadBalancer, ExternalName. | solved |
+| 23 | 07-services/00-ClusterIP/1-yaml-structure.md | 28 | service labels subset of pod labels | solved |
+| 24 | 07-services/00-ClusterIP/1-yaml-structure.md | 42 | say that this is actually a virtual IP automatically assigned if not manually set to None | solved |
 | 25 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/3-imperative-commands.md | 2 | this page is almost useless, merge with structure | unsolved |
 | 26 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/1-yaml-structure.md | 10 | add remov etaint commad and move here taint fields table | unsolved |
 | 27 | 07-services/04-Ingress/2-mechanics/03-human-friendly-notes.md | 77 | tf is an HA dont spit acronyms | unsolved |
