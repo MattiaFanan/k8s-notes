@@ -36,15 +36,21 @@ kubectl label namespace dev pod-security.kubernetes.io/audit=restricted
 
 ### Combined Configuration
 
-A namespace can have all three modes set simultaneously.
+A namespace can have all three modes set simultaneously. The standard pattern is to `enforce` the level you are ready to block **now**, and set `warn` and `audit` to a **stricter** level to preview the impact of tightening later.
 
 ```bash
 kubectl label namespace production \
-  pod-security.kubernetes.io/enforce=restricted \
-  pod-security.kubernetes.io/warn=baseline \
+  pod-security.kubernetes.io/enforce=baseline \
+  pod-security.kubernetes.io/warn=restricted \
   pod-security.kubernetes.io/audit=restricted
 ```
-%comment why would i log what i enforced and warn a livel more lenient that cannot be instantiated?
+
+Each mode is evaluated independently against its own level:
+
+- `enforce=baseline` rejects pods that violate baseline.
+- `warn=restricted` / `audit=restricted` surface pods that **would be rejected** if enforcement were later raised to `restricted` — the pods still run, but the violations show up as user-facing warnings and audit annotations. This is the gradual migration path recommended in the Kubernetes docs (enforce current level, warn/audit the target level).
+- Don't set `audit` to the same level as `enforce`: violating pods are already rejected, so logging them adds nothing. Audit is useful only at a level you have not enforced yet.
+- Don't set `warn` or `audit` to a level more lenient than `enforce`: `restricted` is a strict superset of `baseline`, so any pod violating baseline also violates restricted and is rejected by the enforce check first — the lenient warn/audit can never fire.
 
 ## PSA and Namespace Configuration
 
