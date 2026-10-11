@@ -33,8 +33,7 @@ kubectl get svc web-lb -o jsonpath='{.spec.clusterIP}'
 # Output: 10.96.123.45
 ```
 
-Key insight: **You can access a LoadBalancer Service internally via its ClusterIP, just like any other Service.** The LoadBalancer is only for external traffic.
-%comment misleading, it seems loadbalancer is a deployment served throug a service. while in reality the served/accessded thing are pods matching the service selector
+Key insight: **You can access a LoadBalancer Service internally via its ClusterIP, just like any other Service.** The "LoadBalancer" part is only the external access mechanism: the cloud provider provisions a load balancer that forwards traffic to the nodePort on each node, which then routes to the selected Pods. Internally, you can (and should) access the same Pods via the ClusterIP, just like any other Service. The served/accessed things are always the Pods matching the service selector — the LoadBalancer is not a deployment, it is an external traffic path on top of the Service.
 
 ## Relationship with Ingress
 
