@@ -7,7 +7,7 @@
 | 3 | 05-storage/1-yaml-structure.md | 5 | make sure somewhere in this argoment folder, the fact that pv and pvc exist is to decouple pod volume usage and physical volume properties | solved |
 | 4 | 05-storage/1-yaml-structure.md | 25 | hostpath pv without nodeaffinity is not really usefull, add somewhere this class | solved |
 | 5 | 07-services/02-LoadBalancer/2-mechanics/05-session-affinity.md | 75 | broken mermaid | solved |
-| 6 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 80 | explain that endpoints and services are always associated by the same name | unsolved |
+| 6 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 80 | explain that endpoints and services are always associated by the same name | solved |
 | 7 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 127 | i think names are mandatory when multiple ports are used | unsolved |
 | 8 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 254 | with final dot i think, explain the 5dots linux serch | unsolved |
 | 9 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 312 | this is never explained before, add it to yaml structure | unsolved |

@@ -77,7 +77,23 @@ kubectl run dns-test --image=busybox:1.36 --rm -it --restart=Never -- \
 # Test with curl from another Pod
 kubectl exec -it frontend -- curl -s http://user-service.api.svc.cluster.local/health
 ```
-%comment explain that endpoints and services are always associated by the same name
+### Endpoints and Services: Name Association
+
+**Endpoints (and EndpointSlices) always share the same name as their Service.** This is a fundamental Kubernetes convention:
+
+- When you create a Service with a selector, the Kubernetes endpoint controller automatically creates an `Endpoints` or `EndpointSlice` object with the **exact same name** as the Service.
+- For a Service without a selector, you must manually create an `Endpoints` object — and it **must** use the same name as the Service, otherwise Kubernetes will not link them.
+- This 1:1 name mapping is how kube-proxy and CoreDNS know which endpoints belong to which Service. There is no separate endpoint name space; the endpoint object inherits the Service's name.
+
+```bash
+# Endpoints always match the Service name
+kubectl get endpoints user-service
+kubectl get svc user-service
+# Both return the same name: user-service
+```
+
+This is why, in the manual Endpoints example above, the `Endpoints` object is named `external-db` — matching the `Service` name exactly.
+
 ### Important Namespaces for Services
 
 - `default`: The default namespace where untagged resources go
