@@ -42,7 +42,7 @@
 | 38 | 02-pods/2-mechanics/04-security/2-mechanics/04-psa-configuration.md | 47 | why would i log what i enforced and warn a livel more lenient that cannot be instantiated? | solved |
 | 39 | 02-pods/2-mechanics/04-security/2-mechanics/05-probes-behavior.md | 195 | this parameter is never really explained nor in graphs | solved |
 | 40 | 04-daemonsets/4-debugging.md | 14 | point 2 is not understandable, explain better with example | solved |
-| 41 | 04-daemonsets/2-mechanics/03-typical-use-cases.md | 120 | try not to use acronims out of the blue like HPA | unsolved |
+| 41 | 04-daemonsets/2-mechanics/03-typical-use-cases.md | 120 | try not to use acronims out of the blue like HPA | solved |
 | 42 | 02-pods/2-mechanics/04-security/2-mechanics/03-limitrange-resourcequota.md | 182 | this is already elsewhere merge it there | unsolved |
 | 43 | 02-pods/2-mechanics/02-scheduling-affinity/2-mechanics/02-core-concepts.md | 305 | add the following somewhere | unsolved |
 | 44 | 02-pods/2-mechanics/04-security/2-mechanics/02-pss-basics.md | 115 | add the following somewhere where it fits, or in a new .md file | unsolved |

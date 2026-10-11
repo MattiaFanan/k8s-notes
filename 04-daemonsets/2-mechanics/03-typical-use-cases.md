@@ -113,11 +113,10 @@ flowchart LR
 
 | Scenario | Use Instead |
 |----------|-------------|
-| Stateless web service with HA | Deployment + HPA |
+| Stateless web service with High Availability (HA) | Deployment + Horizontal Pod Autoscaler (HPA) |
 | Job processing queue | Deployment + HPA |
 | Application that needs N replicas across the cluster | Deployment |
 | Per-user or per-tenant workload | Namespace + Deployment |
-%comment try not to use acronims out of the blue like HPA 
 ### Best Practices
 
 - **Run DaemonSet Pods with explicit resource requests/limits**: a misconfigured monitoring agent on 200 nodes can exhaust the cluster.
