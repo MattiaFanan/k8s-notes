@@ -22,7 +22,7 @@ docker history myrepo/app:1.0 --no-trunc | grep -i -E 'entrypoint|cmd'
 | `ENTRYPOINT` | `command` | overrides ENTRYPOINT entirely if set |
 | `CMD` | `args` | overrides CMD entirely if set |
 
-- Pod `command` set, `args` unset → runs `command` with the image's `CMD` args dropped.
+- Pod `command` set, `args` unset → runs `command` (overrides ENTRYPOINT) with the image's `CMD` as args (since `args` is unset, the image's CMD defaults in, it is NOT dropped). Use `args: []` to explicitly empty it.
 - Pod `command` unset, `args` set → runs image's `ENTRYPOINT` with these `args` instead of image's `CMD`.
 - Both unset → runs image's `ENTRYPOINT` + `CMD` as-is.
 

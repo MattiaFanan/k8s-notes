@@ -10,12 +10,15 @@ Service must select only the shared label (not a version label):
 ```bash
 k get svc app-svc -o jsonpath='{.spec.selector}'   # should be just {"app":"app"}, no "version" key
 ```
-Deploy the canary with its own name/version label but the same `app` label the service selects on:
+Deploy the canary with the shared `app=app` label on the pod template (Service selects this, not `version`):
 ```bash
-k create deployment app-v2 --image=nginx:1.25 --replicas=1
-k label deployment app-v2 app=app version=v2 --overwrite
-k label deployment app-v1 version=v1 --overwrite   # if not already labeled
+k create deployment app-v2 --image=nginx:1.25 --replicas=1 $do > app-v2.yaml
 ```
+Edit `app-v2.yaml` — ensure `spec.selector.matchLabels` and `spec.template.metadata.labels` both include `app: app` (plus `version: v2`). Then:
+```bash
+k apply -f app-v2.yaml
+```
+> `kubectl label deployment` only patches `metadata.labels` on the Deployment object, not `spec.template.metadata.labels`. Generate YAML and edit in place, or the Service won't select the pods.
 Now traffic splits roughly by replica count: 4 (v1) : 1 (v2) ≈ 80/20.
 
 **Verify:**
