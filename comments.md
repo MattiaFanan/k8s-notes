@@ -43,7 +43,7 @@
 | 39 | 02-pods/2-mechanics/04-security/2-mechanics/05-probes-behavior.md | 195 | this parameter is never really explained nor in graphs | solved |
 | 40 | 04-daemonsets/4-debugging.md | 14 | point 2 is not understandable, explain better with example | solved |
 | 41 | 04-daemonsets/2-mechanics/03-typical-use-cases.md | 120 | try not to use acronims out of the blue like HPA | solved |
-| 42 | 02-pods/2-mechanics/04-security/2-mechanics/03-limitrange-resourcequota.md | 182 | this is already elsewhere merge it there | unsolved |
+| 42 | 02-pods/2-mechanics/04-security/2-mechanics/03-limitrange-resourcequota.md | 182 | this is already elsewhere merge it there | solved |
 | 43 | 02-pods/2-mechanics/02-scheduling-affinity/2-mechanics/02-core-concepts.md | 305 | add the following somewhere | unsolved |
 | 44 | 02-pods/2-mechanics/04-security/2-mechanics/02-pss-basics.md | 115 | add the following somewhere where it fits, or in a new .md file | unsolved |
 | 45 | 07-services/03-ExternalName/2-mechanics/03-core-mechanics.md | 156 | say that kubeproxy is a daemonset and need to be restarted if kube-proxy configmap is modified (configmaps update the pods by themselves but some changes need a restart, like switching from iptables to IPVS, so it is good norm to restart in any case), or if it goes out of synch and there is node connectivity problems | unsolved |
