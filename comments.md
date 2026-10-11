@@ -26,7 +26,7 @@
 | 22 | 07-services/00-ClusterIP/1-yaml-structure.md | 27 | say that the possible values are ClusterIP, NodePort, LoadBalancer, ExternalName. | solved |
 | 23 | 07-services/00-ClusterIP/1-yaml-structure.md | 28 | service labels subset of pod labels | solved |
 | 24 | 07-services/00-ClusterIP/1-yaml-structure.md | 42 | say that this is actually a virtual IP automatically assigned if not manually set to None | solved |
-| 25 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/3-imperative-commands.md | 2 | this page is almost useless, merge with structure | unsolved |
+| 25 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/3-imperative-commands.md | 2 | this page is almost useless, merge with structure | solved |
 | 26 | 02-pods/2-mechanics/01-scheduling-taints-tolerations/1-yaml-structure.md | 10 | add remov etaint commad and move here taint fields table | unsolved |
 | 27 | 07-services/04-Ingress/2-mechanics/03-human-friendly-notes.md | 77 | tf is an HA dont spit acronyms | unsolved |
 | 28 | 08-networkpolicies/2-mechanics/02-core-concepts.md | 126 | not very clear | unsolved |

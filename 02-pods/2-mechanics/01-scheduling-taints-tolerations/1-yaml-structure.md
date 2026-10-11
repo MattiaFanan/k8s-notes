@@ -7,7 +7,15 @@ Taints and tolerations work together to control which pods can be scheduled onto
 ```bash
 # Imperative taint
 kubectl taint nodes node1 key=value:NoSchedule
-%comment add remov etaint commad and move here taint fields table 
+
+# Remove taint from node
+kubectl taint nodes node1 key:NoSchedule-
+
+# Update existing taint
+kubectl taint nodes node1 key=newvalue:NoSchedule --overwrite
+
+# Describe node to see taints
+kubectl describe node node1 | grep -A5 Taints
 ```
 
 ## Pod with Toleration
@@ -55,3 +63,17 @@ spec:
 | `tolerationSeconds` | Important | Yes — edit pod spec | Only valid with `NoExecute`. Defines how long a pod stays bound before eviction. |
 | Node taint | — | No — use `kubectl taint` | Manage via `kubectl taint nodes <node> ...` and `kubectl taint nodes <node> -`. |
 | Pod tolerations | — | Yes — `kubectl edit pod <name>` | Declared in `spec.tolerations` of the pod YAML.
+
+## Pod Generation
+
+```bash
+kubectl run tolerant-pod --image=nginx --dry-run=client -o yaml > pod.yaml
+# Add tolerations to pod.yaml manually
+```
+
+## View
+
+```bash
+kubectl get pods -o wide
+kubectl describe node node1
+```
