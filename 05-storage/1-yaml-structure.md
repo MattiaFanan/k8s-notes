@@ -23,26 +23,64 @@ spec:
   hostPath:
     path: /mnt/data
 ```
-%comment hostpath pv without nodeaffinity is not really usefull, add somewhere this class 
- local workflow
- Corrected & Unified Workflow: Local hostpath & Node Affinity (With Pending States)
-A hostPath PV without a nodeAffinity is practically useless in a multi-node cluster because Kubernetes has no way of knowing which physical machine's hard drive holds the data.
-To make local storage work seamlessly, Kubernetes relies on one of two workflows:
-Workflow 1: Static Local PVs (Manual)
- * The Setup: You manually create a PV with a strict nodeAffinity pointing to a specific node (e.g., Worker-Node-A).
- * The Pod & Scheduler: When a pod requests a PVC bound to that static PV, the scheduler reads the PV's nodeAffinity.
- * The Enforcement & The Pending State: The scheduler functionally forces the Pod to inherit that constraint.
-   * If Worker-Node-A is healthy: The pod lands on it.
-   * If Worker-Node-A is down, full, or doesn't exist: The scheduler refuses to place the pod anywhere else. The pod gets stuck in a Pending state indefinitely, throwing an event warning about a node affinity mismatch.
-Workflow 2: Dynamic Local Storage Class (Automated / CSI)
-Using tools like the Local Path Provisioner with WaitForFirstConsumer binding mode.
- * The Request: A developer creates a PVC (no PV exists yet). Because of WaitForFirstConsumer, nothing happens immediately, and the pod sits Pending until scheduled.
- * The Scheduler Steps In: A Pod requests that PVC. The scheduler looks at the cluster, picks an optimal node (e.g., Worker-Node-B), and locks it in.
- * The CSI Trigger: Once the node is chosen, the CSI storage controller wakes up, reads the target node, and executes the physical actions:
-   * It creates the local folder on Worker-Node-B.
-   * It dynamically generates the PV object on the fly.
-   * It automatically stamps that new PV with a nodeAffinity pointing directly to Worker-Node-B.
- * The Failure / Pending State: If the CSI driver encounters an error (e.g., it fails to create the folder on Worker-Node-B due to permissions or disk space), the provisioning fails, and the pod remains stuck in a Pending state while reporting the storage error in its events.
+## Local PersistentVolumes & Node Affinity
+
+A `hostPath` PV without `nodeAffinity` is practically useless in a multi-node cluster because Kubernetes has no way of knowing which physical machine's hard drive holds the data. The scheduler cannot enforce placement, leading to pods potentially running on nodes without the backing storage.
+
+To make local storage work correctly, Kubernetes relies on one of two workflows:
+
+### Workflow 1: Static Local PVs (Manual)
+
+You manually create a PV with a strict `nodeAffinity` pointing to a specific node:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-local-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/disks/ssd1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - worker-node-a
+```
+
+When a pod requests a PVC bound to this PV:
+- The scheduler reads the PV's `nodeAffinity`
+- The pod is forced to run on the specified node
+- If that node is down, full, or missing: the pod stays `Pending` indefinitely with an affinity mismatch event
+
+### Workflow 2: Dynamic Local Storage (CSI + WaitForFirstConsumer)
+
+Using a CSI driver (e.g., Local Path Provisioner) with `volumeBindingMode: WaitForFirstConsumer`:
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+```
+
+Flow:
+1. Developer creates a PVC (no PV exists yet); pod sits `Pending`
+2. Scheduler picks an optimal node (e.g., `worker-node-b`) and locks it in
+3. CSI driver provisions storage on that node, creates the PV, and stamps it with `nodeAffinity` for that node
+4. If provisioning fails (permissions, disk space), pod remains `Pending` with storage error events
 
 ## PersistentVolumeClaim (PVC) Manifest
 
