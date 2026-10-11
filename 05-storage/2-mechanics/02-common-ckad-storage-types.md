@@ -8,21 +8,17 @@ Kubernetes provides several volume types that serve different purposes in the li
 
 ```mermaid
 flowchart TD
-    A[Need persistent data that survives pod deletion?] --> B{Yes}
+    A{Need persistent data that survives pod deletion?} -->|Yes| B[Use PVC with PersistentVolume]
     A -->|No| C{Need shared temp space between containers in same pod?}
-    B -->|Yes| D[Use PVC with PersistentVolume]
-    B -->|No| C
-
-    C -->|Yes| E[Use emptyDir with medium: Memory or Disk]
-    C -->|No| F{Need data from a config file or secret?}
-    F -->|Config data| G[Mount a ConfigMap as a volume]
-    F -->|Secret data| H[Mount a Secret as a volume]
-    F -->|Neither| I[Use hostPath for node-local access]
-    I --> J{Node-specific data like /proc, /sys?}
-    J -->|Yes| K[Use hostPath with read-only]
-    J -->|No| L[Reconsider architecture — hostPath is not portable]
+    C -->|Yes| D[Use emptyDir with medium: Memory or Disk]
+    C -->|No| E{Need data from a config file or secret?}
+    E -->|Config data| F[Mount a ConfigMap as a volume]
+    E -->|Secret data| G[Mount a Secret as a volume]
+    E -->|Neither| H[Use hostPath for node-local access]
+    H --> I{Node-specific data like /proc, /sys?}
+    I -->|Yes| J[Use hostPath with read-only]
+    I -->|No| K[Reconsider architecture — hostPath is not portable]
 ```
-%comment this marmaid is strange, like yes in the node?
 ## emptyDir
 
 `emptyDir` is created when a pod is assigned to a node. It exists as long as the pod runs on that node. When the pod is removed, `emptyDir` is deleted permanently.
