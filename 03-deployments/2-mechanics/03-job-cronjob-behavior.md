@@ -39,16 +39,19 @@ spec:
 
 ```mermaid
 flowchart LR
-    A["Job: completions=3, parallelism=2"] --> B["Attempt 1: 3 failures"]
-    B --> C{"Failures > backoffLimit?"}
-    C -->|No| D["Exponential backoff"]
-    D --> E["Attempt 2: 2 success, 1 failure"]
-    E --> F{"Successes >= completions?"}
-    F -->|Yes| G["Job Complete"]
-    C -->|Yes| H["Job Failed"]
-    F -->|No| E
+    A["Job: completions=3, parallelism=2"] --> B["Create up to 2 Pods"]
+    B --> C["Attempt 1: 2 failures"]
+    C --> D{"Failures >= backoffLimit(6)?"}
+    D -->|No| E["Exponential backoff"]
+    E --> F["Attempt 2: 1 success, 1 failure"]
+    F --> G{"Successes >= completions(3)?"}
+    G -->|No| H["Attempt 3: 2 success"]
+    H --> G
+    G -->|Yes| I["Job Complete"]
+    D -->|Yes| J["Job Failed"]
 ```
-%comment how can attempt 2 have less failures than attempt 1
+
+> **Why attempt 2 can have fewer failures than attempt 1:** With `parallelism: 2`, at most 2 Pods run concurrently. In attempt 1 both Pods failed (2 failures). In attempt 2 one Pod succeeded and one failed (1 success, 1 failure). The number of *new* failures decreased because one Pod succeeded — the Job controller only replaces failed Pods, so the next attempt may have better luck or the transient issue resolved. `backoffLimit` counts the **cumulative** failures across all Pods (default 6), not failures per attempt.
 ### Backoff Limit and Exponential Backoff
 
 The Job controller retries Pods with exponential backoff:
