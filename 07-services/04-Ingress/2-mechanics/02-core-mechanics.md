@@ -2,7 +2,6 @@
 
 This document covers the fundamental internal mechanics of Kubernetes Ingress: how L7 routing works, the role of the Ingress Controller, IngressClass selection, and backend service references.
 
-%comment somewhere in 04 ingress there should be a section on IngressClass, then say that ingress are configurations that the ingress controller polls from the api and autoapply on himeslf, while an ingressClass works as a label to make the controller poll only its ofn configs, while being a concern separation to avoid modifying all ingresses just to change the type of ingress controller. specify the default ingressclass k8s label.
 one esterbal lb can only point to one internal ingress controller through its service, but another ingress controlle deployment, even if of different type like traefik for service discover, can also be acessible as normal internal service or externally with another lb
 
 
@@ -64,6 +63,12 @@ sequenceDiagram
 
 `IngressClass` is a cluster-scoped resource that defines which controller should handle a given Ingress resource. It was introduced to replace the ambiguous `kubernetes.io/ingress.class` annotation with a typed, versioned API resource.
 
+### How Ingress and IngressClass Work Together
+
+An **Ingress resource** is declarative routing configuration — it does not run any proxy code. The **Ingress Controller** (a separate Deployment) continuously watches the Kubernetes API for Ingress resources and translates their rules into its own proxy configuration (e.g., NGINX `location` blocks, Traefik Middleware/routers, HAProxy frontends/backends). The controller polls the API, detects changes, and auto-applies them to itself without manual intervention.
+
+An **IngressClass** acts as a label/selector mechanism. Each IngressClass specifies exactly which controller (via the `spec.controller` field) should handle Ingress resources that reference it. This creates **concern separation**: you can have multiple Ingress controllers (e.g., NGINX for external traffic, Traefik for service discovery) running in the same cluster, each watching only Ingress resources that reference its own IngressClass. You can change the controller implementation for a set of Ingress resources by simply updating the IngressClass's `spec.controller` field — no need to modify every individual Ingress resource.
+
 ### Why IngressClass Matters
 
 Before IngressClass, the annotation `kubernetes.io/ingress.class` was a string that every controller parsed. This caused problems when multiple controllers were installed, as each controller would act on the annotation if it matched. IngressClass adds:
@@ -71,6 +76,21 @@ Before IngressClass, the annotation `kubernetes.io/ingress.class` was a string t
 - **Controller identity**: Each class specifies exactly which controller handles it.
 - **Parameterization**: An `IngressClass` can reference an `IngressClassParameters` resource for controller-specific configuration.
 - **Default class**: A controller can mark itself as the default, handling Ingress resources that omit `spec.ingressClassName`.
+
+### Default IngressClass
+
+You can mark a particular IngressClass as the cluster default using the annotation `ingressclass.kubernetes.io/is-default-class: "true"`. When set, new Ingress resources without an explicit `spec.ingressClassName` will automatically be assigned this default class. Only one IngressClass per cluster should have this annotation set to `true`.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: k8s.io/ingress-nginx
+```
 
 ### Concrete Example
 
@@ -99,15 +119,6 @@ kubectl get ingress example -o jsonpath='{.spec.ingressClassName}'
 
 # Check which IngressResources reference which class
 kubectl get ingress -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.ingressClassName}{"\n"}{end}'
-```
-
-### Default IngressClass
-
-If an Ingress resource does not specify `spec.ingressClassName`, the cluster falls back to the controller's configured default class. Only one IngressClass should be marked as the default per cluster.
-
-```bash
-# Find which IngressClass is the default
-kubectl get ingressclass -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.controller}{"\t"}{.metadata.annotations}{"\n"}{end}' | grep default
 ```
 
 ## Backend Reference Resolution
