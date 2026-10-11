@@ -103,7 +103,11 @@ This is why, in the manual Endpoints example above, the `Endpoints` object is na
 
 ### Multiple Ports and DNS SRV Records
 
-When a Service exposes multiple ports with named ports, Kubernetes creates SRV (Service) DNS records:
+When a Service exposes multiple ports, **Kubernetes requires every port to have a `name` field**. This is mandatory — not optional — because named ports enable:
+
+- **DNS SRV records**: `_port-name._protocol.service.namespace.svc.cluster.local`
+- **EndpointSlice port mapping**: Controllers match port names to targetPorts
+- **CLI clarity**: `kubectl describe svc` shows meaningful port names
 
 ```yaml
 apiVersion: v1
@@ -132,25 +136,7 @@ nslookup -type=SRV _grpc._tcp.multi-port-svc
 #   port 50051, target my-app-pod-xxx.default.pod.cluster.local
 ```
 
-**CKAD Exam Tip:** Always name your Service ports when a Service exposes multiple ports. Named ports are required for DNS SRV records and are good practice for readability.
-
-```yaml
-# ❌ Named port not specified — ambiguous with multiple ports
-ports:
-  - port: 80
-    targetPort: 8080
-  - port: 50051
-    targetPort: 50051  %comment i think names are mandatory when multiple ports are used
-
-# ✅ Named ports — clear and DNS-friendly
-ports:
-  - name: http
-    port: 80
-    targetPort: 8080
-  - name: grpc
-    port: 50051
-    targetPort: 50051
-```
+**CKAD Exam Tip:** Always name your Service ports when a Service exposes multiple ports. Omitting names will cause the Service creation to fail validation.
 
 ## Endpoints and EndpointSlices
 
