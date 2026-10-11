@@ -9,7 +9,7 @@
 | 5 | 07-services/02-LoadBalancer/2-mechanics/05-session-affinity.md | 75 | broken mermaid | solved |
 | 6 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 80 | explain that endpoints and services are always associated by the same name | solved |
 | 7 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 127 | i think names are mandatory when multiple ports are used | solved |
-| 8 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 254 | with final dot i think, explain the 5dots linux serch | unsolved |
+| 8 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 254 | with final dot i think, explain the 5dots linux serch | solved |
 | 9 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 312 | this is never explained before, add it to yaml structure | unsolved |
 | 10 | 07-services/00-ClusterIP/2-mechanics/01-common-ckad-patterns.md | 319 | i think svcname.ns is not FQDN but only domain qualified | unsolved |
 | 11 | 07-services/02-LoadBalancer/2-mechanics/02-core-mechanics.md | 2 | make esplicit that the lb is essentially a way to balance the traffic among the nodes, it is better than nodeport cause you can use usual port like 8080 (nodeport goes 30000+) it is cloud managed so if a node goes down you dont loose the ip customer and DNS use, it does tcp connection healthcheck with eternalTrafficPolicy local avoiding the nodeport no-response in case of no matching pod. | unsolved |

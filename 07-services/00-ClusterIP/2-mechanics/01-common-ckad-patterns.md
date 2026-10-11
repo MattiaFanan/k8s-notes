@@ -19,13 +19,16 @@ Kubernetes provides built-in DNS resolution for Services via CoreDNS. Every Serv
 - `.svc.cluster.local`: The default Kubernetes DNS domain
 
 ### DNS Resolution Shortcuts
-
-| Form | Example | Resolves To | Scope |
-|------|---------|-------------|-------|
-| **Short name** | `web-service` | `web-service.<current-namespace>.svc.cluster.local` | Same namespace only |
-| **Namespace-qualified** | `web-service.api` | `web-service.api.svc.cluster.local` | Any namespace |
-| **Fully qualified** | `web-service.api.svc.cluster.local` | `web-service.api.svc.cluster.local` | Any namespace |
-| **Cluster-local** | `web-service.api.svc` | `web-service.api.svc.cluster.local` | Any namespace |
+ 
+ | Form | Example | Resolves To | Scope |
+ |------|---------|-------------|-------|
+ | **Short name** | `web-service` | `web-service.<current-namespace>.svc.cluster.local` | Same namespace only |
+ | **Namespace-qualified** | `web-service.api` | `web-service.api.svc.cluster.local` | Any namespace |
+ | **Fully qualified (FQDN)** | `web-service.api.svc.cluster.local` | `web-service.api.svc.cluster.local` | Any namespace |
+ | **Fully qualified with trailing dot** | `web-service.api.svc.cluster.local.` | `web-service.api.svc.cluster.local` (absolute) | Any namespace |
+ | **Cluster-local** | `web-service.api.svc` | `web-service.api.svc.cluster.local` | Any namespace |
+ 
+ **Note:** The trailing dot (`.`) makes the name **absolute**, bypassing the Linux DNS resolver's search path and `ndots` setting. Without it, queries with fewer than 5 dots (e.g., `web-service.api` has 1 dot) are treated as relative names, causing the resolver to append each search domain sequentially (see **DNS Search Path & ndots** below).
 
 **CKAD Exam Tip:** If a Pod in namespace `default` needs to reach a Service in namespace `api`, it must use the namespace-qualified form `web-service.api` (or the FQDN). Using just `web-service` will attempt DNS resolution in the `default` namespace and fail.
 
@@ -254,6 +257,8 @@ flowchart LR
 1. **Always name your Service ports** when there are multiple ports — required for DNS SRV records and CKAD exam clarity.
 2. **Use FQDN for cross-namespace calls** (`service.namespace.svc.cluster.local`) — short names only work within the same namespace.
 %comment with final dot i think, explain the 5dots linux serch
+### DNS Search Path & ndots
+
 Why should i use FQSN when servicename.namespace is always enough
 While servicename.namespace (or even just a short name within the same namespace) is usually enough for day-to-day functionality, using the full Fully Qualified Service Name (FQSN/FQDN) like servicename.namespace.svc.cluster.local offers critical advantages in performance, security, and strict environment management:
 1. Performance and DNS Optimization (ndots)
