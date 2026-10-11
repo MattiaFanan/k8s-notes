@@ -323,7 +323,7 @@ Summary
 
 | Mistake | Why It Fails | Correct Approach |
 |---------|-------------|------------------|
-| Using short DNS name for cross-namespace calls | DNS search suffix does not include the other namespace | Use FQDN or `service.other-namespace` %comment i think svcname.ns is not FQDN but only domain qualified |
+| Using short DNS name for cross-namespace calls | DNS search suffix does not include the other namespace | Use `service.other-namespace` (domain-qualified, resolved via the search path) or the true FQDN `service.other-namespace.svc.cluster.local.` (trailing dot makes it absolute, bypassing the search path) |
 | Forgetting to name ports in multi-port Service | DNS SRV records not created; confusing `kubectl describe svc` output | Always add `name` to multi-port Services |
 | Assuming ClusterIP is reachable externally | ClusterIP is a virtual IP only routable inside the cluster | Use NodePort, LoadBalancer, or Ingress for external access |
 | Creating a Service without Endpoints for a non-selector Service | No EndpointSlice created → connection refused | Manually create `Endpoints` object for non-selector Services |
