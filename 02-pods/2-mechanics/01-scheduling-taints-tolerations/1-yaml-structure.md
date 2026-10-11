@@ -8,7 +8,10 @@ Taints and tolerations work together to control which pods can be scheduled onto
 # Imperative taint
 kubectl taint nodes node1 key=value:NoSchedule
 
-# Remove taint from node
+# Remove taint from node (specify key, value, and effect exactly as added)
+kubectl taint nodes node1 key=value:NoSchedule-
+
+# Remove taint by key only (if taint had no value)
 kubectl taint nodes node1 key:NoSchedule-
 
 # Update existing taint
@@ -17,6 +20,22 @@ kubectl taint nodes node1 key=newvalue:NoSchedule --overwrite
 # Describe node to see taints
 kubectl describe node node1 | grep -A5 Taints
 ```
+
+## Taint Fields Reference
+
+| Component | Required | Description | Example |
+|-----------|----------|-------------|---------|
+| `key` | Yes | A label-like identifier for the taint | `dedicated` |
+| `value` | No | A string value associated with the key | `gpu` |
+| `effect` | Yes | How the scheduler/node controller responds | `NoSchedule` |
+
+### The Three Effects
+
+| Effect | Behavior |
+|--------|----------|
+| `NoSchedule` | Prevents the scheduler from placing new Pods on the node unless they tolerate the taint. Does not affect running Pods. |
+| `PreferNoSchedule` | A soft preference that the scheduler tries to honor but will override if no other nodes are available. |
+| `NoExecute` | Prevents scheduling AND evicts running Pods that do not tolerate the taint. The node controller manages eviction timing. |
 
 ## Pod with Toleration
 
