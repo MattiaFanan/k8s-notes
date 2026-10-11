@@ -131,7 +131,7 @@ spec:
 
 This pod will be scheduled on nodes that:
 1. Have the labels `kubernetes.io/os=linux` and `node-role.kubernetes.io/worker=""`
-2. Are NOT tainted with `NoSchedule` (unless the toleration matches) %comment seems to me that the tolleration is to allow schedule on manager
+2. Are NOT tainted with `NoSchedule` (unless the toleration matches). The toleration shown above (`node-role.kubernetes.io/control-plane` with `operator: Exists` and `effect: NoSchedule`) is what allows this pod to be scheduled on a control-plane (manager) node, which is tainted by default to keep user pods off it.
 
 ## Inspecting Node Labels
 
