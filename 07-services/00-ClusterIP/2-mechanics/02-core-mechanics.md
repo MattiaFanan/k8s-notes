@@ -45,16 +45,16 @@ spec:
 ### 2. Endpoint Tracking
 
 The Kubernetes control plane continuously monitors which Pods match a Service's selector and creates Endpoints (or the modern EndpointSlice) objects that list the IP addresses and ports of all ready matching Pods.
-%comment broken marmaid 
+
 ```mermaid
 flowchart TD
-    S[Service Created with Selector] --> W[Workload Controller]
-    W --> R[Creates Pods matching selector]
-    R --> H[Pod becomes Ready (readinessProbe passes)]
-    H --> C[EndpointSlice Controller detects match]
-    C --> E[Adds Pod IP:Port to EndpointSlice]
-    E --> I[kube-proxy updates iptables/IPVS rules]
-    I --> RT[Traffic can now reach the Pod]
+    S["Service Created with Selector"] --> W["Workload Controller"]
+    W --> R["Creates Pods matching selector"]
+    R --> H["Pod becomes Ready (readinessProbe passes)"]
+    H --> C["EndpointSlice Controller detects match"]
+    C --> E["Adds Pod IP:Port to EndpointSlice"]
+    E --> I["kube-proxy updates iptables/nftables/IPVS rules"]
+    I --> RT["Traffic can now reach the Pod"]
 ```
 
 #### EndpointSlice (Modern, K8s 1.21+)
