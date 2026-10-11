@@ -1,9 +1,10 @@
 # Storage - YAML Structure
 
-Kubernetes provides persistent storage through PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs). A PV is a cluster-administered volume, while a PVC is a user's request for that storage. StorageClasses define the type and provisioning behavior of storage. The examples below show how to define PVs, PVCs, StorageClasses, and how to mount a PVC into a Pod.
+Kubernetes provides persistent storage through PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs). 
 
-%comment make sure somewhere in this argoment folder, the fact that pv and pvc exist is to decouple pod volume usage and physical volume properties
-a pod says i want 10Gi and uses a pvc, but the admin can later change the type to cloud or local or a different cloud without the pod having to modify its yaml
+PersistentVolumes (PVs) represent cluster storage resources (the actual physical or provisioned storage), while PersistentVolumeClaims (PVCs) represent user requests for that storage. This decoupling allows Pod specs to reference storage needs via PVCs without needing to know the underlying storage backend, type, or provisioning details. A Pod can simply request "10Gi" through a PVC, and cluster administrators can change the underlying storage (e.g., local disk, cloud block storage, or a different provider) without modifying the Pod's YAML.
+
+StorageClasses define the type and provisioning behavior of storage. The examples below show how to define PVs, PVCs, StorageClasses, and how to mount a PVC into a Pod.
 
 ## PersistentVolume (PV) Manifest
 
