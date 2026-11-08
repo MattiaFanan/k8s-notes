@@ -24,7 +24,7 @@ metadata:
 
 spec:
   # ── Scheduling ───────────────────────────────────────────────────
-  nodeName: worker-node-1                     # pin to specific node (skips scheduling)
+  nodeName: worker-node-1                     # pin to specific node (skips scheduling -> so it ignores taints)
   nodeSelector:
     kubernetes.io/os: linux
     node-role.kubernetes.io/worker: "true"
