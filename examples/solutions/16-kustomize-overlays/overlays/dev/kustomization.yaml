@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kust-dev
+namePrefix: dev-
+labels:
+- pairs: {env: dev}
+  includeSelectors: true       # also adds env=dev to selectors and pod templates (like the old commonLabels)
+resources:
+- ../../base
+configMapGenerator:
+- name: web-config             # same name as in base + behavior merge = change the base generator
+  behavior: merge
+  literals:
+  - APP_ENV=dev
+  - LOG_LEVEL=debug

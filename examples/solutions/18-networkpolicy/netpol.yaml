@@ -1,0 +1,86 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: default-deny, namespace: np-18}
+spec:
+  podSelector: {}                # {} = every pod in the namespace
+  policyTypes: [Ingress, Egress] # listed type + no rules = deny everything of that type
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: allow-dns, namespace: np-18}
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels: {kubernetes.io/metadata.name: kube-system}   # label set automatically on every namespace
+      podSelector:
+        matchLabels: {k8s-app: kube-dns}
+    ports:
+    - {protocol: UDP, port: 53}
+    - {protocol: TCP, port: 53}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: web-ingress, namespace: np-18}
+spec:
+  podSelector: {matchLabels: {app: web}}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector: {matchLabels: {role: frontend}}   # podSelector alone = same namespace only
+    ports:
+    - {protocol: TCP, port: 5678}                    # the POD port, not the Service port 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: api-ingress, namespace: np-18}
+spec:
+  podSelector: {matchLabels: {app: api}}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector: {matchLabels: {role: frontend}}
+    - namespaceSelector: {matchLabels: {team: monitoring}}   # ONE list item with both selectors = AND
+      podSelector: {matchLabels: {app: prober}}
+    ports:
+    - {protocol: TCP, port: 5678}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: db-ingress, namespace: np-18}
+spec:
+  podSelector: {matchLabels: {app: db}}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector: {matchLabels: {app: api}}
+    ports:
+    - {protocol: TCP, port: 5678}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: frontend-egress, namespace: np-18}
+spec:
+  podSelector: {matchLabels: {role: frontend}}
+  policyTypes: [Egress]
+  egress:
+  - to:
+    - podSelector:
+        matchExpressions:
+        - {key: app, operator: In, values: [web, api]}
+    ports:
+    - {protocol: TCP, port: 5678}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: api-egress, namespace: np-18}
+spec:
+  podSelector: {matchLabels: {app: api}}
+  policyTypes: [Egress]
+  egress:
+  - to:
+    - podSelector: {matchLabels: {app: db}}
+    ports:
+    - {protocol: TCP, port: 5678}

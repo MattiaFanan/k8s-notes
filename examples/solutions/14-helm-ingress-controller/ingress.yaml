@@ -1,0 +1,9 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: {name: echo, namespace: helm-14}
+spec:                          # no ingressClassName: admission sets the (newest) default class
+  rules:
+  - host: echo.ckad.local
+    http:
+      paths:
+      - {path: /, pathType: Prefix, backend: {service: {name: echo, port: {number: 80}}}}

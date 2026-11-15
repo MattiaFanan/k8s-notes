@@ -1,0 +1,18 @@
+# kubectl patch deploy shop -n probe-21 --patch-file probes-patch.yaml   (strategic merge, container matched by name)
+spec:
+  template:
+    spec:
+      containers:
+      - name: nginx
+        readinessProbe:
+          tcpSocket: null               # remove the old handler: a probe may have only one
+          httpGet: {path: /, port: 80}
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: {path: /, port: 80}
+          periodSeconds: 10
+          failureThreshold: 3
+        startupProbe:
+          httpGet: {path: /, port: 80}
+          periodSeconds: 2
+          failureThreshold: 30

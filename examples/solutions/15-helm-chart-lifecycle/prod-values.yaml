@@ -1,0 +1,3 @@
+replicaCount: 3
+image:
+  tag: "1.27-alpine"           # quote tags: 1.10 unquoted would become the number 1.1

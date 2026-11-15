@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: LimitRange
+metadata: {name: dev-defaults, namespace: dev-32}
+spec:
+  limits:
+  - type: Container
+    default: {cpu: 200m}          # the quota covers limits.cpu, so every pod must have one
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata: {name: storage, namespace: storage-32}
+spec:
+  hard:
+    persistentvolumeclaims: "2"
+    requests.storage: 1Gi
+    local-path.storageclass.storage.k8s.io/requests.storage: 500Mi   # <class>.storageclass.storage.k8s.io/...
+---
+apiVersion: v1
+kind: LimitRange
+metadata: {name: pvc-limits, namespace: storage-32}
+spec:
+  limits:
+  - type: PersistentVolumeClaim
+    min: {storage: 100Mi}
+    max: {storage: 400Mi}
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata: {name: besteffort, namespace: batch-32}
+spec:
+  hard: {pods: "1"}
+  scopes: [BestEffort]            # only counts pods without any requests/limits
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata: {name: objects, namespace: batch-32}
+spec:
+  hard:
+    configmaps: "2"
+    services: "1"
+    services.nodeports: "0"

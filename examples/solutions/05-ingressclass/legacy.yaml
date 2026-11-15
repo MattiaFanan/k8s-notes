@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: legacy
+  namespace: ingress-05
+  # the deprecated kubernetes.io/ingress.class annotation is removed
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: legacy.ckad.local
+    http:
+      paths:
+      - {path: /, pathType: Prefix, backend: {service: {name: hello, port: {number: 80}}}}

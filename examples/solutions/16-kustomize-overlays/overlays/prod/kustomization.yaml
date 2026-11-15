@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kust-prod
+namePrefix: prod-
+labels:
+- pairs: {env: prod}
+  includeSelectors: true
+resources:
+- ../../base
+replicas:
+- name: web                    # the name BEFORE the prefix is applied
+  count: 3
+images:
+- name: nginx                  # matches the image name, without the tag
+  newTag: "1.27"
+configMapGenerator:
+- name: web-config
+  behavior: merge
+  literals:
+  - APP_ENV=prod
+  files:
+  - app.properties             # key = file name, value = file content

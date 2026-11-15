@@ -1,0 +1,6 @@
+# append to work/platform/values.yaml: values under the subchart's name are passed to it
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.27-alpine"

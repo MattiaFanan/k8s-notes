@@ -1,0 +1,9 @@
+controller:
+  service:
+    type: NodePort             # traefik's LoadBalancer already holds 80/443 on the node
+    nodePorts:
+      http: 30080
+      https: 30443
+  ingressClassResource:
+    name: nginx
+    default: true              # the chart adds ingressclass.kubernetes.io/is-default-class: "true"

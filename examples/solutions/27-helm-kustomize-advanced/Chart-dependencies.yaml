@@ -1,0 +1,6 @@
+# append to work/platform/Chart.yaml
+dependencies:
+- name: backend                # must equal the subchart's Chart.yaml name
+  version: 0.1.0               # semver constraint, e.g. "0.1.x" also works
+  repository: file://../backend   # local path; for remote: https://... or oci://...
+  condition: backend.enabled   # value in the PARENT chart that switches it on or off

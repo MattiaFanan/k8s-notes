@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: pod-reader, namespace: sa-08}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: read-pods, namespace: sa-08}
+rules:
+- apiGroups: [""]                 # "" = core API group (pods, services, secrets...)
+  resources: [pods]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [pods/log]           # subresources are listed as resource/subresource
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: read-pods, namespace: sa-08}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: read-pods}
+subjects:
+- {kind: ServiceAccount, name: pod-reader, namespace: sa-08}
+---
+# A RoleBinding to a ClusterRole grants the ClusterRole's rules ONLY in the RoleBinding's namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: view-other, namespace: sa-08-other}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: view}
+subjects:
+- {kind: ServiceAccount, name: pod-reader, namespace: sa-08}   # the SA lives in another namespace: that is fine

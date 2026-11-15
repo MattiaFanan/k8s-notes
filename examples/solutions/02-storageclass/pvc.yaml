@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: web-data
+  namespace: storage-02
+spec:
+  storageClassName: local-retain
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scratch
+  namespace: storage-02
+spec:                          # no storageClassName -> admission sets the default (local-path)
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Mi

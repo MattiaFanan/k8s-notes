@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: builder
+  namespace: sa-07
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: builder-token
+  namespace: sa-07
+  annotations:
+    kubernetes.io/service-account.name: builder   # the token controller fills data.token for this SA
+type: kubernetes.io/service-account-token

@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: secure, namespace: psa-19}
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+  - name: nginx
+    image: nginxinc/nginx-unprivileged:1.27-alpine
+    ports: [{containerPort: 8080}]
+    securityContext:                  # these four are container-level only
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities: {drop: [ALL]}
+    volumeMounts:
+    - {name: tmp, mountPath: /tmp}    # nginx-unprivileged writes pid + cache under /tmp
+  volumes:
+  - {name: tmp, emptyDir: {}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: ids, namespace: psa-19}
+spec:
+  securityContext:                    # pod level: applies to every container
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000                     # supplementary group + group owner of mounted volumes
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+  - name: c
+    image: busybox:1.36
+    command: [sleep, "3600"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {drop: [ALL]}
+    volumeMounts:
+    - {name: data, mountPath: /data}
+  volumes:
+  - {name: data, emptyDir: {}}

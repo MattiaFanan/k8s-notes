@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shop
+  namespace: ingress-04
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: shop.ckad.local
+    http:
+      paths:
+      - path: /web
+        pathType: Prefix          # matches /web, /web/, /web/x (whole path segments, not /webx)
+        backend:
+          service:
+            name: web
+            port: {number: 8080}  # the Service port, not the containerPort
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api
+            port: {name: http}    # name of the Service port
+      - path: /healthz
+        pathType: Exact           # only exactly /healthz
+        backend:
+          service:
+            name: web
+            port: {number: 8080}
+  - host: admin.ckad.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api
+            port: {number: 9090}

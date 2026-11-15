@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: helm-27-kust
+resources:
+- rendered.yaml
+labels:
+- pairs: {rendered-by: kustomize}
+  includeSelectors: false        # labels only on metadata; selectors are immutable, don't touch them
+replicas:
+- name: plat-platform
+  count: 3

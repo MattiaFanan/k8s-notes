@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass                     # cluster-scoped, like IngressClass
+metadata: {name: ckad-gw}
+spec:
+  controllerName: traefik.io/gateway-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway                          # owned by the platform team
+metadata: {name: web-gw, namespace: gateway-system}
+spec:
+  gatewayClassName: ckad-gw
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 8000                         # traefik maps listeners to its entrypoints by port (web = 8000)
+    hostname: "*.ckad.local"
+    allowedRoutes:
+      namespaces:
+        from: Selector                 # Same (default) | All | Selector
+        selector:
+          matchLabels: {gateway-access: "true"}

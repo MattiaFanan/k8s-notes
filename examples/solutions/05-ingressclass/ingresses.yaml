@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-internal
+  namespace: ingress-05
+spec:
+  ingressClassName: traefik-internal
+  rules:
+  - host: internal.ckad.local
+    http:
+      paths:
+      - {path: /, pathType: Prefix, backend: {service: {name: hello, port: {number: 80}}}}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-default
+  namespace: ingress-05
+spec:                          # no ingressClassName: admission fills in the default class
+  rules:
+  - host: default.ckad.local
+    http:
+      paths:
+      - {path: /, pathType: Prefix, backend: {service: {name: hello, port: {number: 80}}}}

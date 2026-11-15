@@ -1,0 +1,14 @@
+apiVersion: apps/v1                # was extensions/v1beta1 (removed in 1.16)
+kind: Deployment
+metadata: {name: web, namespace: api-26}
+spec:
+  replicas: 2
+  selector:                        # REQUIRED in apps/v1 (old versions guessed it from the template labels)
+    matchLabels: {app: web}
+  template:
+    metadata: {labels: {app: web}}
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        resources: {requests: {cpu: 50m}}

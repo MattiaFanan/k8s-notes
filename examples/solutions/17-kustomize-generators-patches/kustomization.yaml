@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kust-17
+resources:
+- deployment.yaml
+configMapGenerator:
+- name: api-config
+  literals:
+  - LOG_LEVEL=info             # step 8: change to warn
+  files:
+  - settings.json
+- name: api-static
+  literals:
+  - OWNER=team-a
+  options:
+    disableNameSuffixHash: true   # only for this generator (generatorOptions: would apply to all)
+secretGenerator:
+- name: api-secret
+  literals:
+  - DB_PASSWORD=changeme       # stored base64-encoded; still plain text in git!
+patches:
+- path: patch-resources.yaml   # strategic merge: a partial object, matched by kind + name
+- target:
+    kind: Deployment
+    name: api
+  patch: |-                    # JSON 6902: a list of operations on paths
+    - op: replace
+      path: /spec/replicas
+      value: 2

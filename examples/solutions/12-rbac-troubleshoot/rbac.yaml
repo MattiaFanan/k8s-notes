@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: ci-deployer, namespace: rbac-12}
+rules:
+- apiGroups: [apps]                     # was "": Deployments are in the apps group
+  resources: [deployments]
+  verbs: [get, list, watch, create, update, patch]   # no delete
+- apiGroups: [apps]
+  resources: [deployments/scale]        # scaling is a separate subresource
+  verbs: [get, update, patch]
+- apiGroups: [""]
+  resources: [pods, pods/log]           # was "pod": resource names are plural
+  verbs: [get, list]                    # pods/log only needs get; list on it is harmless

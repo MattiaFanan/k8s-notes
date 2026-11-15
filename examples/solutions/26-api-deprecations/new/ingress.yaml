@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1   # was extensions/v1beta1 (removed in 1.22)
+kind: Ingress
+metadata: {name: web, namespace: api-26}
+spec:
+  ingressClassName: traefik        # replaces the kubernetes.io/ingress.class annotation
+  rules:
+  - host: web.ckad.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix           # now required
+        backend:
+          service:                 # was serviceName / servicePort
+            name: web
+            port: {number: 80}

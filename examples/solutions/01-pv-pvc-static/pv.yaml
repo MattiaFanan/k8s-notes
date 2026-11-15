@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-logs
+  labels:
+    tier: logs                 # the PVC selector matches on this
+spec:
+  capacity:
+    storage: 200Mi
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual     # just a name: no StorageClass object needed for static binding
+  hostPath:
+    path: /tmp/ckad/pv-logs
+    type: DirectoryOrCreate

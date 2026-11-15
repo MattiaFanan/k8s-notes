@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-db
+  namespace: storage-03
+spec:
+  storageClassName: slow
+  accessModes: [ReadWriteOnce]   # was ReadWriteMany: the PV only offers RWO
+  resources:
+    requests:
+      storage: 1Gi               # was 2Gi: a PV must be >= the request

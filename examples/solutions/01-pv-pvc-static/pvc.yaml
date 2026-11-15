@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-logs
+  namespace: storage-01
+spec:
+  storageClassName: manual     # must equal the PV's class, otherwise the default class (local-path) is used
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 100Mi
+  selector:
+    matchLabels:
+      tier: logs

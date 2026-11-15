@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: batch, namespace: jobs-23}
+spec:
+  completions: 6                 # successful pods needed
+  parallelism: 2                 # pods running at the same time
+  backoffLimit: 2                # retries before the Job is Failed
+  activeDeadlineSeconds: 120     # whole-Job time limit (wins over backoffLimit)
+  ttlSecondsAfterFinished: 600   # garbage-collect the Job + pods 10 min after it finishes
+  template:
+    spec:
+      restartPolicy: Never       # Jobs need Never or OnFailure
+      containers:
+      - name: c
+        image: busybox:1.36
+        command: ["sh", "-c", "echo processed by $HOSTNAME; sleep 2"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: indexed, namespace: jobs-23}
+spec:
+  completions: 3
+  parallelism: 3
+  completionMode: Indexed        # each pod gets JOB_COMPLETION_INDEX = 0..completions-1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: busybox:1.36
+        command: ["sh", "-c", "echo index=$JOB_COMPLETION_INDEX"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: failer, namespace: jobs-23}
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - {name: c, image: busybox:1.36, command: ["sh", "-c", "exit 1"]}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: reporter, namespace: jobs-23}
+spec:
+  schedule: "*/5 * * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid      # Allow (default) | Forbid (skip the new run) | Replace (kill the old one)
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - {name: c, image: busybox:1.36, command: ["sh", "-c", "date; echo report done"]}

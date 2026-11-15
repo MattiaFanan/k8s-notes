@@ -1,0 +1,26 @@
+apiVersion: ckad.example.com/v1
+kind: Backup
+metadata: {name: nightly, namespace: crd-25}
+spec:
+  schedule: "0 2 * * *"
+  retention: 7
+  target: db
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: backup-operator, namespace: crd-25}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: backup-editor, namespace: crd-25}
+rules:
+- apiGroups: [ckad.example.com]       # the CRD's group
+  resources: [backups]                # the plural
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: backup-editor, namespace: crd-25}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: backup-editor}
+subjects:
+- {kind: ServiceAccount, name: backup-operator, namespace: crd-25}
