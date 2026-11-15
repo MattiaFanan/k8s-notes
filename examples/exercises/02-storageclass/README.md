@@ -15,3 +15,5 @@ Run `./setup.sh` first. Namespace: `storage-02`. k3s ships the `rancher.io/local
    - What happens to the dynamically created PV when `web-data` is deleted?
 
 Check with `./verify.sh`, clean up with `./teardown.sh`.
+
+remember describe the pv and to remove it from /var/lib/rancher/k3s/storage/pvc-... or whatever is your path 
