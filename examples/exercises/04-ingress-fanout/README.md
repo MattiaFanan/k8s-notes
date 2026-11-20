@@ -16,11 +16,15 @@ Create **one** Ingress `shop` (class `traefik`) with these rules:
 | `shop.ckad.local`  | `/healthz` | Exact  | `web`, port 8080 |
 | `admin.ckad.local` | `/`        | Prefix | `api`, port 9090 |
 
-Test it (traefik listens on localhost):
+Test it (traefik listens on localhost through a LoadBalancer):
 ```bash
-curl -H 'Host: shop.ckad.local'  http://127.0.0.1/web/x      # web
-curl -H 'Host: shop.ckad.local'  http://127.0.0.1/healthz/x  # 404 (Exact)
-curl -H 'Host: admin.ckad.local' http://127.0.0.1/anything   # api
+# get traefik ip
+kubectl get svc -o wide -A
+```
+```bash
+curl -H 'Host: shop.ckad.local'  http://TRAEFIK_IP/web/x      # web
+curl -H 'Host: shop.ckad.local'  http://TRAEFIK_IP/healthz/x  # 404 (Exact)
+curl -H 'Host: admin.ckad.local' http://TRAEFIK_IP/anything   # api
 ```
 Bonus: write the Ingress with `kubectl create ingress` (no YAML).
 

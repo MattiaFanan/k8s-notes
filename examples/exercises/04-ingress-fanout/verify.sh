@@ -10,11 +10,22 @@ check "/web uses port number 8080"   eq "$(ing '{.spec.rules[?(@.host=="shop.cka
 check "/healthz pathType Exact"      eq "$(ing '{.spec.rules[?(@.host=="shop.ckad.local")].http.paths[?(@.path=="/healthz")].pathType}')" Exact
 sleep 2   # give traefik a moment to pick up changes
 echo "Routing through traefik"
-check "shop /web      -> web"        eq "$(http shop.ckad.local /web)" web
-check "shop /web/x    -> web"        eq "$(http shop.ckad.local /web/x)" web
-check "shop /api/v1   -> api"        eq "$(http shop.ckad.local /api/v1)" api
-check "shop /healthz  -> web"        eq "$(http shop.ckad.local /healthz)" web
-check "shop /healthz/x -> not routed" no eq "$(http shop.ckad.local /healthz/x)" web
-check "shop /other    -> 404"        eq "$(curl -s -o /dev/null -w '%{http_code}' -m 5 -H 'Host: shop.ckad.local' http://127.0.0.1/other)" 404
-check "admin /anything -> api"       eq "$(http admin.ckad.local /anything)" api
+
+LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+if [ -z "$LB_IP" ]; then
+  LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+fi
+if [ -z "$LB_IP" ]; then
+  LB_IP="127.0.0.1"
+fi
+
+http_lb() { curl -s -m 5 -H "Host: $1" "http://$LB_IP$2"; }
+
+check "shop /web      -> web"        eq "$(http_lb shop.ckad.local /web)" web
+check "shop /web/x    -> web"        eq "$(http_lb shop.ckad.local /web/x)" web
+check "shop /api/v1   -> api"        eq "$(http_lb shop.ckad.local /api/v1)" api
+check "shop /healthz  -> web"        eq "$(http_lb shop.ckad.local /healthz)" web
+check "shop /healthz/x -> not routed" no eq "$(http_lb shop.ckad.local /healthz/x)" web
+check "shop /other    -> 404"        eq "$(curl -s -o /dev/null -w '%{http_code}' -m 5 -H 'Host: shop.ckad.local' http://$LB_IP/other)" 404
+check "admin /anything -> api"       eq "$(http_lb admin.ckad.local /anything)" api
 summary
