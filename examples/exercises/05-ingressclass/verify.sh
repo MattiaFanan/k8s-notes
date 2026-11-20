@@ -11,8 +11,20 @@ check "hello-default got class traefik"      eq "$(get ing hello-default -n $N -
 check "legacy has no ingress.class annotation" eq "$(get ing legacy -n $N -o jsonpath='{.metadata.annotations.kubernetes\.io/ingress\.class}')" ""
 check "legacy uses spec.ingressClassName traefik" eq "$(get ing legacy -n $N -o jsonpath='{.spec.ingressClassName}')" traefik
 sleep 2
+
 echo "Routing"
-check "internal.ckad.local -> hello" eq "$(http internal.ckad.local /)" hello
-check "default.ckad.local  -> hello" eq "$(http default.ckad.local /)" hello
-check "legacy.ckad.local   -> hello" eq "$(http legacy.ckad.local /)" hello
+
+LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+if [ -z "$LB_IP" ]; then
+  LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+fi
+if [ -z "$LB_IP" ]; then
+  LB_IP="127.0.0.1"
+fi
+
+http_lb() { curl -s -m 5 -H "Host: $1" "http://$LB_IP$2"; }
+
+check "internal.ckad.local -> hello" eq "$(http_lb internal.ckad.local /)" hello
+check "default.ckad.local  -> hello" eq "$(http_lb default.ckad.local /)" hello
+check "legacy.ckad.local   -> hello" eq "$(http_lb legacy.ckad.local /)" hello
 summary

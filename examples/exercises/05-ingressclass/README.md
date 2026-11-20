@@ -11,11 +11,15 @@ k3s has one IngressClass, `traefik`, handled by controller `traefik.io/ingress-c
    Then look at its `spec.ingressClassName`. Who set it?
 5. Setup created an Ingress `legacy` (host `legacy.ckad.local`) that traefik ignores.
    Find out why and fix it so traefik serves it, using the **current** way to select a class.
-6. All three must answer:
+6. All three must answer (traefik listens on localhost through a LoadBalancer):
    ```bash
-   curl -H 'Host: internal.ckad.local' http://127.0.0.1/   # hello
-   curl -H 'Host: default.ckad.local'  http://127.0.0.1/   # hello
-   curl -H 'Host: legacy.ckad.local'   http://127.0.0.1/   # hello
+   # get traefik ip
+   kubectl get svc -o wide -A
+   ```
+   ```bash
+   curl -H 'Host: internal.ckad.local' http://TRAEFIK_IP/   # hello
+   curl -H 'Host: default.ckad.local'  http://TRAEFIK_IP/   # hello
+   curl -H 'Host: legacy.ckad.local'   http://TRAEFIK_IP/   # hello
    ```
 
 Check with `./verify.sh`, clean up with `./teardown.sh`.
