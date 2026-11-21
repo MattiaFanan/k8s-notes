@@ -17,8 +17,12 @@ Run `./setup.sh` first. Namespaces: `sa-08` and `sa-08-other` (it contains a Ser
    command:
       - "/bin/sh"
       - "-c"
-      - 'while true; do sleep 10; curl -k -X GET "https://kubernetes.default.svc/api/v1/namespaces/sa-08/pods" -H "Authorization: Bearer $(cat TOKEN_MOUNT_PATH/token)"; done'
+      - 'while true; do sleep 10; curl -s --cacert TOKEN_MOUNT_PATH/ca.crt -X GET "https://kubernetes.default.svc/api/v1/namespaces/sa-08/pods" -H "Authorization: Bearer $(cat TOKEN_MOUNT_PATH/token)"; done'
    ```
+   - -s to reduce info returned
+   - --cacert (or -k) is needed to make curl trust the connection
+   - -H sets the serviceaccount token to avoid the 403 unauthorized
+
 5. Check with `kubectl auth can-i ... --as=system:serviceaccount:sa-08:pod-reader`:
    - can list pods in sa-08, cannot delete them
    - cannot list secrets in sa-08
