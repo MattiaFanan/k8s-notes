@@ -11,6 +11,14 @@ Run `./setup.sh` first. Namespaces: `sa-08` and `sa-08-other` (it contains a Ser
    every 10 seconds, lists the pods of `sa-08` through the API server, **using the mounted token and CA**:
    `https://kubernetes.default.svc/api/v1/namespaces/sa-08/pods`.
    The response must be in the pod logs.
+
+   You can see the token mount path from the pod once started.
+   ```bash
+   command:
+      - "/bin/sh"
+      - "-c"
+      - 'while true; do sleep 10; curl -k -X GET "https://kubernetes.default.svc/api/v1/namespaces/sa-08/pods" -H "Authorization: Bearer $(cat TOKEN_MOUNT_PATH/token)"; done'
+   ```
 5. Check with `kubectl auth can-i ... --as=system:serviceaccount:sa-08:pod-reader`:
    - can list pods in sa-08, cannot delete them
    - cannot list secrets in sa-08
