@@ -4,7 +4,7 @@ Run `./setup.sh` first. It creates **new** files in `exercises/10-kubeconfig-con
 - `multi.kubeconfig`: clusters `k3s` (the real cluster) and `prod` (fake), several users and contexts
 - `extra.kubeconfig`: a cluster `staging` with user `staging-dev` and context `staging-dev`
 
-Work **only** on these files, with `--kubeconfig work/multi.kubeconfig` or
+Work **only** on multi.kubeconfig, with `--kubeconfig work/multi.kubeconfig` or
 `export KUBECONFIG=$PWD/work/multi.kubeconfig` (in that shell only). `~/.kube/k3s.yaml` must not change.
 Do steps 1–3 **before** you change anything.
 
