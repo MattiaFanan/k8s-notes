@@ -15,8 +15,8 @@ traefik already uses ports 80/443 on this node, so the new controller is exposed
    Which class did it get? traefik is also marked default. Why did nginx win?
 4. Test:
    ```bash
-   curl -H 'Host: echo.ckad.local' http://127.0.0.1:30080/   # echo  (ingress-nginx)
-   curl -H 'Host: echo.ckad.local' http://127.0.0.1/         # 404   (traefik ignores it)
+   curl -H 'Host: echo.ckad.local' http://TRAEFIK_IP:30080/   # echo  (ingress-nginx)
+   curl -H 'Host: echo.ckad.local' http://TRAEFIK_IP/         # 404   (traefik ignores it)
    ```
 5. Look at the release with `helm list -A`, `helm status`, `helm get values`, `helm get manifest`.
    Do **not** modify the traefik IngressClass.

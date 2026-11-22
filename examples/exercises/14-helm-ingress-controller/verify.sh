@@ -15,7 +15,17 @@ check "IngressClass nginx controller k8s.io/ingress-nginx" eq "$(get ingressclas
 check "traefik IngressClass untouched (still default)" eq "$(get ingressclass traefik -o jsonpath='{.metadata.annotations.ingressclass\.kubernetes\.io/is-default-class}')" true
 check "ingress echo got class nginx"   eq "$(get ing echo -n helm-14 -o jsonpath='{.spec.ingressClassName}')" nginx
 sleep 2
+
+
+LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+if [ -z "$LB_IP" ]; then
+  LB_IP=$(kubectl get svc -n kube-system traefik -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+fi
+if [ -z "$LB_IP" ]; then
+  LB_IP="127.0.0.1"
+fi
+
 echo "Routing"
-check "via ingress-nginx :30080 -> echo" eq "$(curl -s -m 5 -H 'Host: echo.ckad.local' http://127.0.0.1:30080/)" echo
-check "via traefik :80 -> 404"         eq "$(curl -s -o /dev/null -w '%{http_code}' -m 5 -H 'Host: echo.ckad.local' http://127.0.0.1/)" 404
+check "via ingress-nginx :30080 -> echo" eq "$(curl -s -m 5 -H 'Host: echo.ckad.local' http://$LB_IP:30080/)" echo
+check "via traefik :80 -> 404"         eq "$(curl -s -o /dev/null -w '%{http_code}' -m 5 -H 'Host: echo.ckad.local' http://$LB_IP/)" 404
 summary
