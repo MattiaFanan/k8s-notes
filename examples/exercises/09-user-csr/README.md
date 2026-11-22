@@ -20,3 +20,5 @@ Kubernetes has no User objects. A "user" is whoever presents a certificate signe
    jane must not be able to read secrets, or create deployments in `default`.
 
 Check with `./verify.sh`, clean up with `./teardown.sh`.
+
+CSR are deleted after 1h if approved (24h if pending), recreate it if it took too much to finish the test and you see a FAIL on CSR checks.
